@@ -1,0 +1,440 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.SpaceSchedule>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        //---------------------------------------------------
+        SPACE_CONTROLLER = "McoSpace/";
+        SPACE_MODULE = "SPACE";
+
+        scheduleId = 0;
+        currentDisplayedMonth = 0;
+        actualMonth = 0;
+        //-----------------------------------------------
+
+        TimeFiller($("#mco-space-div #SPACE_hourselector"), $("#mco-space-div #SPACE_minuteselector"));
+
+        NextMonthBuilder();
+
+        CalendarBuilder($("#mco-space-div #SPACE_thismonth-div"));
+
+        TriggerTimeChanges(SPACE_MODULE);
+
+        $("#mco-space-div .calendar-table-td").click(function () {
+            if ($(this).hasClass("passedDay")) {
+                return false;
+            }
+            pickedday = $(this);
+            $("#mco-space-div .calendar-table-td").each(function () {
+                if ($(this).hasClass("daypicked")) {
+                    $(this).removeClass("daypicked");
+                }
+            });
+            pickedday.addClass("daypicked");
+        });
+
+        $("#mco-space-div #scheduler-btn").click(function () {
+            if ($("#mco-space-div .daypicked").length != 1) {
+                alert("Veuillez d'abord sélectionner une date avant de procéder!!");
+            }
+            else {
+                now = new Date();
+                ParentTable = $("#mco-space-div .daypicked").closest("table");
+                source = ParentTable.attr('id').match(/next/);
+                authorized = false;
+                if (source != null) {
+                    scheduled = new Date(now.getFullYear(), $("#mco-space-div .daypicked").attr("name"),
+                        $("#mco-space-div .daypicked").text(), $("#mco-space-div #SPACE_hourselectorinput").val(),
+                        $("#mco-space-div #SPACE_minuteselectorinput").val(), 0, 0);
+                }
+                else {
+                    scheduled = new Date(now.getFullYear(), now.getMonth(),
+                        $("#mco-space-div .daypicked").text(), $("#mco-space-div #SPACE_hourselectorinput").val(),
+                        $("#mco-space-div #SPACE_minuteselectorinput").val(), 0, 0);
+                }
+                if ((scheduled - now) < 300000) {
+                    scheduled = new Date(now.getFullYear(), now.getMonth(),
+                        $("#mco-space-div .daypicked").text(), now.getHours(),
+                        now.getMinutes() + 3, 0, 0);
+                    authorized = confirm("Vous devez planifier au moins 03 minutes en avance \n" +
+                            "Voulez-vous valider votre choix pour " + scheduled + "?");
+                }
+                else {
+                    authorized = true;
+                }
+                if (authorized) {
+                    SPACE_MCO_DIV.prepend(loadinggif);
+                    $.ajax({
+                        url: SITENAME + SPACE_CONTROLLER + 'CreateSchedule',
+                        type: "POST",
+                        data: { day: scheduled.getDate(), month: scheduled.getMonth(),
+                            year: scheduled.getFullYear(), hours: scheduled.getHours(),
+                            minutes: scheduled.getMinutes(),
+                            multiplicity: $("#mco-space-div #multiplicity").val(),
+                            taskname: $("#mco-space-div #taskname").val()
+                        },
+                        success: function (data) {
+                            alert(data);
+                        },
+                        error: function (errorThrown) {
+                            alert('Erreur lors de la communication avec le serveur');
+                        },
+                        complete: function () {
+                            NAV_SPACE_SCHEDULER_BTN.trigger("click");
+                            colourTitles();
+                        }
+                    });
+                }
+            }
+        });
+
+        $("#mco-space-div input").focus(
+            function () {
+                $(this).select();
+            }
+        ).mouseup(
+            function (e) {
+                e.preventDefault();
+            }
+        );
+
+        $("#mco-space-div .deleter").click(function () {
+            oldColor = $(this).closest("tr").css("background-color");
+            $(this).closest("tr").css("background-color", "#ffef6c");
+            deletor = confirm("Voulez vous réellement supprimer cette planification?");
+            if (deletor) {
+                scheduleId = $(this).closest("td").find(".action-id-getter").val();
+                $.ajax({
+                    url: SITENAME + SPACE_CONTROLLER + 'DeleteSchedule/' + scheduleId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        SPACE_MCO_DIV.html(error.responseText);
+                    },
+                    complete: function () {
+                        NAV_SPACE_SCHEDULER_BTN.trigger("click");
+                        colourTitles();
+                    }
+                });
+            }
+            else {
+                $(this).closest("tr").css("background-color", oldColor);
+            }
+        });
+
+        $("#mco-space-div .details-viewer").click(function () {
+            scheduleId = $(this).closest("td").find(".action-id-getter").val();
+            $.ajax({
+                url: SITENAME + SPACE_CONTROLLER + 'DisplayScheduleReports/' + scheduleId,
+                type: "GET",
+                success: function (response) {
+                    SPACE_MCO_DIV.html(response);
+                },
+                error: function (error) {
+                    SPACE_MCO_DIV.html(error.responseText);
+                },
+                complete: function () {
+                    previous = "<div id='previous-link-div' class='previous-link'>Retour" +
+                        "<a class='previous-link-a' id='previous-link-a' href='" + scheduleId + "'>previous</a></div>";
+                    SPACE_MCO_DIV.prepend(previous);
+                    colourTitles();
+                }
+            });
+        });
+
+        $("#mco-space-div .details-editor").click(function () {
+            columns = $(this).closest("tr").find("td");
+            $("#mco-space-div #taskname").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
+            launchingDate = columns.eq(2).text().replace(/^\s+|\s+$/g, '').split(" ");
+            var day = launchingDate[0].split("/")[0];
+            var month = launchingDate[0].split("/")[1];
+            var hour = launchingDate[1].split(":")[0];
+            var minute = launchingDate[1].split(":")[1];
+            var multiplicity = columns.eq(4).text().replace(/^\s+|\s+$/g, '');
+            switch (multiplicity) {
+                case "Une fois": $("#mco-space-div #multiplicity").prop("selectedIndex", 0); break;
+                case "Quotidien": $("#mco-space-div #multiplicity").prop("selectedIndex", 1); break;
+                case "Hebdomadaire ": $("#mco-space-div #multiplicity").prop("selectedIndex", 2); break;
+            }
+            scheduleId = columns.eq(7).find(".action-id-getter").val();
+            $("#mco-space-div #SPACE_hourselectorinput").val(hour); $("#mco-space-div #SPACE_hourselector").prop("selectedIndex", hour);
+            $("#mco-space-div #SPACE_minuteselectorinput").val(minute); $("#mco-space-div #SPACE_minuteselector").prop("selectedIndex", minute);
+            $("#mco-space-div .displayedmonth-div div").each(function () {
+                if (!($(this).hasClass("hidden-month"))) {
+                    $(this).addClass("hidden-month");
+                }
+                if (($(this).hasClass("displayed-month"))) {
+                    $(this).removeClass("displayed-month");
+                }
+            });
+            var scheduledMonth = $("#mco-space-div .displayedmonth-div").find("div").eq(month - actualMonth - 1);
+            scheduledMonth.removeClass("hidden-month");
+            scheduledMonth.addClass("displayed-month");
+            scheduledMonth.find(".calendar-table-td").each(function () {
+                if ($(this).hasClass("daypicked")) {
+                    $(this).removeClass("daypicked");
+                }
+                if ($(this).text().replace(/^\s+|\s+$/g, '') == day || "0" + $(this).text().replace(/^\s+|\s+$/g, '') == day) {
+                    pickedday = $(this);
+                    if (!pickedday.hasClass("passedDay")) {
+                        pickedday.addClass("daypicked");
+                    }
+                }
+            });
+            if ($("#mco-space-div .daypicked").length != 1) {
+                $("#mco-space-div .calendar-table-td").each(function () {
+                    if ($(this).hasClass("daypicked")) {
+                        $(this).removeClass("daypicked");
+                    }
+                });
+                alert("La date de planification étant passée, la date d'aujourd'hui a été" +
+                    " sélectionnée par défaut.");
+                newpickedday = $("#mco-space-div #SPACE_thismonth-div").find(".today");
+                newpickedday.addClass("daypicked");
+
+            }
+
+            $("#mco-space-div #scheduler-btn").css("visibility", "hidden");
+            $("#mco-space-div #scheduler-btn").css("display", "none");
+            $("#mco-space-div .schedule-editor-control").css("visibility", "visible");
+            $("#mco-space-div .schedule-editor-control").css("display", "inline");
+
+        });
+
+        $("#mco-space-div #scheduler-btn-cancelor").click(function () {
+            $("#mco-space-div #taskname").val("");
+            $("#mco-space-div #multiplicity").prop("selectedIndex", 0);
+            $("#mco-space-div #SPACE_hourselectorinput").val("00"); $("#mco-space-div #SPACE_hourselector").prop("selectedIndex", 0);
+            $("#mco-space-div #SPACE_minuteselectorinput").val("00"); $("#mco-space-div #SPACE_minuteselector").prop("selectedIndex", 0);
+            $("#mco-space-div .daypicked").removeClass("daypicked");
+            $("#mco-space-div .schedule-editor-control").css("visibility", "hidden");
+            $("#mco-space-div .schedule-editor-control").css("display", "none");
+            $("#mco-space-div #scheduler-btn").css("visibility", "visible");
+            $("#mco-space-div #scheduler-btn").css("display", "inline");
+            $("#mco-space-div .displayedmonth-div div").each(function () {
+                if (!($(this).hasClass("hidden-month"))) {
+                    $(this).addClass("hidden-month");
+                }
+                if (($(this).hasClass("displayed-month"))) {
+                    $(this).removeClass("displayed-month");
+                }
+            });
+            currentDisplayedMonth = actualMonth;
+            $("#mco-space-div .SPACE_thismonth-div").removeClass("hidden-month");
+            $("#mco-space-div .SPACE_thismonth-div").addClass("displayed-month");
+            currentDisplayedMonth = 0;
+            actualMonth = 0;
+            CalendarBuilder();
+        });
+
+        $("#mco-space-div #scheduler-btn-editor").click(function () {
+            if ($("#mco-space-div .daypicked").length != 1) {
+                alert("Veuillez d'abord sélectionner une date avant de procéder!!");
+            }
+            else {
+                now = new Date();
+                ParentTable = $("#mco-space-div .daypicked").closest("table");
+                source = ParentTable.attr('id').match(/next/);
+                if (source != null) {
+                    scheduled = new Date(now.getFullYear(), $("#mco-space-div .daypicked").attr("name"),
+                        $("#mco-space-div .daypicked").text(), $("#mco-space-div #SPACE_hourselectorinput").val(),
+                        $("#mco-space-div #SPACE_minuteselectorinput").val(), 0, 0);
+                }
+                else {
+                    scheduled = new Date(now.getFullYear(), now.getMonth(),
+                        $("#mco-space-div .daypicked").text(), $("#mco-space-div #SPACE_hourselectorinput").val(),
+                        $("#mco-space-div #SPACE_minuteselectorinput").val(), 0, 0);
+                }
+                if ((scheduled - now) < 300000) {
+                    scheduled = new Date(now.getFullYear(), now.getMonth(),
+                        $("#mco-space-div .daypicked").text(), now.getHours(),
+                        now.getMinutes() + 3, 0, 0);
+                    authorized = confirm("Vous devez planifier au moins 03 minutes en avance \n" +
+                            "Voulez-vous valider votre choix pour " + scheduled + "?");
+                }
+                else {
+                    authorized = true;
+                }
+                if (authorized) {
+                    autocorrect = $("#mco-space-div #autocorrect").prop("checked");
+                    SPACE_MCO_DIV.prepend(loadinggif);
+                    $.ajax({
+                        url: SITENAME + SPACE_CONTROLLER + 'EditSchedule/' + scheduleId,
+                        type: "POST",
+                        data: { day: scheduled.getDate(), month: scheduled.getMonth(),
+                            year: scheduled.getFullYear(), hours: scheduled.getHours(),
+                            minutes: scheduled.getMinutes(),
+                            multiplicity: $("#mco-space-div #multiplicity").val(),
+                            taskname: $("#mco-space-div #taskname").val()
+                        },
+                        success: function (data) {
+                            alert(data);
+                        },
+                        error: function (errorThrown) {
+                            alert(errorThrown.responseText);
+                        },
+                        complete: function () {
+                            NAV_SPACE_SCHEDULER_BTN.trigger("click");
+                            colourTitles();
+                        }
+                    });
+                }
+            }
+        });
+
+        $("#mco-space-div .email-sender").click(function () {
+            scheduleId = $(this).closest("td").find(".action-id-getter").val();
+            sendagain = confirm("Voulez-vous envoyer ce rapport de nouveaux à ses destinataires?");
+            if (sendagain) {
+                $.ajax({
+                    url: SITENAME + SPACE_CONTROLLER + 'ReSendLastEmail/' + scheduleId,
+                    type: "GET",
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de communication avec le serveur');
+                    }
+                });
+            }
+        });
+
+        $("#mco-space-div #next-month").click(function () {
+            if (currentDisplayedMonth < 11) {
+                $("#mco-space-div .displayedmonth-div div").each(function () {
+                    if (!($(this).hasClass("hidden-month"))) {
+                        $(this).addClass("hidden-month");
+                    }
+                    if (($(this).hasClass("displayed-month"))) {
+                        $(this).removeClass("displayed-month");
+                    }
+                });
+                currentDisplayedMonth++;
+                $("#mco-space-div #nextmonth-div-" + currentDisplayedMonth).removeClass("hidden-month");
+                $("#mco-space-div #nextmonth-div-" + currentDisplayedMonth).addClass("displayed-month");
+            }
+        });
+
+        $("#mco-space-div #previous-month").click(function () {
+            if (currentDisplayedMonth > actualMonth + 1) {
+                $("#mco-space-div .displayedmonth-div div").each(function () {
+                    if (!($(this).hasClass("hidden-month"))) {
+                        $(this).addClass("hidden-month");
+                    }
+                    if (($(this).hasClass("displayed-month"))) {
+                        $(this).removeClass("displayed-month");
+                    }
+                });
+                currentDisplayedMonth--;
+                $("#mco-space-div #nextmonth-div-" + currentDisplayedMonth).removeClass("hidden-month");
+                $("#mco-space-div #nextmonth-div-" + currentDisplayedMonth).addClass("displayed-month");
+            }
+            else {
+                if (currentDisplayedMonth == actualMonth + 1) {
+                    $("#mco-space-div .displayedmonth-div div").each(function () {
+                        if (!($(this).hasClass("hidden-month"))) {
+                            $(this).addClass("hidden-month");
+                        }
+                        if (($(this).hasClass("displayed-month"))) {
+                            $(this).removeClass("displayed-month");
+                        }
+                    });
+                    currentDisplayedMonth--;
+                    $("#mco-space-div .SPACE_thismonth-div").removeClass("hidden-month");
+                    $("#mco-space-div .SPACE_thismonth-div").addClass("displayed-month");
+                }
+            }
+        });
+    });
+</script>
+    <hgroup>
+        <h2 class="page-title">Planifier le lancement du processus</h2>
+    </hgroup>
+    <p class="page-title-info warning"></p>
+    <div id="schedule-index-div">
+    <div id="calendar-scheduler-div">
+        <div id="timepicker">
+            <label><span class="nav-info">Nom de la tâche : </span></label>
+            <input type="text" id="taskname" value="" placeholder ="Tâche planifiée" class="taskname-input"/><br /><br />
+            
+            <label class="select_time_label"><span class="nav-info">Repéter: </span></label>
+            <select id="multiplicity" class="select_time">
+                <option id="once">Une fois</option>
+                <option id="dayly">Quotidien</option>
+                <option id="weekly">Hebdomadaire</option>
+            </select>
+            
+            <label><span class="nav-info">Heure : </span></label>
+            <input type="text" id="SPACE_hourselectorinput" value="00" class="timepicker"/>
+            <select id="SPACE_hourselector" class="timeselector"></select>
+            <label><span class="nav-info"> Minutes : </span></label>
+            <input type="text" id="SPACE_minuteselectorinput" value="00"  class="timepicker"/>
+            <select id="SPACE_minuteselector" class="timeselector"></select>
+        </div>
+        <div id="calendar-div">
+            <input id="previous-month" class="month-navigator-button" type="button" />
+            <div class="displayedmonth-div">
+                <div id="SPACE_thismonth-div" class="SPACE_thismonth-div"></div>
+            </div>
+            <input id="next-month" class="month-navigator-button" type="button" />
+        </div>
+        <div id="time-div">
+            <input id="scheduler-btn" class="schedule-control" type="button" value="Planifier" />
+            <input id="scheduler-btn-editor"  style="float:right; width : 100px;" class="schedule-editor-control" type="button" value="Modifier" />
+            <input id="scheduler-btn-cancelor" style="float:left; width : 100px; background-color: #ccc;" class="schedule-editor-control" type="button" value="Annuler" />
+        </div>
+    </div>
+    <div id="schedule-displayer-div">
+    <table id="schedule-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Tâche</th>
+            <th>Création</th>
+            <th>Prochaine exécution</th>
+            <th>Etat</th>
+            <th>Multiplicité</th>
+            <th>Nombre d'exécutions</th>
+            <th>Générateur de la tâche</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) { 
+        <tr class="item-summary-tr">
+            <td>
+                @Html.DisplayFor(modelItem => item.TaskName) 
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreationTime) 
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NextExecution) 
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.State) 
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Multiplicity) 
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Executed) 
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Generator) 
+            </td>
+            <td style="margin:0px;padding:0px;width:15%;">
+                @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+                <div class="action-div">
+                    <div class="action-icon details-viewer" title="voir rapports"></div>
+                    <div class="action-icon email-sender" title="renvoyer le mail associé au dernier rapport"></div>
+                    <div class="action-icon details-editor" title="modifier planification"></div>
+                    <div class="action-icon deleter" title="supprimer"></div>
+                </div>                
+            </td>
+        </tr>
+} 
+    </tbody>
+</table>
+    
+    </div>
+    </div>

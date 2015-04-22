@@ -1,0 +1,249 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.Application>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        APP_CONTROLLER = "McoApp/";
+        APP_MODULE = "APP";
+
+        $("#mco-app-div .uncheckedapp td.line-selector, .checkedapp td.line-selector").click(function () {
+            if ($(this).find(".checkapp").length == 0) {
+                checkbox = $(this).closest("tr").find("td").find(".checkapp");
+                checkbox.trigger("click");
+            }
+        });
+
+        $("#mco-app-div .checkapp").change(function () {
+            line = $(this).closest("tr");
+            if ($(this).prop("checked") == true) {
+                line.removeClass("uncheckedapp");
+                line.addClass("checkedapp");
+            }
+            else {
+                line.removeClass("checkedapp");
+                line.addClass("uncheckedapp");
+                $("#mco-app-div #CheckAllboxes").prop("checked", false);
+            }
+        })
+
+        $("#mco-app-div .server-option").click(function () {
+            if ($(this).prop("selected") == true) {
+                checkbox = $(this).closest("tr").find(".checkapp");
+                if (!checkbox.prop("checked")) {
+                    checkbox.prop("checked", true);
+                    checkbox.trigger("change");
+                }
+            }
+        });
+
+        $("#mco-app-div #search-input").keyup(function (key) {
+            var search = $(this).val().toLowerCase();
+            $("#mco-app-div .visible").each(function () {
+                var name = $(this).find("td").eq(0).text().trim().toLowerCase();
+                if (name.startsWith(search)) {
+                    $(this).show();
+                }
+                else {
+                    $(this).hide();
+                }
+            });
+        });
+
+        $("#mco-app-div #search-input").change(function () {
+            var search = $(this).val().toLowerCase();
+            if (search.trim() == "") {
+                $("#mco-app-div .visible").each(function () {
+                    $(this).show();
+                });
+            }
+        });
+
+        $("#mco-app-div #CheckAllboxes").change(function () {
+            if ($(this).prop("checked")) {
+                $("#mco-app-div .checkapp").each(function () {
+                    $(this).prop("checked", true);
+                    $(this).trigger("change");
+                });
+            }
+            else {
+                $("#mco-app-div .checkapp").each(function () {
+                    $(this).prop("checked", false);
+                    $(this).trigger("change");
+                });
+            }
+        });
+
+        $("#mco-app-div #check-launcher").click(function () {
+            list = "";
+            server_list = "";
+            names = "";
+            $("#mco-app-div .checkapp").each(function () {
+                if ($(this).prop("checked") == true) {
+                    list += $(this).attr("id") + ";";
+                    names += $(this).val() + "\n";
+                }
+            })
+            $("#mco-app-div .selected-servers").each(function () {
+                $(this).find("option").each(function () {
+                    if ($(this).prop("selected") == true) {
+                        server_list += $(this).val() + ";";
+                    }
+                });
+            });
+            if (list == "") {
+                alert("Vous devez sélectionner au moins une Application");
+                return false;
+            }
+            if (server_list != "") {
+                server_list = server_list.substr(0, server_list.length - 1);
+            }
+            list = list.substr(0, list.length - 1);
+            message = "Voulez-vous lancer la vérification pour les Applications suivantes? \n" + names;
+            message += "\n (Une tentative de connexion sera effectuée pour les Url des serveurs sélectionnés)";
+            launch = confirm(message);
+            if (!launch) {
+                return false;
+            }
+            success = false;
+            APP_MCO_DIV.prepend(loadinggif);
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + 'FurtherCheckApplications',
+                type: "POST",
+                data: { list: list, server_list: server_list },
+                success: function (data) {
+                    if (data.response == "OK") {
+                        success = true;
+                        applications = data.applications;
+                        appemailId = data.email;
+                        email = "" +
+                            "<label class='ReadyEmail-label'>Destinataires: </label>" +
+                            " <input type='text' id='input-recipient'class='ReadyEmail-input'/><br />" +
+                            "<input type='button' id='input-button' onClick='SendAppEmail(" + appemailId + ");'class='ReadyEmail-submit' value='Envoyer' />" +
+                            "<label class='ReadyEmail-label'>Sujet : </label>" +
+                            "<input type='text' id='input-subject'  class='ReadyEmail-input'/><br />" +
+                            "<div id='input-body'  class='ReadyEmail-body'>" +
+                            "<textarea id='input-message' placeholder='Ajoutez un message ici...' " +
+                            "style='margin-left:10px;width:800px;border:0px solid #000;'" +
+                            "class='ReadyEmail-input'></textarea></div>";
+                        APP_MCO_DIV.html(email);
+
+                        AddressParser();
+                    }
+                    else {
+                        success = false;
+                        alert(data.errors);
+                    }
+                },
+                error: function (errorThrown) {
+                    alert('Erreur lors de communication avec le serveur');
+                    NAV_HOME_BTN.trigger("click");
+                },
+                complete: function () {
+                    colourTitles();
+                    if (success) {
+                        $.ajax({
+                            url: SITENAME + 'Emails/Open/' + appemailId,
+                            type: "POST",
+                            data: { applications: applications },
+                            success: function (content) {
+                                failedapps = content.failedapps;
+                                $("#mco-app-div #input-recipient").val(content.recipient);
+                                $("#mco-app-div #input-subject").val(content.subject);
+                                $("#mco-app-div #input-body").append(content.body);
+                                APP_MCO_DIV.prepend(failedapps);
+                            },
+                            error: function (errorThrown) {
+                                alert('Erreur lors de communication avec le serveur');
+                                NAV_HOME_BTN.trigger("click");
+                            },
+                            complete: function () { colourTitles(); }
+                        });
+                    }
+                }
+            });
+        });
+
+    });
+</script>
+<div id="search-div" class="search-div">
+    <p class="page-title-info warning"></p>
+    <table class="search-table">
+        <tr>
+            <td style="width:20%;">
+                <span class="search-span">Retrouvez une application:</span>
+            </td>
+            <td style="width:30%;">
+                <input type="search" id="search-input" placeholder ="Entrez le nom d'une application existente" class="search-input"/>
+            </td>
+            <td style="width:50%;">
+                <input type="checkbox" style="height:15px; width:20px;" id="CheckAllboxes"/>
+                <span>
+                    Sélectionner toutes les applications
+                </span>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="div-app-launcher">
+    <span>
+        Veuillez sélectionner les Applications dont vous désirez vérifier l'état.
+    </span>
+    <br /><br />
+    <input id="check-launcher" type="button" class="app-controls-btn" value="Lancer le check"
+        title="Lancer la vérification des Applications sélectionnées"/><br /><br />
+    <table id="app-table" class="app-select-table">
+        <thead>
+            <tr class="item-summary-thead">
+                <th>Application</th>
+                <th> </th>
+                <th>Serveurs</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model) {
+            <tr class="uncheckedapp visible line-selector">
+                <td style="width:60%;" class="line-selector">
+                    @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td style="width:10%;" class="line-selector">
+                    <input type="checkbox" style="height:15px; width:20px;" name="application-@Html.DisplayFor(modelItem => item.Id)"
+                        class="checkapp" value="@Html.DisplayFor(modelItem => item.Name)"
+                        id="application-@Html.DisplayFor(modelItem => item.Id)"/>
+                </td>
+                <td style="width:30%;" class="servers-list">
+                    @{
+                        var servers = item.AppServers;
+                        int size = (servers.Count < 4) ? servers.Count : 4;
+                        string select = "<select multiple class='selected-servers' size="+size+">";
+                        if (servers.Count == 0)
+                        {
+                            select = "Pas de serveur";
+                        }
+                        else 
+                        {
+                            foreach (var server in servers)
+                            {
+                                if (!server.StartOrder.Contains("URL|"))
+                                {
+                                    continue;
+                                }
+                                select += "<option class='server-option' value='" + server.Id + "'>" + server.Name + "</option>";
+                            }
+                            if (select == "<select multiple class='selected-servers' size=" + size + ">")
+                            {
+                                select = "Pas d'URL de serveur";
+                            }
+                            else 
+                            {
+                                select += "</option>";   
+                            }
+                        }
+
+                        @select;
+                    }
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table> 
+</div>
+

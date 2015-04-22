@@ -1,0 +1,91 @@
+﻿@{Layout = null;}@model McoEasyTool.FaultyServer
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        AD_CONTROLLER = "McoAd/";
+        AD_MODULE = "AD";
+
+        var FIRST_ENTRY = 0;
+        var LEFT_ENTRY = 0;
+        var RIGHT_ENTRY = 0;
+        var LAST_ENTRY = 0;
+
+        FIRST_ENTRY = "@ViewBag.First_Entry";
+        LEFT_ENTRY = "@ViewBag.Left_Entry";
+        RIGHT_ENTRY = "@ViewBag.Right_Entry";
+        LAST_ENTRY = "@ViewBag.Last_Entry";
+
+        get_arrows(AD_MCO_DIV, AD_CONTROLLER + "DisplayFaultyServerDetails/", FIRST_ENTRY, LEFT_ENTRY, RIGHT_ENTRY, LAST_ENTRY);
+
+
+        $("#mco-ad-div .previous-link").click(function () {
+            NAV_AD_FAULTYSERVERS_BTN.trigger("Click");
+        });
+    });
+</script>
+<hgroup>
+    <h2 class="page-title">Contrôleur en état critique</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<a class="previous-link">Précédent</a>
+<fieldset>
+    <legend>FaultyServer</legend>
+
+    <div class="display-label">
+        @Html.DisplayNameFor(model => model.IpAddress) : 
+        <strong>
+            @Html.DisplayFor(model => model.IpAddress)
+        </strong>
+    </div>
+
+    <div class="display-label">
+        @Html.DisplayNameFor(model => model.Name) :
+        <strong>
+            @Html.DisplayFor(model => model.Name)
+        </strong>
+    </div>
+    
+    <div class="display-label">
+        @Html.DisplayNameFor(model => model.Status) :
+        <strong>
+            @Html.DisplayFor(model => model.Status)
+        </strong>
+    </div>
+</fieldset>
+    <span>
+        Remarque: Les données contenues dans le tableau ci-dessous ne relatent
+        pas forcément l'état actuel de ce contrôleur de domaine mais plutôt les états
+        dans lesquels il a été référencé lors des différentes analyses.
+    </span>
+<table id="faultyserver-detail-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Date du rapport</th>
+            <th>Ping</th>
+            <th>Durée d'absence</th>
+            <th>Ticket</th>
+            <th>Détails</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.FaultyServer_Reports) {
+        <tr class="item-summary-tr">
+            <td>
+                @Html.DisplayFor(modelItem => item.AdReport.DateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ping)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AbsenceDuration)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ticket)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Details)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<a class="previous-link">Précédent</a>

@@ -1,0 +1,126 @@
+﻿@{Layout = null;}@model IEnumerable<dynamic>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        SPACE_CONTROLLER = "McoSpace/";
+        SPACE_MODULE = "SPACE";
+
+        $("#mco-space-div #Form1").attr("action", SITENAME + $("#mco-space-div #Form1").attr("action"));
+
+        $("#mco-space-div #upload-file-path, #upload-launcher").click(function () {
+            $("#mco-space-div .trueFile").trigger("click");
+        });
+
+        $("#mco-space-div .trueFile").change(function () {
+            filepaths = $("#mco-space-div .trueFile").val().split("\\");
+            filepath = filepaths[filepaths.length - 1];
+            extension = filepath.split(".");
+            if (extension[extension.length - 1].indexOf("xlsx") != -1) {
+                $("#mco-space-div #upload-file-path").val(filepath);
+            }
+            else {
+                alert("Veuillez sélectionner un ficher Excel au format xlsx");
+            }
+        });
+
+        $("#mco-space-div #import-launcher").click(function () {
+            if ($("#mco-space-div #upload-file-path").val().trim() != "") {
+                imported = confirm("Voulez-vous réellement réinitialiser la base de donnée SPACE? \n" +
+                    "Tous les Pools et Serveurs actuels seront remplacés par ceux contenus dans le fichier" +
+                    "Uploadé.");
+                if (imported) {
+                    $("#mco-space-div .trueUploadButton").trigger("click");
+                    SPACE_MCO_DIV.prepend(loadinggif);
+                }
+            }
+            else {
+                alert("Veuillez d'abord sélectionner un fichier au format xlsx");
+                return false;
+            }
+        });
+
+        $("#mco-space-div #download-launcher").click(function () {
+            FileWindow = window.open(SITENAME + SPACE_CONTROLLER + 'DownloadInitFile/');
+        });
+    });
+</script>
+<hgroup>
+    <h2 class="page-title">Alimentation de la base de données SPACE</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<div class="import-controls">
+    <input id="download-launcher" type="button" class="imports-controls-btn" value="Modèle"
+        title="Télécharger le fichier modèle"/>
+
+    <form id="Form1" runat="server" enctype="multipart/form-data" action="McoSpace/UploadInitFile" >
+        <input runat="server" id="file"  name="file" type="file" class="hidden-imports-controls-btn trueFile"/>
+        <asp:Button runat="server" id="btnUpload" text="Upload" class="hidden-imports-controls-btn trueUploadButton"></asp:Button>
+    </form>
+
+    <input id="upload-file-path" type="text" class="imports-controls-btn input-file-info"
+        title="Uploader votre fichier Excel contenant la liste des serveurs" readonly/>
+    <input id="upload-launcher" type="button" class="imports-controls-btn input-file-btn" value="Choisissez"
+        title="Uploader votre fichier Excel contenant la liste des serveurs"/>
+    
+
+    <input id="import-launcher" type="button" class="imports-controls-btn" value="Importer"
+        title="Lancher l'importation maintenant"/>
+
+        
+
+    
+    
+</div>
+<br />
+<ol>
+    <li>
+    OBSOLETE
+        <h5 class="page-chapter-subtitle">Uploader un fichier</h5>
+        L'alimentation de la base de données se fait via un fichier Excel contenant <span class="warning">(02) deux pages.</span><br /><br />
+        - La première page nommée <span class="nav-info">Pool</span> contient:<br /><br />
+            <span class="paragraph-info">
+                Dans la première colonne, le nom du Pool <strong>(Ex: SPACE1)</strong>
+            </span><br /><br />
+            <span class="paragraph-info">
+                Dans la seconde colonne, le jour d'exécution de la sauvegarde pour ce Pool écrite en toute lettre <strong>(Lundi,
+                Mardi, Mercredi,<br /> Jeudi, Vendredi, Samedi, Dimanche)</strong>.
+            </span><br /><br />
+            <span class="paragraph-info">
+                La troisième et dernière colonne est optionnelle; elle contient le code html (sans le #) de la couleur avec laquelle<br />
+                les cellules de ce Pool seront colorées dans le fichier Excel <strong>(EX: 75923C)</strong>.
+            </span><br /><br />
+            <span class="paragraph-info">
+                <span class="warning">
+                    Notons que cette couleur pourra être modifiée ultérieurement directement via l'onglet Pool; il est donc
+                    inutile de s'y attarder.<br />
+                    Par ailleurs Une couleur par défaut est automatiquement choisie pour les Pools.
+                </span>
+           </span><br /><br />
+            
+            
+        - La seconde page nommée <span class="nav-info">Servers</span>; 
+        cette page contient la liste de tous les serveurs. Le format suivant est à suivre:
+            <br /><br />
+            <span class="paragraph-info">
+                La première colonne contient le Pool d'appartenance du serveur <strong>(EX: SPACE1)</strong>.
+            </span><br /><br />
+            <span class="paragraph-info">
+                La seconde colonne contient le nom du serveur <strong>(EX: BCVNB123)</strong>.
+            </span><br /><br />
+            <span class="paragraph-info">
+                La troisième colonne contient la liste des partitions à sauvegarder séparées par une 
+                virgule et un espace <strong>(EX: C, D, T)</strong>.
+            </span>
+    </li>
+    <li>
+        <h5 class="page-chapter-subtitle">Fichier modèle</h5>
+        Afin de vous assurer de la validité de votre fichier, vous pouvez télécharger le fichier modèle
+        et suivre son format?<br /> ou vous pouvez tout simplement le télécharger, le modifier à votre guise
+        et l'uploader par la suite.
+    </li>
+    <li>
+        <h5 class="page-chapter-subtitle">Importer</h5>
+        Si vous êtes certain que votre fichier rempli tous les prérequis mentionnés ci-dessus,<br /> vous 
+        pouvez l'uploader et cliquer sur <span class="nav-info">Importer</span> afin de réinitialiser la base de données SPACE.
+    </li>
+</ol>
+

@@ -1,0 +1,439 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.Application>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        APP_CONTROLLER = "McoApp/";
+        APP_MODULE = "APP";
+
+        function SetNavigatorsList() {
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + 'GetNavigatorsList/',
+                type: "GET",
+                success: function (content) {
+                    list = "";
+                    for (index = 0; index < content.length; index++) {
+                        if (content[index] == "IE") {
+                            list += "<option value='" + content[index] + "' selected>" + content[index] + "</options>";
+                        }
+                        else {
+                            list += "<option value='" + content[index] + "'>" + content[index] + "</options>";
+                        }
+
+                    }
+                    $("#mco-app-div #new-application-navigator").html(list);
+                },
+                error: function (error) { },
+                complete: function () { }
+            });
+        }
+
+        function SetDomainsList() {
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + 'GetAppDomainsList/',
+                type: "GET",
+                dataType: "JSON",
+                success: function (content) {
+                    list = "";
+                    for (index = 0; index < content.length; index++) {
+                        list += "<option value='" + content[index].Id + "'>" + content[index].Name + "</options>";
+                    }
+                    $("#mco-app-div #new-application-domain").html(list);
+                    $("#mco-app-div .item-summary-tr").each(function () {
+                        idDomain = $(this).find("td").eq(3).text().trim();
+                        found = false;
+                        for (index = 0; index < content.length; index++) {
+                            if (content[index].Id == idDomain) {
+                                $(this).find("td").eq(3).text(content[index].Name);
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            $(this).find("td").eq(3).text("N/A");
+                        }
+                    });
+                },
+                error: function (error) {
+                    alert(error.responseText);
+                    NAV_HOME_BTN.trigger("click");
+                },
+                complete: function () { }
+            });
+        }
+
+        function Init() {
+            SetDomainsList();
+            SetNavigatorsList();
+        }
+
+        Init();
+
+        $("#mco-app-div #new-application-url").blur(function () {
+            Url = $(this).val().trim();
+            Url = correctUrl(Url);
+            if (isValidUrl(Url)) {
+                $(this).val(Url);
+            }
+            else {
+                alert(Url + " n'est pas une Url valide");
+                $(this).val("");
+            }
+        });
+
+        $("#mco-app-div #create-application-btn").click(function () {
+            Application_Name = $("#mco-app-div #new-application-name").val().trim();
+            Application_Url = $("#mco-app-div #new-application-url").val().trim();
+            Application_Domain = $("#mco-app-div #new-application-domain").val().trim();
+            Application_Navigator = $("#mco-app-div #new-application-navigator").val().trim();
+            if (Application_Name != "" && Application_Url != "") {
+                create_app = confirm("Voulez vous enregistrer rajouter une application avec ces informations?");
+                if (!create_app) {
+                    return false;
+                }
+                $.ajax({
+                    url: SITENAME + APP_CONTROLLER + 'AddApplication',
+                    type: "POST",
+                    data: { Name: Application_Name, Url: Application_Url, Domain: Application_Domain, Navigator: Application_Navigator },
+                    success: function (response) {
+                        if (response.status != "OK") {
+                            alert("Une erreur est survenue lors de l'ajout de l'application:\n" + response.status);
+                        }
+                        else {
+                            appId = response.appId;
+                            serverinfos = confirm("L'application a été correctement rajoutée à la base de données.\n Voulez-vous gérer les serveurs intervenants dans l'application maintenant?");
+                            if (serverinfos) {
+                                $.ajax({
+                                    url: SITENAME + APP_CONTROLLER + 'DisplayApplicationServers/' + appId,
+                                    type: "GET",
+                                    success: function (content) {
+                                        APP_MCO_DIV.html(content);
+                                    },
+                                    error: function (error) {
+                                        alert(error.responseText);
+                                        NAV_APP_APPLICATIONS_BTN.trigger("click");
+                                    },
+                                    complete: function () { }
+                                });
+                            }
+                        }
+                    },
+                    error: function (errorThrown) {
+                        alert("Erreur lors de l'ajout de l'application.");
+                    },
+                    complete: function () {
+                        NAV_APP_APPLICATIONS_BTN.trigger("click");
+                    }
+                });
+            }
+            else {
+                alert("Veuillez remplir les champs noms et url de l'application avant de l'ajouter");
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-app-div .deleter").click(function () {
+            deletor = confirm("Voulez vous réellement supprimer cette application de la liste?");
+            if (deletor) {
+                appId = $(this).closest("td").find(".action-id-getter").val();
+                APP_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: SITENAME + APP_CONTROLLER + 'DeleteApplication/' + appId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        NAV_APP_APPLICATIONS_BTN.trigger("click");
+                    }
+                });
+            }
+        });
+
+        function SetSelectedDomain(name) {
+            value = 0;
+            $("#mco-app-div #new-application-domain").find("option").each(function () {
+                if ($(this).text().trim() == name.trim()) {
+                    value = $(this).val();
+                }
+            });
+            return value;
+        }
+
+        //----------------------------------------------------------
+        $("#mco-app-div .details-editor").click(function () {
+            columns = $(this).closest("tr").find("td");
+            $("#mco-app-div #new-application-name").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
+            $("#mco-app-div #new-application-url").val(columns.eq(2).text().replace(/^\s+|\s+$/g, ''));
+            $("#mco-app-div #new-application-domain").val(SetSelectedDomain(columns.eq(3).text().replace(/^\s+|\s+$/g, '')));
+            $("#mco-app-div #new-application-navigator").val(columns.eq(4).text().replace(/^\s+|\s+$/g, ''));
+
+            appId = $(this).closest("td").find(".action-id-getter").val();
+            $("#mco-app-div #create-application-btn").css("visibility", "hidden");
+            $("#mco-app-div #create-application-btn").css("display", "none");
+            $("#mco-app-div .application-editor-control").css("visibility", "visible");
+            $("#mco-app-div .application-editor-control").css("display", "inline");
+        });
+
+        $("#mco-app-div .cancelor").click(function () {
+            $("#mco-app-div #new-application-name").val("");
+            $("#mco-app-div #new-application-url").val("");
+            $("#mco-app-div #new-application-navigator").val("IE");
+            $("#mco-app-div #create-application-btn").css("visibility", "visible");
+            $("#mco-app-div #create-application-btn").css("display", "inline");
+            $("#mco-app-div .application-editor-control").css("visibility", "hidden");
+            $("#mco-app-div .application-editor-control").css("display", "none");
+        });
+
+        $("#mco-app-div #application-btn-editor").click(function () {
+            Application_Name = $("#mco-app-div #new-application-name").val().trim();
+            Application_Url = $("#mco-app-div #new-application-url").val().trim();
+            Application_Domain = $("#mco-app-div #new-application-domain").val().trim();
+            Application_Navigator = $("#mco-app-div #new-application-navigator").val().trim();
+            if (Application_Name != "" && Application_Url != "") {
+                edit_app = confirm("Voulez vous enregistrer les modifications effectuées au niveau de l'application?");
+                if (!edit_app) {
+                    return false;
+                }
+                $.ajax({
+                    url: SITENAME + APP_CONTROLLER + 'EditApplication/' + appId,
+                    type: "POST",
+                    data: { Name: Application_Name, Url: Application_Url, Domain: Application_Domain, Navigator: Application_Navigator },
+                    success: function (response) {
+                        if (response != "OK") {
+                            alert("Une erreur est survenue lors de la mise à jour de l'application:\n" + response);
+                        }
+                    },
+                    error: function (errorThrown) {
+                        alert("Erreur lors de l'ajout de l'application.");
+                    },
+                    complete: function () {
+                        NAV_APP_APPLICATIONS_BTN.trigger("click");
+                    }
+                });
+            }
+            else {
+                alert("Veuillez remplir les champs noms et url de l'application avant de l'ajouter");
+            }
+        });
+
+        $("#mco-app-div .details-viewer").click(function () {
+            appId = $(this).closest("td").find(".action-id-getter").val();
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + 'DisplayApplicationServers/' + appId,
+                type: "GET",
+                success: function (content) {
+                    APP_MCO_DIV.html(content);
+                },
+                error: function (error) {
+                    alert(error.responseText);
+                },
+                complete: function () { colourTitles(); }
+            });
+        });
+
+        $("#mco-app-div .authentication-editor").click(function () {
+            appId = $(this).closest("td").find(".action-id-getter").val();
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + 'DisplayAuthenticationInfos/' + appId,
+                type: "GET",
+                success: function (content) {
+                    APP_MCO_DIV.html(content);
+                },
+                error: function (error) {
+                    APP_MCO_DIV.html(error.responseText);
+                },
+                complete: function () { colourTitles(); }
+            });
+        });
+
+
+        $("#mco-app-div .application-link").click(function () {
+            if ($(this).text().trim() != "") {
+                window.open($(this).text().trim());
+            }
+        });
+
+        $("#mco-app-div .application-function").click(function () {
+            link = "";
+            appId = $(this).closest("td").find(".action-id-getter").val();
+            execute = false;
+            if ($(this).hasClass("check-launcher")) {
+                execute = confirm("Voulez-vous vraiment récupérer l'état de l'application maintenant?");
+                link = SITENAME + APP_CONTROLLER + 'GetApplicationState/' + appId;
+            }
+            if ($(this).hasClass("item-starter")) {
+                execute = confirm("Attention!! vous êtes sur le point de lancer l'application. Voulez-vous continuer?");
+                link = SITENAME + APP_CONTROLLER + 'StartApplication/' + appId;
+            }
+            if ($(this).hasClass("item-restarter")) {
+                execute = confirm("Attention!! vous êtes sur le point de redémarrer l'application. Voulez-vous continuer?");
+                link = SITENAME + APP_CONTROLLER + 'RestartApplication/' + appId;
+            }
+            if ($(this).hasClass("item-stopper")) {
+                execute = confirm("Attention!! vous êtes sur le point d'arrêter l'application. Voulez-vous continuer?");
+                link = SITENAME + APP_CONTROLLER + 'StopApplication/' + appId;
+            }
+            if (execute) {
+                APP_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: link,
+                    type: "GET",
+                    success: function (response) {
+                        message = "L'opération a retourné le statut " + response.status + " avec les détails suivants";
+                        alert(message + "\n" + response.details);
+                    },
+                    error: function (errorThrown) {
+                        alert("Erreur l'exécution de la demande.");
+                    },
+                    complete: function () {
+                        NAV_APP_APPLICATIONS_BTN.trigger("click");
+                    }
+                });
+            }
+        });
+
+        $("#mco-app-div #search-input").keyup(function (key) {
+            var search = $(this).val().toLowerCase();
+            $("#mco-app-div .item-summary-tr").each(function () {
+                var name = $(this).find("td").eq(0).text().trim().toLowerCase();
+                if (name.startsWith(search)) {
+                    $(this).show();
+                }
+                else {
+                    $(this).hide();
+                }
+            });
+        });
+
+        $("#mco-app-div #search-input").change(function () {
+            var search = $(this).val().toLowerCase();
+            if (search.trim() == "") {
+                $("#mco-app-div .visible").each(function () {
+                    $(this).show();
+                });
+            }
+        });
+
+        $("#mco-app-div #save-btn").click(function () {
+            savelist = confirm("Vous avez cliqué le bouton d'exportation; un fichier Excel contenant la liste des applications va être généré.\n\n" +
+                "Vous pourrez à tout moment via le fichier exporté, réinitialiser la liste des applications et les ramener dans leur état actuel.\n\n" +
+                "Voulez-vous exporter la liste des applications maintenant?");
+            if (savelist) {
+                FileWindow = window.open(SITENAME + APP_CONTROLLER + 'Export');
+            }
+        });
+    });
+</script>
+<hgroup>
+    <h2 class="page-title">Gestion des Applications</h2>
+</hgroup>
+<div id="search-div" class="search-div">
+    <p class="page-title-info warning"></p>
+    <table class="search-table">
+        <tr>
+            <td style="width:25%;">
+                <span class="search-span">Retrouvez une application:</span>
+            </td>
+            <td style="width:75%;">
+                <input type="search" id="search-input" placeholder ="Entrez le nom d'une application existente" class="search-input"/>
+            </td>
+        </tr>
+    </table>
+</div>
+<div id="new-application" class="new-application">
+    <label><span class="new-recipient-title">
+        <strong>Ajoutez une nouvelle application à la liste</strong>
+    </span></label>
+    <table class="new-application-procedure-table">
+        <tr>
+            <td style="width:10%;">
+                <span class="new-application-label">Nom :</span>
+            </td>
+            <td style="width:30%;">
+                <input type="text" id="new-application-name" placeholder ="Argos" class="application-input"/>
+            </td>
+            <td style="width:10%;">
+                <span class="new-application-label">Url :</span>
+            </td>
+            <td style="width:50%;">
+                <input type="text" id="new-application-url" placeholder ="http://argos.bouygues-construction.com/" class="application-input"/>
+            </td>
+         </tr>
+         <tr>
+            <td style="width:10%;">
+                <span class="new-application-label">Domaine :</span>
+            </td>
+            <td style="width:30%;">
+                <select id="new-application-domain" class="new-application-domain"></select>
+            </td>
+            <td style="width:10%;">
+                <span class="new-application-label">Navigateur :</span>
+            </td>
+            <td style="width:50%;">
+                <select id="new-application-navigator" class="new-application-domain"></select>
+            </td>
+        </tr>
+    </table>
+    <div style="width:50%;margin:auto;position:relative;text-align:center;">
+        <input id="create-application-btn" class="application-creator" type="button" value="Ajouter" />
+        <input id="application-btn-editor"  style="float:right" class="application-editor-control editor" type="button" value="Modifier" />
+        <input id="application-btn-cancelor" style="float:left" class="application-editor-control cancelor" type="button" value="Annuler" />
+    </div>
+</div>
+<br /><br />
+<div id="application-list" class="application-list">
+        <table id="application-table" class="item-summary application-table">
+            <thead>
+                <tr class="item-summary-thead">
+                    <th>Applications</th>
+                    <th>Serveurs</th>
+                    <th>Lien d'accès</th>
+                    <th>Domaine</th>
+                    <th>Navigateur</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody> 
+            @foreach (var item in Model) {
+                <tr class="item-summary-tr index-tr">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td style="width:10%;">
+                        @Html.DisplayFor(modelItem => item.AppServers.Count) Serveur(s)
+                    </td>
+                    <td class="application-link">
+                        @Html.DisplayFor(modelItem => item.Url)
+                    </td>
+                    <td style="width:15%;">
+                        @item.Domain
+                    </td>
+                    <td style="width:10%;">
+                        @item.Navigator
+                    </td>
+                    <td style="margin=0px;padding=0px;width:25%;">
+                        @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+                        <div class="action-div">
+                            <div class="action-icon check-launcher application-function" title="Vérifier l'état de l'application"></div>
+                            <div class="action-icon item-starter application-function" title="Mettre l'application en marche"></div>
+                            <div class="action-icon item-restarter application-function" title="Redémarrer l'application"></div>
+                            <div class="action-icon item-stopper application-function" title="Arrêter l'application"></div>
+                            <div class="action-icon details-viewer" title="consulter la liste des serveurs"></div>
+                            <div class="action-icon authentication-editor" title="Modifier la Procédure d'authentification"></div>
+                            <div class="action-icon details-editor" title="Modifier"></div>
+                            <div class="action-icon deleter" title="Supprimer"></div>
+                        </div>                
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+</div> 
+<div id="save-list" class="save-div">
+    <span class="save-span">Exporter la liste des applications</span><br />
+    <input type="button" id="save-btn" value ="Exporter" class="save-btn"/>
+</div>
+
+

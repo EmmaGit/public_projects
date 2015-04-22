@@ -1,0 +1,156 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.AppDomain>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        APP_CONTROLLER = "McoApp/";
+        APP_MODULE = "APP";
+
+        $("#mco-app-div #create-domain-btn").click(function () {
+            name = $("#mco-app-div #domain-name").val();
+            if (name.trim() == "") {
+                alert("Veuillez remplir au moins un champ avant validation SVP.");
+                return false;
+            }
+            else {
+                APP_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: SITENAME + APP_CONTROLLER + 'AddAppDomain',
+                    type: "POST",
+                    data: { name: name },
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de la communication avec le serveur');
+                    },
+                    complete: function () {
+                        NAV_APP_DOMAINS_BTN.trigger("click");
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-app-div .deleter").click(function () {
+            deletor = confirm("Voulez vous réellement supprimer ce domaine?");
+            if (deletor) {
+                domainId = $(this).closest("td").find(".action-id-getter").val();
+                $.ajax({
+                    url: SITENAME + APP_CONTROLLER + 'DeleteAppDomain/' + domainId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        NAV_APP_DOMAINS_BTN.trigger("click");
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-app-div .details-editor").click(function () {
+            columns = $(this).closest("tr").find("td");
+            $("#mco-app-div #domain-name").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
+            domainId = $(this).closest("td").find(".action-id-getter").val();
+
+            $("#mco-app-div #create-domain-btn").css("visibility", "hidden");
+            $("#mco-app-div #create-domain-btn").css("display", "none");
+            $("#mco-app-div .domain-editor-control").css("visibility", "visible");
+            $("#mco-app-div .domain-editor-control").css("display", "inline");
+        });
+
+        //----------------------------------------------------------
+        $("#mco-app-div .cancelor").click(function () {
+            $("#mco-app-div #domain-name").val("");
+            $("#mco-app-div .domain-editor-control").css("visibility", "hidden");
+            $("#mco-app-div .domain-editor-control").css("display", "none");
+            $("#mco-app-div #create-domain-btn").css("visibility", "visible");
+            $("#mco-app-div #create-domain-btn").css("display", "inline");
+        });
+
+        //----------------------------------------------------------
+        $("#mco-app-div .editor").click(function () {
+            name = $("#mco-app-div #domain-name").val();
+            if (name.trim() == "") {
+                alert("Veuillez remplir le champ nom avant validation SVP.");
+                return false;
+            }
+            else {
+                APP_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: SITENAME + APP_CONTROLLER + 'EditAppDomain/' + domainId,
+                    type: "POST",
+                    data: { name: name },
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de la communication avec le serveur');
+                    },
+                    complete: function () {
+                        NAV_APP_DOMAINS_BTN.trigger("click");
+                    }
+                });
+            }
+        });
+
+    });
+    
+</script>
+<hgroup>
+    <h2 class="page-title">Gestion de la liste des Domaines d'application</h2>
+</hgroup>
+<div id="new-domain" class="new-domain">
+    <p class="page-title-info warning"></p>
+    <label><span class="new-domain-title">
+        <strong>Ajoutez un domaine à la liste</strong>
+        </span></label>
+    <br /><br />
+    <label><span class="new-domain-label">Nom du domaine :</span></label>
+    <input type="text" id="domain-name" value="" placeholder ="ACHATS" class="domain-input"/><br /><br />
+    <input id="create-domain-btn" class="domain-creator" type="button" value="Ajouter" />
+    <input id="domain-btn-editor"  style="float:right" class="domain-editor-control editor" type="button" value="Modifier" />
+    <input id="domain-btn-cancelor" style="float:left" class="domain-editor-control cancelor" type="button" value="Annuler" />
+</div>
+<br /><br />
+<label>
+    <span>
+        Les domaines ci-dessous sont utilisables dans la section de gestion des applications <br />
+        Ils permettent de classer ces dernières en fonction de leur domaine d'appartenance.<br />
+    </span>
+</label>
+<table id="domain-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Domaines</th>
+            <th>Applications</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+ 
+@foreach (var item in Model) {
+        <tr class="item-summary-tr">
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            Ce domaine possède @Html.DisplayFor(modelItem => item.Applications) application(s).
+        </td>
+        <td style="margin=0px;padding=0px;">
+            @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+            <div class="action-div">
+                <div class="action-icon details-editor" title="modifier domaine"></div>
+                <div class="action-icon deleter" title="supprimer"></div>
+            </div>                
+        </td>
+    </tr>
+}
+    </tbody>
+</table>
+
+

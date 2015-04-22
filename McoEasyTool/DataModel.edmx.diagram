@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="0c8348250bac4ab584b52f7e37926a3e" Name="Diagram1" ZoomLevel="101" >
+        <EntityTypeShape EntityType="DataModel.AdReport" Width="1.5" PointX="9.75" PointY="11.625" FillColor="0, 192, 192" />
+        <EntityTypeShape EntityType="DataModel.FaultyServer" Width="1.5" PointX="9.75" PointY="14.5" FillColor="0, 192, 0" />
+        <EntityTypeShape EntityType="DataModel.FaultyServer_Report" Width="1.5" PointX="12" PointY="10.875" FillColor="192, 255, 255" />
+        <EntityTypeShape EntityType="DataModel.Recipient" Width="1.5" PointX="0.75" PointY="1.75" FillColor="255, 128, 128" />
+        <EntityTypeShape EntityType="DataModel.AdSchedule" Width="1.5" PointX="5.75" PointY="12.75" FillColor="255, 192, 128" />
+        <EntityTypeShape EntityType="DataModel.ReftechServers" Width="1.5" PointX="5.75" PointY="14.75" FillColor="Gray" />
+        <EntityTypeShape EntityType="DataModel.Pool" Width="1.5" PointX="11.75" PointY="15" FillColor="255, 128, 128" />
+        <EntityTypeShape EntityType="DataModel.BackupServer" Width="1.5" PointX="14" PointY="15.5" FillColor="0, 192, 0" />
+        <EntityTypeShape EntityType="DataModel.BackupReport" Width="1.5" PointX="12.75" PointY="2.5" FillColor="0, 192, 192" />
+        <EntityTypeShape EntityType="DataModel.BackupServer_Report" Width="1.5" PointX="15" PointY="1.875" FillColor="192, 255, 255" />
+        <EntityTypeShape EntityType="DataModel.BackupSchedule" Width="1.5" PointX="14.75" PointY="9.75" FillColor="255, 192, 128" />
+        <EntityTypeShape EntityType="DataModel.AD_Settings" Width="1.5" PointX="14.75" PointY="11.75" FillColor="255, 128, 128" />
+        <EntityTypeShape EntityType="DataModel.AppReport" Width="1.5" PointX="0.75" PointY="4.875" FillColor="0, 192, 192" />
+        <EntityTypeShape EntityType="DataModel.AppSchedule" Width="1.5" PointX="3.75" PointY="0.75" FillColor="255, 192, 128" />
+        <EntityTypeShape EntityType="DataModel.Application" Width="1.5" PointX="0.75" PointY="7.125" FillColor="255, 128, 128" />
+        <EntityTypeShape EntityType="DataModel.Application_Report" Width="1.5" PointX="3" PointY="5" FillColor="192, 255, 255" />
+        <EntityTypeShape EntityType="DataModel.AppServer" Width="1.5" PointX="3" PointY="9.25" FillColor="0, 192, 0" />
+        <EntityTypeShape EntityType="DataModel.AppServer_Report" Width="1.5" PointX="5.25" PointY="3.875" FillColor="192, 255, 255" />
+        <EntityTypeShape EntityType="DataModel.AppHtmlElement" Width="1.5" PointX="3" PointY="12" FillColor="255, 192, 192" />
+        <EntityTypeShape EntityType="DataModel.Scheduled_Application" Width="1.5" PointX="6" PointY="7.5" FillColor="255, 255, 192" />
+        <EntityTypeShape EntityType="DataModel.Email" Width="1.5" PointX="13.25" PointY="6.25" />
+        <EntityTypeShape EntityType="DataModel.Report" Width="1.5" PointX="11" PointY="6" />
+        <EntityTypeShape EntityType="DataModel.Schedule" Width="1.5" PointX="8.75" PointY="6" FillColor="255, 128, 0" />
+        <EntityTypeShape EntityType="DataModel.Server" Width="1.5" PointX="0.75" PointY="16.75" FillColor="Green" />
+        <EntityTypeShape EntityType="DataModel.AppDomain" Width="1.5" PointX="2.75" PointY="16.75" FillColor="255, 128, 128" />
+        <EntityTypeShape EntityType="DataModel.SpaceServer" Width="1.5" PointX="7.75" PointY="2" FillColor="0, 192, 0" />
+        <EntityTypeShape EntityType="DataModel.SpaceSchedule" Width="1.5" PointX="15.75" PointY="5.75" FillColor="255, 192, 128" />
+        <EntityTypeShape EntityType="DataModel.SpaceReport" Width="1.5" PointX="7.75" PointY="10.625" FillColor="0, 192, 192" />
+        <EntityTypeShape EntityType="DataModel.SpaceServer_Report" Width="1.5" PointX="10" PointY="1.875" FillColor="192, 255, 255" />
+        <EntityTypeShape EntityType="DataModel.Account" Width="1.5" PointX="16.75" PointY="7.75" FillColor="Maroon" />
+        <AssociationConnector Association="DataModel.AdReportFaultyServer_Report" />
+        <AssociationConnector Association="DataModel.FaultyServerFaultyServer_Report" />
+        <AssociationConnector Association="DataModel.PoolBackupServer" />
+        <AssociationConnector Association="DataModel.BackupReportBackupServer_Report" />
+        <AssociationConnector Association="DataModel.AppReportApplication_Report" />
+        <AssociationConnector Association="DataModel.AppScheduleScheduled_Application" />
+        <AssociationConnector Association="DataModel.ApplicationApplication_Report" />
+        <AssociationConnector Association="DataModel.ApplicationAppHtmlElement" />
+        <AssociationConnector Association="DataModel.ApplicationScheduled_Application" />
+        <AssociationConnector Association="DataModel.Application_AppServer" />
+        <AssociationConnector Association="DataModel.AppServer_AppServerReport" />
+        <AssociationConnector Association="DataModel.Application_ReportAppServer_Report" />
+        <AssociationConnector Association="DataModel.ReportEmail" />
+        <AssociationConnector Association="DataModel.ScheduleReport" />
+        <AssociationConnector Association="DataModel.SpaceServerSpaceServer_Report" />
+        <AssociationConnector Association="DataModel.SpaceReportSpaceServer_Report" />
+        <InheritanceConnector EntityType="DataModel.AdReport" />
+        <InheritanceConnector EntityType="DataModel.AppReport" />
+        <InheritanceConnector EntityType="DataModel.BackupReport" />
+        <InheritanceConnector EntityType="DataModel.SpaceReport" />
+        <InheritanceConnector EntityType="DataModel.AdSchedule" />
+        <InheritanceConnector EntityType="DataModel.AppSchedule" />
+        <InheritanceConnector EntityType="DataModel.BackupSchedule" />
+        <InheritanceConnector EntityType="DataModel.SpaceSchedule" />
+        <InheritanceConnector EntityType="DataModel.BackupServer" />
+        <InheritanceConnector EntityType="DataModel.AppServer" />
+        <InheritanceConnector EntityType="DataModel.FaultyServer" />
+        <InheritanceConnector EntityType="DataModel.SpaceServer" />
+        <AssociationConnector Association="DataModel.BackupServerBackupServer_Report" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

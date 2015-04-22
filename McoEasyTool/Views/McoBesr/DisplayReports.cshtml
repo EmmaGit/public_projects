@@ -1,0 +1,125 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.BackupReport>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        BESR_CONTROLLER = "McoBesr/";
+        BESR_MODULE = "BESR";
+
+        $("#mco-besr-div .file-opener").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            FileWindow = window.open(SITENAME + 'Reports/Download/' + reportId);
+        });
+
+        $("#mco-besr-div .details-viewer").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            $.ajax({
+                url: SITENAME + BESR_CONTROLLER + 'DisplayReportDetails/' + reportId,
+                type: "GET",
+                success: function (content) {
+                    BESR_MCO_DIV.html(content);
+                },
+                error: function (error) { BESR_MCO_DIV.html(error.responseText); },
+                complete: function () {
+                    colourTitles();
+                }
+            });
+        });
+
+        $("#mco-besr-div .email-viewer").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            EmailWindow = window.open(SITENAME + 'Reports/ViewEmail/' + reportId);
+        });
+
+        $("#mco-besr-div .email-sender").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            sendagain = confirm("Voulez-vous envoyer ce rapport de nouveaux à ses destinataires?");
+            if (sendagain) {
+                $.ajax({
+                    url: SITENAME + 'Reports/ReSend/' + reportId,
+                    type: "GET",
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de communication avec le serveur');
+                    }
+                });
+            }
+        });
+
+        $("#mco-besr-div .deleter").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            deletor = confirm("Voulez-vous vraiment supprimer ce rapport?");
+            if (deletor) {
+                $.ajax({
+                    url: SITENAME + BESR_CONTROLLER + 'DeleteBackupReport/' + reportId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) { BESR_MCO_DIV.html(error.responseText); },
+                    complete: function () {
+                        NAV_BESR_REPORTS_BTN.trigger("click");
+                        colourTitles();
+                    }
+                });
+            }
+        });
+
+        $("#mco-besr-div #report-statistic-btn").click(function () {
+            StatisticWindow = window.open(SITENAME + BESR_CONTROLLER + "DisplayReportStatistics");
+        });
+    });
+
+</script>
+<hgroup>
+    <h2 class="page-title">Historique des opérations</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<input id="report-statistic-btn" type="button" value="Statistiques" class="statistics-btn" title=
+    "Appuyez ici pour afficher les statistques" />
+<br /><br />
+<table id="report-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Lancement</th>
+            <th>Durée</th>
+            <th>Serveurs en erreur</th>
+            <th>Résultat</th>
+            <th>Auteur</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) { 
+        <tr class="item-summary-tr">
+            <td>
+                @Html.DisplayFor(modelItem => item.DateTime) 
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Duration) 
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalErrors)  erreurs(s)
+                sur @Html.DisplayFor(modelItem => item.TotalChecked) vérifié(s).
+            </td>
+            <td class="file-opener">
+                @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+                @Html.DisplayFor(modelItem => item.ResultPath) 
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Author) 
+            </td>
+            <td style="margin:0px;padding:0px;width:auto;">
+                @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+                <div class="action-div">
+                    <div class="action-icon details-viewer" title="voir details"></div>
+                    <div class="action-icon email-viewer" title="voir mail"></div>
+                    <div class="action-icon email-sender" title="renvoyer le mail associé à ce rapport"></div>
+                    <div class="action-icon deleter" title="supprimer"></div>
+                </div>                
+            </td>
+        </tr>
+} 
+    </tbody>
+</table>

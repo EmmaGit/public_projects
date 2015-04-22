@@ -1,0 +1,461 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.AdSchedule>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        //---------------------------------------------------
+        AD_CONTROLLER = "McoAd/";
+        AD_MODULE = "AD";
+
+        scheduleId = 0;
+        currentDisplayedMonth = 0;
+        actualMonth = 0;
+        //-----------------------------------------------
+        
+        TimeFiller($("#mco-ad-div #AD_hourselector"),$("#mco-ad-div #AD_minuteselector"));
+        
+        NextMonthBuilder();
+
+        CalendarBuilder($("#mco-ad-div #AD_thismonth-div"));
+
+        TriggerTimeChanges(AD_MODULE);
+
+        $("#mco-ad-div .calendar-table-td").click(function () {
+            if ($(this).hasClass("passedDay")) {
+                return false;
+            }
+            pickedday = $(this);
+            $("#mco-ad-div .calendar-table-td").each(function () {
+                if ($(this).hasClass("daypicked")) {
+                    $(this).removeClass("daypicked");
+                }
+            });
+            pickedday.addClass("daypicked");
+        });
+
+        $("#mco-ad-div #scheduler-btn").click(function () {
+            if ($("#mco-ad-div .daypicked").length != 1) {
+                alert("Veuillez d'abord sélectionner une date avant de procéder!!");
+            }
+            else {
+                now = new Date();
+                ParentTable = $("#mco-ad-div .daypicked").closest("table");
+                source = ParentTable.attr('id').match(/next/);
+                authorized = false;
+                if (source != null) {
+                    scheduled = new Date(now.getFullYear(), $("#mco-ad-div .daypicked").attr("name"),
+                        $("#mco-ad-div .daypicked").text(), $("#mco-ad-div #AD_hourselectorinput").val(),
+                        $("#mco-ad-div #AD_minuteselectorinput").val(), 0, 0);
+                }
+                else {
+                    scheduled = new Date(now.getFullYear(), now.getMonth(),
+                        $("#mco-ad-div .daypicked").text(), $("#mco-ad-div #AD_hourselectorinput").val(),
+                        $("#mco-ad-div #AD_minuteselectorinput").val(), 0, 0);
+                }
+                if ((scheduled - now) < 300000) {
+                    scheduled = new Date(now.getFullYear(), now.getMonth(),
+                        $("#mco-ad-div .daypicked").text(), now.getHours(),
+                        now.getMinutes() + 3, 0, 0);
+                    authorized = confirm("Vous devez planifier au moins 03 minutes en avance \n" +
+                            "Voulez-vous valider votre choix pour " + scheduled + "?");
+                }
+                else {
+                    authorized = true;
+                }
+                if (authorized) {
+                    autocorrect = $("#mco-ad-div #autocorrect").prop("checked");
+                    AD_MCO_DIV.prepend(loadinggif);
+                    $.ajax({
+                        url: SITENAME + AD_CONTROLLER + 'CreateSchedule',
+                        type: "POST",
+                        data: { day: scheduled.getDate(), month: scheduled.getMonth(),
+                            year: scheduled.getFullYear(), hours: scheduled.getHours(),
+                            minutes: scheduled.getMinutes(),
+                            multiplicity: $("#mco-ad-div #multiplicity").val(),
+                            taskname: $("#mco-ad-div #taskname").val(),
+                            autocorrect: autocorrect
+                        },
+                        success: function (data) {
+                            alert(data);
+                        },
+                        error: function (errorThrown) {
+                            alert('Erreur lors de la communication avec le serveur');
+                        },
+                        complete: function () {
+                            NAV_AD_SCAN_SCHEDULER_BTN.trigger("click");
+                            colourTitles();
+                        }
+                    });
+                }
+            }
+        });
+
+        $("#mco-ad-div input").focus(
+            function () {
+                $(this).select();
+            }
+        ).mouseup(
+            function (e) {
+                e.preventDefault();
+            }
+        );
+
+        $("#mco-ad-div .deleter").click(function () {
+            oldColor = $(this).closest("tr").css("background-color");
+            $(this).closest("tr").css("background-color", "#ffef6c");
+            deletor = confirm("Voulez vous réellement supprimer cette planification?");
+            if (deletor) {
+                scheduleId = $(this).closest("td").find(".action-id-getter").val();
+                $.ajax({
+                    url: SITENAME + AD_CONTROLLER + 'DeleteSchedule/' + scheduleId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        AD_MCO_DIV.html(error.responseText);
+                    },
+                    complete: function () {
+                        NAV_AD_SCAN_SCHEDULER_BTN.trigger("click");
+                        colourTitles();
+                    }
+                });
+            }
+            else {
+                $(this).closest("tr").css("background-color", oldColor);
+            }
+        });
+
+        $("#mco-ad-div .details-viewer").click(function () {
+            scheduleId = $(this).closest("td").find(".action-id-getter").val();
+            $.ajax({
+                url: SITENAME + AD_CONTROLLER + 'DisplayScheduleReports/' + scheduleId,
+                type: "GET",
+                success: function (response) {
+                    AD_MCO_DIV.html(response);
+                },
+                error: function (error) {
+                    AD_MCO_DIV.html(error.responseText);
+                },
+                complete: function () {
+                    colourTitles();
+                }
+            });
+        });
+
+        $("#mco-ad-div .details-editor").click(function () {
+            columns = $(this).closest("tr").find("td");
+            $("#mco-ad-div #taskname").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
+            launchingDate = columns.eq(2).text().replace(/^\s+|\s+$/g, '').split(" ");
+            var day = launchingDate[0].split("/")[0];
+            var month = launchingDate[0].split("/")[1];
+            var hour = launchingDate[1].split(":")[0];
+            var minute = launchingDate[1].split(":")[1];
+            var multiplicity = columns.eq(4).text().replace(/^\s+|\s+$/g, '');
+            switch (multiplicity) {
+                case "Une fois": $("#mco-ad-div #multiplicity").prop("selectedIndex", 0); break;
+                case "Quotidien": $("#mco-ad-div #multiplicity").prop("selectedIndex", 1); break;
+                case "Hebdomadaire ": $("#mco-ad-div #multiplicity").prop("selectedIndex", 2); break;
+            }
+            if (columns.eq(5).text().indexOf("OUI") != -1) {
+                $("#mco-ad-div #autocorrect").prop("checked", true);
+                $("#mco-ad-div #autocorrect").trigger("change");
+            }
+            else {
+                $("#mco-ad-div #autocorrect").prop("checked", false);
+                $("#mco-ad-div #autocorrect").trigger("change");
+            }
+            scheduleId = columns.eq(8).find(".action-id-getter").val();
+            $("#mco-ad-div #AD_hourselectorinput").val(hour); $("#mco-ad-div #AD_hourselector").prop("selectedIndex", hour);
+            $("#mco-ad-div #AD_minuteselectorinput").val(minute); $("#mco-ad-div #AD_minuteselector").prop("selectedIndex", minute);
+            $("#mco-ad-div .displayedmonth-div div").each(function () {
+                if (!($(this).hasClass("hidden-month"))) {
+                    $(this).addClass("hidden-month");
+                }
+                if (($(this).hasClass("displayed-month"))) {
+                    $(this).removeClass("displayed-month");
+                }
+            });
+            var scheduledMonth = $("#mco-ad-div .displayedmonth-div").find("div").eq(month - actualMonth - 1);
+            scheduledMonth.removeClass("hidden-month");
+            scheduledMonth.addClass("displayed-month");
+            scheduledMonth.find(".calendar-table-td").each(function () {
+                if ($(this).hasClass("daypicked")) {
+                    $(this).removeClass("daypicked");
+                }
+                if ($(this).text().replace(/^\s+|\s+$/g, '') == day || "0" + $(this).text().replace(/^\s+|\s+$/g, '') == day) {
+                    pickedday = $(this);
+                    if (!pickedday.hasClass("passedDay")) {
+                        pickedday.addClass("daypicked");
+                    }
+                }
+            });
+            if ($("#mco-ad-div .daypicked").length != 1) {
+                $("#mco-ad-div .calendar-table-td").each(function () {
+                    if ($(this).hasClass("daypicked")) {
+                        $(this).removeClass("daypicked");
+                    }
+                });
+                alert("La date de planification étant passée, la date d'aujourd'hui a été" +
+                    " sélectionnée par défaut.");
+                newpickedday = $("#mco-ad-div #AD_thismonth-div").find(".today");
+                newpickedday.addClass("daypicked");
+
+            }
+            
+            $("#mco-ad-div #scheduler-btn").css("visibility", "hidden");
+            $("#mco-ad-div #scheduler-btn").css("display", "none");
+            $("#mco-ad-div .schedule-editor-control").css("visibility", "visible");
+            $("#mco-ad-div .schedule-editor-control").css("display", "inline");
+
+        });
+
+        $("#mco-ad-div #scheduler-btn-cancelor").click(function () {
+            $("#mco-ad-div #taskname").val("");
+            $("#mco-ad-div #multiplicity").prop("selectedIndex", 0);
+            $("#mco-ad-div #AD_hourselectorinput").val("00"); $("#mco-ad-div #AD_hourselector").prop("selectedIndex", 0);
+            $("#mco-ad-div #AD_minuteselectorinput").val("00"); $("#mco-ad-div #AD_minuteselector").prop("selectedIndex", 0);
+            $("#mco-ad-div .daypicked").removeClass("daypicked");
+            $("#mco-ad-div .schedule-editor-control").css("visibility", "hidden");
+            $("#mco-ad-div .schedule-editor-control").css("display", "none");
+            $("#mco-ad-div #scheduler-btn").css("visibility", "visible");
+            $("#mco-ad-div #scheduler-btn").css("display", "inline");
+            $("#mco-ad-div .displayedmonth-div div").each(function () {
+                if (!($(this).hasClass("hidden-month"))) {
+                    $(this).addClass("hidden-month");
+                }
+                if (($(this).hasClass("displayed-month"))) {
+                    $(this).removeClass("displayed-month");
+                }
+            });
+            $("#mco-ad-div #autocorrect").prop("checked", false);
+            $("#mco-ad-div #autocorrect").trigger("change");
+            currentDisplayedMonth = actualMonth;
+            $("#mco-ad-div .AD_thismonth-div").removeClass("hidden-month");
+            $("#mco-ad-div .AD_thismonth-div").addClass("displayed-month");
+            currentDisplayedMonth = 0;
+            actualMonth = 0;
+            CalendarBuilder();
+        });
+
+        $("#mco-ad-div #scheduler-btn-editor").click(function () {
+            if ($("#mco-ad-div .daypicked").length != 1) {
+                alert("Veuillez d'abord sélectionner une date avant de procéder!!");
+            }
+            else {
+                now = new Date();
+                ParentTable = $("#mco-ad-div .daypicked").closest("table");
+                source = ParentTable.attr('id').match(/next/);
+                authorized = false;
+                if (source != null) {
+                    scheduled = new Date(now.getFullYear(), $("#mco-ad-div .daypicked").attr("name"),
+                        $("#mco-ad-div .daypicked").text(), $("#mco-ad-div #AD_hourselectorinput").val(),
+                        $("#mco-ad-div #AD_minuteselectorinput").val(), 0, 0);
+                }
+                else {
+                    scheduled = new Date(now.getFullYear(), now.getMonth(),
+                        $("#mco-ad-div .daypicked").text(), $("#mco-ad-div #AD_hourselectorinput").val(),
+                        $("#mco-ad-div #AD_minuteselectorinput").val(), 0, 0);
+                }
+                if ((scheduled - now) < 300000) {
+                    scheduled = new Date(now.getFullYear(), now.getMonth(),
+                        $("#mco-ad-div .daypicked").text(), now.getHours(),
+                        now.getMinutes() + 3, 0, 0);
+                    authorized = confirm("Vous devez planifier au moins 03 minutes en avance \n" +
+                            "Voulez-vous valider votre choix pour " + scheduled + "?");
+                }
+                else {
+                    authorized = true;
+                }
+                if (authorized) {
+                    autocorrect = $("#mco-ad-div #autocorrect").prop("checked");
+                    AD_MCO_DIV.prepend(loadinggif);
+                    $.ajax({
+                        url: SITENAME + AD_CONTROLLER + 'EditSchedule/' + scheduleId,
+                        type: "POST",
+                        data: { day: scheduled.getDate(), month: scheduled.getMonth(),
+                            year: scheduled.getFullYear(), hours: scheduled.getHours(),
+                            minutes: scheduled.getMinutes(),
+                            multiplicity: $("#mco-ad-div #multiplicity").val(),
+                            taskname: $("#mco-ad-div #taskname").val(),
+                            autocorrect: autocorrect
+                        },
+                        success: function (data) {
+                            alert(data);
+                        },
+                        error: function (errorThrown) {
+                            alert(errorThrown.responseText);
+                        },
+                        complete: function () {
+                            NAV_AD_SCAN_SCHEDULER_BTN.trigger("click");
+                            colourTitles();
+                        }
+                    });
+                }
+            }
+        });
+
+        $("#mco-ad-div .email-sender").click(function () {
+            scheduleId = $(this).closest("td").find(".action-id-getter").val();
+            sendagain = confirm("Voulez-vous envoyer ce rapport de nouveaux à ses destinataires?");
+            if (sendagain) {
+                $.ajax({
+                    url: SITENAME + AD_CONTROLLER + 'ReSendLastEmail/' + scheduleId,
+                    type: "GET",
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de communication avec le serveur');
+                    }
+                });
+            }
+        });
+
+        $("#mco-ad-div #next-month").click(function () {
+            if (currentDisplayedMonth < 11) {
+                $("#mco-ad-div .displayedmonth-div div").each(function () {
+                    if (!($(this).hasClass("hidden-month"))) {
+                        $(this).addClass("hidden-month");
+                    }
+                    if (($(this).hasClass("displayed-month"))) {
+                        $(this).removeClass("displayed-month");
+                    }
+                });
+                currentDisplayedMonth++;
+                $("#mco-ad-div #nextmonth-div-" + currentDisplayedMonth).removeClass("hidden-month");
+                $("#mco-ad-div #nextmonth-div-" + currentDisplayedMonth).addClass("displayed-month");
+            }
+        });
+
+        $("#mco-ad-div #previous-month").click(function () {
+            if (currentDisplayedMonth > actualMonth + 1) {
+                $("#mco-ad-div .displayedmonth-div div").each(function () {
+                    if (!($(this).hasClass("hidden-month"))) {
+                        $(this).addClass("hidden-month");
+                    }
+                    if (($(this).hasClass("displayed-month"))) {
+                        $(this).removeClass("displayed-month");
+                    }
+                });
+                currentDisplayedMonth--;
+                $("#mco-ad-div #nextmonth-div-" + currentDisplayedMonth).removeClass("hidden-month");
+                $("#mco-ad-div #nextmonth-div-" + currentDisplayedMonth).addClass("displayed-month");
+            }
+            else {
+                if (currentDisplayedMonth == actualMonth + 1) {
+                    $("#mco-ad-div .displayedmonth-div div").each(function () {
+                        if (!($(this).hasClass("hidden-month"))) {
+                            $(this).addClass("hidden-month");
+                        }
+                        if (($(this).hasClass("displayed-month"))) {
+                            $(this).removeClass("displayed-month");
+                        }
+                    });
+                    currentDisplayedMonth--;
+                    $("#mco-ad-div .AD_thismonth-div").removeClass("hidden-month");
+                    $("#mco-ad-div .AD_thismonth-div").addClass("displayed-month");
+                }
+            }
+        });
+    });
+</script>
+    <hgroup>
+        <h2 class="page-title">Planifier le lancement du processus</h2>
+    </hgroup>
+    <p class="page-title-info warning"></p>
+    <div id="schedule-index-div">
+    <div id="calendar-scheduler-div">
+        <div id="timepicker">
+            <label><span class="nav-info">Nom de la tâche : </span></label>
+            <input type="text" id="taskname" value="" placeholder ="Tâche planifiée" class="taskname-input"/><br /><br />
+            
+            <label class="select_time_label"><span class="nav-info">Repéter: </span></label>
+            <select id="multiplicity" class="select_time">
+                <option id="once">Une fois</option>
+                <option id="dayly">Quotidien</option>
+                <option id="weekly">Hebdomadaire</option>
+            </select>
+            
+            <label><span class="nav-info">Heure : </span></label>
+            <input type="text" id="AD_hourselectorinput" value="00" class="timepicker"/>
+            <select id="AD_hourselector" class="timeselector"></select>
+            <label><span class="nav-info"> Minutes : </span></label>
+            <input type="text" id="AD_minuteselectorinput" value="00"  class="timepicker"/>
+            <select id="AD_minuteselector" class="timeselector"></select>
+            <br /><br /><input type="checkbox" name="autocorrect" style="height:15px; width:20px;" id="autocorrect" value="autocorrect"/>
+            <span class="warning">Activer la détection et la correction de l'erreur 8606 sur les contrôleurs défaillants</span>
+        </div>
+        <div id="calendar-div">
+            <input id="previous-month" class="month-navigator-button" type="button" />
+            <div class="displayedmonth-div">
+                <div id="AD_thismonth-div" class="AD_thismonth-div"></div>
+            </div>
+            <input id="next-month" class="month-navigator-button" type="button" />
+        </div>
+        <div id="time-div">
+            <input id="scheduler-btn" class="schedule-control" type="button" value="Planifier" />
+            <input id="scheduler-btn-editor"  style="float:right; width : 100px;" class="schedule-editor-control" type="button" value="Modifier" />
+            <input id="scheduler-btn-cancelor" style="float:left; width : 100px; background-color: #ccc;" class="schedule-editor-control" type="button" value="Annuler" />
+        </div>
+    </div>
+    <div id="schedule-displayer-div">
+    <table id="schedule-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Tâche</th>
+            <th>Création</th>
+            <th>Prochaine exécution</th>
+            <th>Etat</th>
+            <th>Multiplicité</th>
+            <th>Correction automatique erreur 8606</th>
+            <th>Nombre d'exécutions</th>
+            <th>Générateur de la tâche</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr class="item-summary-tr">
+            <td>
+                @Html.DisplayFor(modelItem => item.TaskName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreationTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NextExecution)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.State)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Multiplicity)
+            </td>
+            <td>
+                @if(item.AutoCorrect == true){
+                    <span>OUI</span>
+                 } else{
+                    <span>NON</span>
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Executed)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Generator)
+            </td>
+            <td style="margin:0px;padding:0px;width:15%;">
+                @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})%>
+                <div class="action-div">
+                    <div class="action-icon details-viewer" title="voir rapports"></div>
+                    <div class="action-icon email-sender" title="renvoyer le mail associé au dernier rapport"></div>
+                    <div class="action-icon details-editor" title="modifier planification"></div>
+                    <div class="action-icon deleter" title="supprimer"></div>
+                </div>                
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+    
+    </div>
+    </div>

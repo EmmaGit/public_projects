@@ -1,0 +1,839 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.AppServer>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        APP_CONTROLLER = "McoApp/";
+        APP_MODULE = "APP";
+
+        var FIRST_ENTRY = 0;
+        var LEFT_ENTRY = 0;
+        var RIGHT_ENTRY = 0;
+        var LAST_ENTRY = 0;
+
+        FIRST_ENTRY = "@ViewBag.First_Entry";
+        LEFT_ENTRY = "@ViewBag.Left_Entry";
+        RIGHT_ENTRY = "@ViewBag.Right_Entry";
+        LAST_ENTRY = "@ViewBag.Last_Entry";
+
+        get_arrows(APP_MCO_DIV, APP_CONTROLLER + "DisplayApplicationServers/", FIRST_ENTRY, LEFT_ENTRY, RIGHT_ENTRY, LAST_ENTRY);
+
+        var Services = "";
+        var Server = "";
+        var TYPES = "";
+        var ACTIONS = "";
+
+        $("#mco-app-div .previous-link").click(function () {
+            NAV_APP_APPLICATIONS_BTN.trigger("click");
+        });
+
+        $("#mco-app-div #new-server-name").keypress(function (key) {
+            if (key.which == 32 || key.which == 59 || key.which == 44) {
+                return false;
+            }
+        });
+
+        $("#mco-app-div #new-server-name").blur(function () {
+            if ($(this).val().length == 0) {
+                return false;
+            }
+            $(this).val($(this).val().toUpperCase());
+            if ($(this).val().length >= 0 && Server != $("#mco-app-div #new-server-name").val()) {
+                Server = $("#mco-app-div #new-server-name").val();
+                $("body").toggleClass("wait");
+                $.ajax({
+                    url: SITENAME + APP_CONTROLLER + 'GetServersServices',
+                    type: "POST",
+                    data: { Servers: Server },
+                    success: function (data) {
+                        services_list = data.split("; ");
+                        for (index = 0; index < services_list.length; index++) {
+                            Services += "<option>" + services_list[index] + "</option>";
+                        }
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de la récupération de la liste de services.');
+                    },
+                    complete: function () {
+                        $("body").toggleClass("wait");
+                        $("#mco-app-div #new-application-procedure-table .new-application-procedure-type").each(function () {
+                            if ($(this).val() == "SERVICE") {
+                                $(this).trigger("change");
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        function noDoubleServers(server) {
+            $("#mco-app-div .application-server").each(function () {
+                servername = $(this).text().trim();
+                if (servername == server) {
+                    return false;
+                }
+            });
+            return true;
+        }
+        //END SERVER FILLER
+
+        function getProcedureTypes() {
+            options = "";
+            content = ["BATCH", "PROCESS", "SERVICE", "URL"];
+            for (index = 0; index < content.length; index++) {
+                switch (content[index]) {
+                    case "BATCH": options += "<option value='" + content[index] + "'>BATCH</option>"; break;
+                    case "PROCESS": options += "<option value='" + content[index] + "'>PROCESSUS</option>"; break;
+                    case "SERVICE": options += "<option value='" + content[index] + "'>SERVICE</option>"; break;
+                    case "URL": options += "<option value='" + content[index] + "'>URL</option>"; break;
+                    default: options += "<option value='" + content[index] + "'>" + content[index] + "</option>"; break;
+                }
+            }
+            return options;
+        }
+
+        function getProcedureActions() {
+            options = "";
+            content = ["START", "RESTART", "STOP", "CHECK"];
+            for (index = 0; index < content.length; index++) {
+                switch (content[index]) {
+                    case "START": options += "<option value='" + content[index] + "'>DEMARRER</option>"; break;
+                    case "STOP": options += "<option value='" + content[index] + "'>ARRETER</option>"; break;
+                    case "RESTART": options += "<option value='" + content[index] + "'>REDEMARRER</option>"; break;
+                    case "CHECK": options += "<option value='" + content[index] + "'>VERIFIER</option>"; break;
+                    default: options += "<option value='" + content[index] + "'>" + content[index] + "</option>"; break;
+                }
+            }
+            return options;
+        }
+        TYPES = getProcedureTypes();
+        ACTIONS = getProcedureActions();
+
+        function setNewProcedure() {
+            newline = "";
+            newline = "<tr class='item-summary-tr infoline'>";
+            newline += "<td style='width:15%;'><select  style='width:100%;' class='new-application-procedure-type'>";
+            newline += TYPES;
+            newline += "</select></td>";
+            newline += "<td class='target-td'>";
+            newline += "<input type='text' class='application-input target-td-content'/>";
+            newline += "</td>";
+            newline += "<td style='width:15%;'><select  style='width:100%;' class='new-application-procedure-action'>";
+            newline += ACTIONS;
+            newline += "</select></td>";
+            newline += "</tr>";
+            $("#mco-app-div #new-application-procedure-table").append(newline);
+        }
+
+        function resetNewProcedure() {
+            newline = "";
+            newline = "<tr class='item-summary-tr infoline'>";
+            newline += "<td style='width:15%;'><select  style='width:100%;' class='new-application-procedure-type'>";
+            newline += TYPES;
+            newline += "</select></td>";
+            newline += "<td class='target-td'>";
+            newline += "<input type='text' class='application-input target-td-content'/>";
+            newline += "</td>";
+            newline += "<td style='width:15%;'><select  style='width:100%;' class='new-application-procedure-action'>";
+            newline += ACTIONS;
+            newline += "</select></td>";
+            newline += "</tr>";
+            $("#mco-app-div #new-application-procedure-table").html(newline);
+        }
+
+        //TYPE OF PROCEDURE
+        $("#mco-app-div #new-application-server").on("change", ".new-application-procedure-type", function () {
+            target = $(this).parent().closest("tr").find(".target-td");
+            if ($(this).val() == "SERVICE") {
+                if ($("#mco-app-div #new-application-servers").val() == "") {
+                    alert("Veuillez d'abord remplir la liste des serveurs");
+                    $(this).val("BATCH"); $(this).trigger("change");
+                    $("#mco-app-div #new-application-servers").trigger("focus");
+                    return false;
+                }
+                target.html("<select class='target-service application-input target-td-content'>" + Services + "</select>");
+            }
+            else {
+                target.html("<input type='text' class='application-input target-td-content'/>");
+            }
+        });
+
+        $("#mco-app-div #new-application-server").on("change", ".target-td-content", function () {
+            content = $(this);
+            item_action = $(this).closest("tr").find(".new-application-procedure-action");
+            item_type = $(this).closest("tr").find(".new-application-procedure-type");
+            if (item_type.val() == "BATCH" && content.val().trim().length > 0) {
+                if (!isValidPath(content.val().trim())) {
+                    alert("SVP, veuillez entrer un chemin de fichier sous la forme:\n D:\\Folder\\file.ext");
+                    content.val("");
+                }
+                else {
+                    item_action.val("START");
+                    return true;
+                }
+            }
+            if (item_type.val() == "PROCESS" && content.val().trim().length > 0) {
+                if (content.val().indexOf(".") == -1) {
+                    content.val(content.val().trim() + ".exe");
+                    return true;
+                }
+                else {
+                    extension = content.val().trim().split(".");
+                    if (extension.length != 2 || extension[1].trim() == "") {
+                        alert("SVP, veuillez entrer un nom de process sous la forme:\n process.exe");
+                        content.val("");
+                    }
+                }
+            }
+            if (item_type.val() == "URL" && content.val().trim().length > 0) {
+                Url = content.val().trim();
+                Url = correctUrl(Url);
+                if (isValidUrl(Url)) {
+                    content.val(Url);
+                    item_action.val("CHECK");
+                }
+                else {
+                    alert(Url + " n'est pas une Url valide");
+                    content.val("");
+                }
+            }
+        });
+
+        //ACTION
+        $("#mco-app-div #new-application-server").on("change", "#new-application-procedure-table", function () {
+            actions = $(this).find(".new-application-procedure-action");
+            rows = $(this).find("tbody tr");
+            actions.each(function () {
+                target = $(this).closest("tr").find(".target-td .target-td-content");
+                if (target.val() != null && target.val().trim() != "") {
+                    switch ($(this).val()) {
+                        case "START": $(this).closest("tr").css("background-color", "#22aa77"); break;
+                        case "STOP": $(this).closest("tr").css("background-color", "#ff2222"); break;
+                        case "CHECK": $(this).closest("tr").css("background-color", "#ffe300"); break;
+                        case "RESTART": $(this).closest("tr").css("background-color", "#0f93cc"); break;
+                        default: $(this).closest("tr").css("background-color", "#22aa77"); break;
+                    }
+                }
+                if ($(this).closest("tr").find(".new-application-procedure-type").val().trim() == "BATCH") {
+                    type = $(this);
+                    if (target.val().trim() != "") {
+                        $(this).val("START");
+                    }
+                }
+                if ($(this).closest("tr").find(".new-application-procedure-type").val().trim() == "SERVICE") {
+                    target = $(this).parent().closest("tr").find(".target-td");
+                    if (target.val() != null || target.val().trim() == "") { }
+                }
+                if ($(this).closest("tr").find(".new-application-procedure-type").val().trim() == "URL") {
+                    if (target.val().trim() != "") {
+                        $(this).val("CHECK");
+                    }
+                }
+
+            });
+            last = rows.last();
+            lastindex = rows.length - 1;
+            row_index = 0;
+            addline = true;
+            rows.each(function () {
+                target = $(this).find(".target-td .target-td-content");
+                if (row_index != lastindex && (target.val() == null || target.val().trim() == "")) {
+                    addline = false;
+                    return false;
+                }
+                row_index++;
+            });
+            if (addline) {
+                if (last.find(".target-td .target-td-content").val().trim() != "") {
+                    setNewProcedure();
+                }
+            }
+        });
+
+
+        //START ORDER
+        $("#mco-app-div .start-order-infos").each(function () {
+            infos = $(this).text().split(";");
+            display = "<div class='hidden-app-infos start-infos'><table class='start-order-table' style='background-color:#67c074;width:100%;'>";
+            for (index = 0; index < infos.length; index++) {
+                if (infos[index].trim() != "") {
+                    display += "<tr><td>" + (index + 1) + "- " + infos[index].trim() + "</td></tr>";
+                }
+            }
+            display += "</table></div><span title='cliquez pour voir' class='start-infos-viewer'>" + infos.length + " opération(s)</span>";
+            $(this).html(display);
+        });
+
+        $("#mco-app-div .start-order-infos").click(function () {
+            if (!$(this).hasClass("displayed")) {
+                $("#mco-app-div .displayed").each(function () {
+                    $(this).toggleClass("displayed");
+                });
+                $("#mco-app-div .displayed-app-infos").remove();
+                $(this).toggleClass("displayed");
+                infos = "<div class='displayed-app-infos'>" + $(this).find(".hidden-app-infos").html() + "</div>";
+                $("#mco-app-div .index-tr").each(function () {
+                    if ($(this).find(".displayed").length == 0) {
+                        $(this).hide();
+                    }
+                });
+                APP_MCO_DIV.append(infos);
+                alert("Cliquez de nouveau sur la colonne Procédure de démarrage pour masquer ce panneau");
+            }
+            else {
+                $(this).toggleClass("displayed");
+                $("#mco-app-div .index-tr").each(function () {
+                    $(this).show();
+                });
+                $("#mco-app-div .displayed-app-infos").remove();
+            }
+        });
+        //END START ORDER
+
+        //STOP ORDER
+        $("#mco-app-div .stop-order-infos").each(function () {
+            if ($(this).text().trim() != "") {
+                infos = $(this).text().split(";");
+                display = "<div class='hidden-app-infos stop-infos'><table class='stop-order-table' style='background-color:#cd676a;width:100%;'>";
+                for (index = 0; index < infos.length; index++) {
+                    if (infos[index].trim() != "") {
+                        display += "<tr><td>" + (index + 1) + "- " + infos[index].trim() + "</td></tr>";
+                    }
+                }
+                display += "</table></div><span title='cliquez pour voir'>" + infos.length + " opération(s)</span>";
+            }
+            else {
+                display = "<span title='cliquez pour voir' class='stop-infos-viewer'>Procédure non mentionnée</span>";
+            }
+            $(this).html(display);
+        });
+
+        $("#mco-app-div .stop-order-infos").click(function () {
+            if (!$(this).hasClass("displayed")) {
+                $("#mco-app-div .displayed").each(function () {
+                    $(this).toggleClass("displayed");
+                });
+                $("#mco-app-div .displayed-app-infos").remove();
+                $(this).toggleClass("displayed");
+                infos = "<div class='displayed-app-infos'>" + $(this).find(".hidden-app-infos").html() + "</div>";
+                $("#mco-app-div .index-tr").each(function () {
+                    if ($(this).find(".displayed").length == 0) {
+                        $(this).hide();
+                    }
+                });
+                APP_MCO_DIV.append(infos);
+                alert("Cliquez de nouveau sur la colonne Procédure d'arrêt pour masquer ce panneau");
+            }
+            else {
+                $(this).toggleClass("displayed");
+                $("#mco-app-div .index-tr").each(function () {
+                    $(this).show();
+                });
+                $("#mco-app-div .displayed-app-infos").remove();
+            }
+        });
+        //END STOP ORDER
+
+        $("#mco-app-div #create-application-server-btn").click(function () {
+            Server_Name = $("#mco-app-div #new-server-name").val().trim();
+            appId = $("#mco-app-div #application-id-getter").text();
+            data = "";
+            infos = "";
+            if (Server_Name != "") {
+                $("#mco-app-div .infoline").each(function () {
+                    item_type = $(this).find(".new-application-procedure-type").val().trim();
+                    item_target = $(this).find(".target-td-content").val().trim();
+                    item_action = $(this).find(".new-application-procedure-action").val().trim();
+                    if (item_target.trim() != "") {
+                        data += item_type + " | " + item_target + " | " + item_action + ";";
+                        infos += "Type " + item_type + " : " + item_target + " : Action " + item_action + "\n";
+                    }
+                });
+                if (data != "") {
+                    add_app_server = confirm("Voulez-vous confirmer l'ajout du serveur avec les informations suivantes dans la base de données?\n" + infos +
+                        "\nUne procédure d'arrêt par défaut sera générée; vous pourrez la modifier après ajout du serveur.");
+                    if (add_app_server) {
+                        $("body").toggleClass("wait");
+                        $.ajax({
+                            url: SITENAME + APP_CONTROLLER + 'AddAppServer/' + appId,
+                            type: "POST",
+                            data: { Name: Server_Name, Procedures: data },
+                            success: function (response) {
+                                alert("L'ajout du serveur " + Server_Name + " a retourné le résultat " + response);
+                            },
+                            error: function (error) {
+                                alert("Erreur lors de l'ajout de l'application.");
+                            },
+                            complete: function () {
+                                $("body").toggleClass("wait");
+                                $.ajax({
+                                    url: SITENAME + APP_CONTROLLER + 'DisplayApplicationServers/' + appId,
+                                    type: "GET",
+                                    success: function (content) {
+                                        APP_MCO_DIV.html(content);
+                                    },
+                                    error: function (error) {
+                                        alert(error.responseText);
+                                    },
+                                    complete: function () { colourTitles(); }
+                                });
+                            }
+                        });
+                    }
+                }
+                else {
+                    alert("Veuillez rajouter au moins une opération au serveur");
+                }
+            }
+            else {
+                alert("Veuillez remplir les champs Serveur et rajouter au moins une opération avant de cliquer ce bouton");
+            }
+        });
+
+
+        $("#mco-app-div .details-editor").click(function () {
+            serverId = $(this).closest("td").find(".action-id-getter").val();
+            $("body").toggleClass("wait");
+            columns = $(this).closest("tr").find("td");
+            $("#mco-app-div #new-server-name").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
+            Server = $("#mco-app-div #new-server-name").val();
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + 'GetServersServices',
+                type: "POST",
+                data: { Servers: Server },
+                success: function (data) {
+                    services_list = data.split("; ");
+                    for (index = 0; index < services_list.length; index++) {
+                        Services += "<option>" + services_list[index] + "</option>";
+                    }
+                    table = columns.eq(1).find(".start-order-table");
+                    $("#mco-app-div #new-application-procedure-table").html("");
+                    notfound = "";
+                    table.find("tr").each(function () {
+                        infos = $(this).text().split("|");
+                        type = infos[0].split("- ")[1]; target = infos[1]; action = infos[2];
+                        newline = "<tr class='item-summary-tr infoline infomod'>";
+                        newline += "<td style='width:15%;'><select  style='width:100%;' class='new-application-procedure-type'>";
+                        newline += "<option value='BATCH'>BATCH</option>";
+                        newline += "<option value='SERVICE'>SERVICE</option>";
+                        newline += "<option value='PROCESS'>PROCESSUS</option>";
+                        newline += "<option value='URL'>URL</option>";
+                        newline += "</select></td>";
+                        newline += "<td class='target-td'>";
+                        newline += (type == "SERVICE") ? "<select class='target-service application-input target-td-content'>" + Services + "</select>" :
+                            "<input type='text' class='application-input target-td-content'/>";
+                        newline += "</td>";
+                        newline += "<td style='width:15%;'><select  style='width:100%;' class='new-application-procedure-action'>";
+                        newline += "<option value='START'>DEMARRER</option>";
+                        newline += "<option value='STOP'>ARRETER</option>";
+                        newline += "<option value='RESTART'>REDEMARRER</option>";
+                        newline += "<option value='CHECK'>TESTER</option>";
+                        newline += "</select></td>";
+                        newline += "</tr>";
+                        $("#mco-app-div #new-application-procedure-table").append(newline);
+                        $("#mco-app-div #new-application-procedure-table .infomod").find(".new-application-procedure-type").val(type);
+                        $("#mco-app-div #new-application-procedure-table .infomod").find(".new-application-procedure-action").val(action);
+                        if (type == "SERVICE") {
+                            if (Services.indexOf(target.toLowerCase()) != -1) {
+                                $("#mco-app-div #new-application-procedure-table .infomod").find(".target-td-content").val(target.toLowerCase());
+                            }
+                            else {
+                                if (Services.indexOf(target) != -1) {
+                                    $("#mco-app-div #new-application-procedure-table .infomod").find(".target-td-content").val(target);
+                                }
+                                else {
+                                    $("#mco-app-div #new-application-procedure-table .infomod").find(".target-td-content").val("");
+                                    notfound += target + " non trouvé dans la liste des services disponibles\n";
+                                }
+                            }
+                        }
+                        else {
+                            $("#mco-app-div #new-application-procedure-table .infomod").find(".target-td-content").val(target);
+                        }
+                        $("#mco-app-div #new-application-procedure-table .infomod").each(function () {
+                            $(this).removeClass("infomod");
+                        });
+                    });
+                    if (notfound != "") {
+                        alert(notfound);
+                    }
+                    setNewProcedure();
+                    $("body").toggleClass("wait");
+                    $("#mco-app-div #new-application-procedure-table").trigger("change");
+                },
+                error: function (errorThrown) {
+                    alert('Erreur lors de la récupération de la liste des services.');
+                    $("body").toggleClass("wait");
+                }
+            });
+
+            appId = $(this).closest("td").find(".action-id-getter").val();
+            $("#mco-app-div #create-application-server-btn").css("visibility", "hidden");
+            $("#mco-app-div #create-application-server-btn").css("display", "none");
+            $("#mco-app-div .application-editor-control").css("visibility", "visible");
+            $("#mco-app-div .application-editor-control").css("display", "inline");
+        });
+
+        $("#mco-app-div .stop-details-editor").click(function () {
+            serverId = $(this).closest("td").find(".action-id-getter").val();
+            $("body").toggleClass("wait");
+            columns = $(this).closest("tr").find("td");
+            $("#mco-app-div #new-server-name").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
+            Server = $("#mco-app-div #new-server-name").val();
+            $("#mco-app-div #new-server-name").css("opacity", 0.5);
+            $("#mco-app-div #new-server-name").attr("disabled", "disabled");
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + 'GetServersServices',
+                type: "POST",
+                data: { Servers: Server },
+                success: function (data) {
+                    services_list = data.split("; ");
+                    for (index = 0; index < services_list.length; index++) {
+                        Services += "<option>" + services_list[index] + "</option>";
+                    }
+                    table = columns.find(".stop-infos .stop-order-table");
+                    $("#mco-app-div #new-application-procedure-table").html("");
+                    notfound = "";
+                    table.find("tr").each(function () {
+                        infos = $(this).text().split("|");
+                        type = infos[0].split("- ")[1]; target = infos[1]; action = infos[2];
+                        newline = "<tr class='item-summary-tr infoline infomod'>";
+                        newline += "<td style='width:15%;'><select  style='width:100%;' class='new-application-procedure-type'>";
+                        newline += "<option value='BATCH'>BATCH</option>";
+                        newline += "<option value='SERVICE'>SERVICE</option>";
+                        newline += "<option value='PROCESS'>PROCESSUS</option>";
+                        newline += "<option value='URL'>URL</option>";
+                        newline += "</select></td>";
+                        newline += "<td class='target-td'>";
+                        newline += (type == "SERVICE") ? "<select class='target-service application-input target-td-content'>" + Services + "</select>" :
+                            "<input type='text' class='application-input target-td-content'/>";
+                        newline += "</td>";
+                        newline += "<td style='width:15%;'><select  style='width:100%;' class='new-application-procedure-action'>";
+                        newline += "<option value='START'>DEMARRER</option>";
+                        newline += "<option value='STOP'>ARRETER</option>";
+                        newline += "<option value='RESTART'>REDEMARRER</option>";
+                        newline += "<option value='CHECK'>TESTER</option>";
+                        newline += "</select></td>";
+                        newline += "</tr>";
+                        $("#mco-app-div #new-application-procedure-table").append(newline);
+                        $("#mco-app-div #new-application-procedure-table .infomod").find(".new-application-procedure-type").val(type);
+                        $("#mco-app-div #new-application-procedure-table .infomod").find(".new-application-procedure-action").val(action);
+                        if (type == "SERVICE") {
+                            if (Services.indexOf(target.toLowerCase()) != -1) {
+                                $("#mco-app-div #new-application-procedure-table .infomod").find(".target-td-content").val(target.toLowerCase());
+                            }
+                            else {
+                                if (Services.indexOf(target) != -1) {
+                                    $("#mco-app-div #new-application-procedure-table .infomod").find(".target-td-content").val(target);
+                                }
+                                else {
+                                    $("#mco-app-div #new-application-procedure-table .infomod").find(".target-td-content").val("");
+                                    notfound += target + " non trouvé dans la liste des services disponibles\n";
+                                }
+                            }
+                        }
+                        else {
+                            $("#mco-app-div #new-application-procedure-table .infomod").find(".target-td-content").val(target);
+                        }
+                        $("#mco-app-div #new-application-procedure-table .infomod").each(function () {
+                            $(this).removeClass("infomod");
+                        });
+                        $("#mco-app-div #new-application-procedure-table .infomod").each(function () {
+                            $(this).removeClass("infomod");
+                        });
+                    });
+                    if (notfound != "") {
+                        alert(notfound);
+                    }
+                    setNewProcedure();
+                    $("body").toggleClass("wait");
+                    $("#mco-app-div #new-application-procedure-table").trigger("change");
+                },
+                error: function (errorThrown) {
+                    alert('Erreur lors de la récupération de la liste de services.');
+                    $("body").toggleClass("wait");
+                }
+            });
+
+            appId = $(this).closest("td").find(".action-id-getter").val();
+            $("#mco-app-div #create-application-server-btn").css("visibility", "hidden");
+            $("#mco-app-div #create-application-server-btn").css("display", "none");
+            $("#mco-app-div .application-editor-control").css("visibility", "visible");
+            $("#mco-app-div .application-editor-control").css("display", "inline");
+            $("#mco-app-div #application-server-btn-editor").toggleClass("stop-editor");
+        });
+
+        $("#mco-app-div .cancelor").click(function () {
+            $("#mco-app-div #new-server-name").val("");
+            resetNewProcedure();
+            $("#mco-app-div .application-editor-control").css("visibility", "hidden");
+            $("#mco-app-div .application-editor-control").css("display", "none");
+            $("#mco-app-div #create-application-server-btn").css("visibility", "visible");
+            $("#mco-app-div #create-application-server-btn").css("display", "inline");
+            if ($("#mco-app-div #application-server-btn-editor").hasClass("stop-editor")) {
+                $("#mco-app-div #application-server-btn-editor").removeClass("stop-editor");
+                $("#mco-app-div #new-application-servers").removeAttr("disabled");
+                $("#mco-app-div #new-application-servers").css("opacity", 1);
+            }
+        });
+
+        $("#mco-app-div #application-server-btn-editor").click(function () {
+            Server_Name = $("#mco-app-div #new-server-name").val().trim();
+            appId = $("#mco-app-div #application-id-getter").text();
+            data = "";
+            infos = "";
+            if (Server_Name != "") {
+                $("#mco-app-div .infoline").each(function () {
+                    item_type = $(this).find(".new-application-procedure-type").val().trim();
+                    item_target = $(this).find(".target-td-content").val().trim();
+                    item_action = $(this).find(".new-application-procedure-action").val().trim();
+                    if (item_target.trim() != "") {
+                        data += item_type + " | " + item_target + " | " + item_action + ";";
+                        infos += "Type " + item_type + " : " + item_target + " : Action " + item_action + "\n";
+                    }
+                });
+                if (data != "") {
+                    if ($(this).hasClass("stop-editor")) {
+                        edit_app_server = confirm("Voulez-vous confirmer les modifications de la procédure d'arrêt pour le serveur " + Server_Name + " avec les informations suivantes?\n" + infos);
+                        link = SITENAME + APP_CONTROLLER + 'StopEditAppServer/' + serverId;
+                    }
+                    else {
+                        edit_app_server = confirm("Voulez-vous confirmer les modifications de la procédure de démarrage pour le serveur " + Server_Name + " avec les informations suivantes?\n" + infos);
+                        link = SITENAME + APP_CONTROLLER + 'StartEditAppServer/' + serverId;
+                    }
+                    if (edit_app_server) {
+                        $("body").toggleClass("wait");
+                        $.ajax({
+                            url: link,
+                            type: "POST",
+                            data: { Name: Server_Name, Procedures: data },
+                            success: function (response) {
+                                alert("L'opération de modification a retourné le résultat " + response);
+                            },
+                            error: function (error) {
+                                alert("Erreur lors de l'ajout de l'application.");
+                            },
+                            complete: function () {
+                                $("body").toggleClass("wait");
+                                $.ajax({
+                                    url: SITENAME + APP_CONTROLLER + 'DisplayApplicationServers/' + appId,
+                                    type: "GET",
+                                    success: function (content) {
+                                        APP_MCO_DIV.html(content);
+                                    },
+                                    error: function (error) {
+                                        alert(error.responseText);
+                                    },
+                                    complete: function () { colourTitles(); }
+                                });
+                            }
+                        });
+                    }
+                }
+                else {
+                    alert("Veuillez rajouter au moins une opération au serveur");
+                }
+            }
+            else {
+                alert("Veuillez remplir les champs Serveur et rajouter au moins une opération avant de cliquer ce bouton");
+            }
+        });
+
+
+        $("#mco-app-div .application-function").click(function () {
+            serverId = $(this).closest("td").find(".action-id-getter").val();
+            appId = $("#mco-app-div #application-id-getter").text();
+            link = "";
+            execute = false;
+            if ($(this).hasClass("check-launcher")) {
+                execute = confirm("Voulez-vous vraiment récupérer l'état de ce serveur maintenant?");
+                link = SITENAME + APP_CONTROLLER + 'GetAppServerState/' + serverId;
+            }
+            if ($(this).hasClass("item-starter")) {
+                execute = confirm("Attention!! vous êtes sur le point de lancer la procédure de démarrage pour ce serveur. Voulez-vous continuer?");
+                link = SITENAME + APP_CONTROLLER + 'StartAppServer/' + serverId;
+            }
+            if ($(this).hasClass("item-restarter")) {
+                execute = confirm("Attention!! vous êtes sur le point de lancer la procédure de redémarrage pour ce serveur. Voulez-vous continuer?");
+                link = SITENAME + APP_CONTROLLER + 'RestartAppServer/' + serverId;
+            }
+            if ($(this).hasClass("item-stopper")) {
+                execute = confirm("Attention!! vous êtes sur le point de lancer la procédure d'arrêt pour ce serveur. Voulez-vous continuer?");
+                link = SITENAME + APP_CONTROLLER + 'StopAppServer/' + serverId;
+            }
+            if (execute) {
+                APP_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: link,
+                    type: "GET",
+                    success: function (response) {
+                        message = "L'opération a retourné le statut " + response.status + " avec les détails suivants";
+                        alert(message + "\n" + response.details);
+                    },
+                    error: function (errorThrown) {
+                        alert("Erreur l'exécution de la demande.");
+                    },
+                    complete: function () {
+                        $.ajax({
+                            url: SITENAME + 'Applications/DisplayServers/' + appId,
+                            type: "GET",
+                            success: function (content) {
+                                APP_MCO_DIV.html(content);
+                            },
+                            error: function (error) {
+                                alert(error.responseText);
+                            },
+                            complete: function () { colourTitles(); }
+                        });
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-app-div .deleter").click(function () {
+            appId = $("#mco-app-div #application-id-getter").text();
+            deletor = confirm("Voulez vous réellement supprimer ce serveur?");
+            if (deletor) {
+                serverId = $(this).closest("td").find(".action-id-getter").val();
+                APP_MCO_DIV.prepend(loadinggif);
+                $("body").toggleClass("wait");
+                $.ajax({
+                    url: SITENAME + APP_CONTROLLER + 'DeleteAppServer/' + serverId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        $("body").toggleClass("wait");
+                        $.ajax({
+                            url: SITENAME + APP_CONTROLLER + 'DisplayApplicationServers/' + appId,
+                            type: "GET",
+                            success: function (content) {
+                                APP_MCO_DIV.html(content);
+                            },
+                            error: function (error) {
+                                alert(error.responseText);
+                            },
+                            complete: function () { colourTitles(); }
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>
+<hgroup>
+    <h2 class="page-title">@ViewBag.Message</h2>
+    <span id="application-id-getter" class="application-id-getter">@ViewBag.appId</span>
+</hgroup>
+<div id="new-application-server" class="new-application">
+    <p class="page-title-info warning"></p>
+    <a class="previous-link">Précédent</a>
+    <br />
+    <label><span class="new-recipient-title">
+        <strong>Ajoutez un serveur à la liste</strong>
+    </span></label>
+    <table class="new-application-procedure-table">
+        <tr>
+            <td style="width:15%;">
+                <span class="new-application-label">Serveur :</span>
+            </td>
+            <td style="width:25%;">
+                <input type="text" id="new-server-name" placeholder ="BCNVSSRV007" class="application-input"/>
+            </td>
+        </tr>
+    </table>
+    <label>
+        <span class="new-recipient-title">
+            <strong>Veuillez faire attention à rentrer chaque élément selon l'ordre de lancement<br />
+            La première ligne du tableau contient la première instruction à être exécutée.</strong>
+        </span>
+    </label>
+    <table id="new-application-procedure-table" class="new-application-procedure-table">
+        <thead class="new-application-procedure-thead">
+            <th>Type</th>
+            <th>Cible</th>
+            <th>Action</th>
+        </thead>
+        <tbody>
+            <tr class="item-summary-tr infoline">
+                <td style="width:15%;"><select  style="width:100%;" class="new-application-procedure-type">
+                    <option value="BATCH">BATCH</option>
+                    <option value="SERVICE">SERVICE</option>
+                    <option value="PROCESS">PROCESSUS</option>
+                    <option value='URL'>URL</option>
+                </select></td>
+                <td class="target-td">
+                    <input type="text" value="" class="target-td-content application-input"/>
+                </td>
+                <td style="width:15%;"><select  style="width:100%;" class="new-application-procedure-action">
+                    <option value="START">DEMARRER</option>
+                    <option value="STOP">ARRETER</option>
+                    <option value="RESTART">REDEMARRER</option>
+                    <option value="CHECK">TESTER</option>
+                </select></td>
+            </tr>
+        </tbody>
+    </table>
+    <div style="width:50%;margin:auto;position:relative;text-align:center;">
+        <input id="create-application-server-btn" class="application-creator" type="button" value="Ajouter" />
+        <input id="application-server-btn-editor"  style="float:right" class="application-editor-control editor" type="button" value="Modifier" />
+        <input id="application-server-btn-cancelor" style="float:left" class="application-editor-control cancelor" type="button" value="Annuler" />
+    </div>
+</div>
+<br /><br />
+<div id="application-server-list" class="application-list">
+    <table id="application-server-table" class="item-summary application-table">
+        <thead>
+            <tr class="item-summary-thead">
+                <th>Serveurs</th>
+                <th>Procédure de démarrage</th>
+                <th>Procédure d'arrêt</th>
+                <th>Adresse IP</th>
+                <th>Localisation</th>
+                <th>Statut</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody> 
+        @foreach (var item in Model) {
+        <tr class="item-summary-tr index-tr">
+            <td class="application-server" style="width:15%">
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td class="start-order-infos" style="width:30%">
+                @Html.DisplayFor(modelItem => item.StartOrder)
+            </td>
+            <td class="stop-order-infos" style="width:30%">
+                @Html.DisplayFor(modelItem => item.StopOrder)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IpAddress)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Location)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td style="margin=0px;padding=0px;width:25%">
+                @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+                <div class="action-div">
+                    <div class="action-icon check-launcher application-function" title="Vérifier l'état de ce serveur"></div>
+                    <div class="action-icon item-starter application-function" title="Lancer la procédure de démarrage du serveur"></div>
+                    <div class="action-icon item-restarter application-function" title="Lancer la procédure de redémarrage du serveur"></div>
+                    <div class="action-icon item-stopper application-function" title="Lancer la procédure d'arrêt du serveur"></div>
+                    <div class="action-icon details-editor" title="Modifier la procédure de démarrage du serveur"></div>
+                    <div class="action-icon stop-details-editor" title="Modifier la procédure d'arrêt du serveur"></div>
+                    <div class="action-icon deleter" title="Supprimer ce serveur"></div>
+                 </div>                
+             </td>
+         </tr>
+        }
+        </tbody>
+    </table>
+    <a class="previous-link">Précédent</a><br />
+</div> 
+

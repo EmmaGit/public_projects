@@ -1,0 +1,131 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.Application_Report>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        APP_CONTROLLER = "McoApp/";
+        APP_MODULE = "APP";
+
+        APP_PREVIOUS = $("#mco-app-div .previous-id-getter").eq(0).val();
+
+        $("#mco-app-div .item-summary-tr").each(function () {
+            status = $(this).find("td").eq(1).text().trim();
+            if (status == "OK") {
+                $(this).css("background-color", "#22b14c");
+            }
+            else {
+                if (status == "H-OK") {
+                    $(this).css("background-color", "#de5a26");
+                }
+                else {
+                    if (status == "KO") {
+                        $(this).css("background-color", "#ff3f3f");
+                    }
+                    else {
+                        $(this).css("background-color", "#a3a3a3");
+                    }
+                }
+            }
+            $(this).find("td").each(function () {
+                $(this).css("color", "#fff");
+            });
+        });
+
+        $("#mco-app-div .start-order-infos").each(function () {
+            infos = $(this).val().split(";");
+            display = "";
+            for (index = 0; index < infos.length; index++) {
+                if (infos[index].trim() != "") {
+                    display += "<tr><td>" + (index + 1) + "- " + infos[index].trim() + "</td></tr>";
+                }
+            }
+            $(this).val(display);
+        });
+
+        $("#mco-app-div .stop-order-infos").each(function () {
+            if ($(this).val().trim() != "") {
+                infos = $(this).val().split(";");
+                display = "";
+                for (index = 0; index < infos.length; index++) {
+                    if (infos[index].trim() != "") {
+                        display += "<tr><td>" + (index + 1) + "- " + infos[index].trim() + "</td></tr>";
+                    }
+                }
+            }
+            else {
+                display = "Vide";
+            }
+            $(this).val(display);
+        });
+
+        $("#mco-app-div .item-summary-tr").click(function () {
+            appreportId = $(this).find(".action-id-getter").val();
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + 'DisplayReportFurtherDetails/' + appreportId,
+                data: { origin: "DisplayScheduleReportDetails" },
+                type: "POST",
+                success: function (data) {
+                    APP_MCO_DIV.html(data);
+                },
+                error: function (errorThrown) {
+                    alert('Erreur lors de communication avec le serveur');
+                },
+                complete: function () { colourTitles(); }
+            });
+        });
+
+        $("#mco-app-div .previous-link").click(function () {
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + 'DisplayScheduleReports/' + APP_PREVIOUS,
+                type: "GET",
+                success: function (data) {
+                    APP_MCO_DIV.html(data);
+                },
+                error: function (errorThrown) {
+                    alert('Erreur lors de communication avec le serveur');
+                },
+                complete: function () { colourTitles(); }
+            });
+        });
+    });
+</script>
+
+<hgroup>
+    <h2 class="page-title">Check du @ViewBag.Message</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<a class="previous-link">Précédent</a>
+<table id="appreport-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Applications</th>
+            <th>Etat</th>
+            <th>Authentification</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+    <tr class="item-summary-tr" title="Cliquez pour obtenir plus de détails sur ce résultat : @item.Application.Name">
+        <td class="applicationviewer">
+            @Html.TextBox("action-id-getter-" + item.Id, item.Id, new { @disabled = "disabled", @class = "action-id-getter" })
+            @Html.TextBox("previous-id-getter-" + item.AppReport.ScheduleId, item.AppReport.ScheduleId, new { @disabled = "disabled", @class = "previous-id-getter" })
+            @Html.DisplayFor(modelItem => item.Application.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.State)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Authentified)
+        </td>
+        <td style="margin:0px;padding:0px;">
+            @if (item.State == "OK" || item.State == "KO" || item.State == "H-OK"){
+                @Html.TextBox("action-id-getter-" + item.Id, item.Id, new { @disabled = "disabled", @class = "action-id-getter" })
+                <div class="action-div">
+                    <div class="action-icon details-viewer" title="voir plus de details"></div>
+                </div>
+            }
+         </td>
+    </tr>
+}
+</tbody>
+</table>
+<a class="previous-link">Précédent</a>

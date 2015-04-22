@@ -1,0 +1,202 @@
+﻿@{
+    Layout = null;
+}
+@model IEnumerable<McoEasyTool.Account>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        COMMON_CONTROLLER = "Accounts/";
+
+        $("#mco-common-div #create-account-btn").click(function () {
+            username = $("#mco-common-div #account-username").val();
+            password = $("#mco-common-div #account-password").val();
+            repeat = $("#mco-common-div #account-repeat").val();
+            if (username == null || username.trim() == "" || password == null || password.trim() == "" ||
+                repeat == null || repeat.trim() == "") {
+                alert("Veuillez remplir tous les champs avant validation SVP.");
+                return false;
+            }
+            if (password != repeat) {
+                alert("Les deux mots de passe ne correspondent pas");
+                $("#mco-common-div #account-password").val("");
+                $("#mco-common-div #account-repeat").val("");
+                return false;
+            }
+            else {
+                username = "username=" + username;
+                password = "password=" + password;
+                $.ajax({
+                    url: SITENAME + COMMON_CONTROLLER + 'AddAccount',
+                    type: "POST",
+                    data: username + "&" + password,
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de la communication avec le serveur');
+                    },
+                    complete: function () {
+                        NAV_ACCOUNTS_BTN.trigger("click");
+                        colourTitles();
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-common-div .deleter").click(function () {
+            deletor = confirm("Voulez vous réellement supprimer ce compte de la liste?");
+            if (deletor) {
+                accountId = $(this).closest("td").find(".action-id-getter").val();
+                $.ajax({
+                    url: SITENAME + COMMON_CONTROLLER +'DeleteAccount/' + accountId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        NAV_ACCOUNTS_BTN.trigger("click");
+                        colourTitles();
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-common-div .details-editor").click(function () {
+            columns = $(this).closest("tr").find("td");
+            var username = columns.eq(0).text().replace(/^\s+|\s+$/g, '');
+            username = username + "\\" + columns.eq(1).text().replace(/^\s+|\s+$/g, '');
+            $("#mco-common-div #account-username").val(username);
+            $("#mco-common-div #account-password").val("");
+            $("#mco-common-div #account-repeat").val("");
+            accountId = $(this).closest("td").find(".action-id-getter").val();
+            $("#mco-common-div #create-account-btn").css("visibility", "hidden");
+            $("#mco-common-div #create-account-btn").css("display", "none");
+            $("#mco-common-div .account-editor-control").css("visibility", "visible");
+            $("#mco-common-div .account-editor-control").css("display", "inline");
+        });
+
+        //----------------------------------------------------------
+        $("#mco-common-div .cancelor").click(function () {
+            $("#mco-common-div #account-username").val("");
+            $("#mco-common-div #account-password").val("");
+            $("#mco-common-div #account-repeat").val("");
+            $("#mco-common-div .account-editor-control").css("visibility", "hidden");
+            $("#mco-common-div .account-editor-control").css("display", "none");
+            $("#mco-common-div #create-account-btn").css("visibility", "visible");
+            $("#mco-common-div #create-account-btn").css("display", "inline");
+        });
+
+        //----------------------------------------------------------
+        $("#mco-common-div .editor").click(function () {
+            username = $("#mco-common-div #account-username").val();
+            password = $("#mco-common-div #account-password").val();
+            repeat = $("#mco-common-div #account-repeat").val();
+            if (username == null || username.trim() == "" || password == null || password.trim() == ""||
+                repeat == null || repeat.trim() == "")
+            {
+                alert("Veuillez remplir tous les champs avant validation SVP.");
+                return false;
+            }
+            if (password != repeat)
+            {
+                alert("Les deux mots de passe ne correspondent pas");
+                $("#mco-common-div #account-password").val("");
+                $("#mco-common-div #account-repeat").val("");
+                return false;
+            }
+            else
+            {
+                username = "username=" + username;
+                password = "password=" + password;
+
+                $.ajax({
+                    url: SITENAME + COMMON_CONTROLLER + 'EditAccount/' + accountId,
+                    type: "POST",
+                    data: username + "&" + password,
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de la communication avec le serveur');
+                    },
+                    complete: function () {
+                        NAV_ACCOUNTS_BTN.trigger("click");
+                        colourTitles();
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-common-div #account-username").blur(function () {
+            if ($("#mco-common-div #account-username").val().indexOf("\\") == -1) {
+                alert("Il faut entrer le nom d'utilisateur sous la forme Domaine\\utilisateur.");
+                $("#mco-common-div #account-username").val("");
+            }
+        });
+    });
+    //test if is email address
+
+</script>
+<hgroup>
+    <h2 class="page-title">Gestion de la liste des Destinataires Check SPACE</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<div id="new-account" class="new-account">
+    <label><span class="new-account-title">
+        <strong>Ajoutez un compte à la liste</strong>
+        </span></label>
+    <br /><br />
+    <label><span class="new-account-label">Nom d'utilisateur :</span></label>
+    <input type="text" id="account-username" value="" placeholder ="BYCN\AE.GNAMIAN" class="address-input"/><br /><br />
+    <label><span class="new-account-label">Mot de passe :</span></label>
+    <input type="password" id="account-password" value="" class="address-input"/><br /><br />
+    <label><span class="new-account-label">Confirmer :</span></label>
+    <input type="password" id="account-repeat" value="" class="address-input"/><br /><br />
+    <input id="create-account-btn" class="account-creator" type="button" value="Ajouter" />
+    <input id="account-btn-editor"  style="float:right" class="account-editor-control editor" type="button" value="Modifier" />
+    <input id="account-btn-cancelor" style="float:left" class="account-editor-control cancelor" type="button" value="Annuler" />
+</div>
+<br /><br />
+<label>
+    <span>
+        Les comptes renseignés ici seront utilisables dans les modules utilisant les fonctionnalité de
+        reproduction des comptes utilisateurs (Impersonation).
+    </span>
+</label>
+<table id="account-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Nom du domaine</th>
+            <th>Nom d'utilisateur</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+
+@foreach (var item in Model) {
+        <tr class="item-summary-tr">
+        <td>
+            @Html.DisplayFor(modelItem => item.Domain)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Username)
+        </td>
+        <td style="margin=0px;padding=0px;">
+            @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+            <div class="action-div">
+                <div class="action-icon details-editor" title="modifier compte"></div>
+                @if(!item.IsSystem) {
+                     <div class="action-icon deleter" title="supprimer"></div>
+                }
+            </div>
+        </td>
+    </tr>
+}
+    </tbody>
+</table>

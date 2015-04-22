@@ -1,0 +1,252 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.Application_Report>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        APP_CONTROLLER = "McoApp/";
+        APP_MODULE = "APP";
+
+        $("#mco-app-div .item-summary-tr td").click(function () {
+            if ($(this).find(".selected-apps").length == 0) {
+                checkbox = $(this).closest("tr").find("td").find(".selected-apps");
+                checkbox.trigger("click");
+            }
+        });
+
+        $("#mco-app-div .selected-apps").change(function () {
+            line = $(this).parent().parent();
+            if ($(this).prop("checked") == true) {
+                line.toggleClass("checkedapp");
+                line.css("background-color", "#ffc90e");
+            }
+            else {
+                line.removeClass("checkedapp");
+                line.css("background-color", "#953735");
+                $("#mco-app-div #CheckAllboxes").prop("checked", false);
+            }
+        });
+
+        $("#mco-app-div .item-summary-tr").each(function () {
+            status = $(this).find("td").eq(2).text().trim();
+            if (status == "OK") {
+                $(this).css("background-color", "#22b14c");
+            }
+            else {
+                if (status == "H-OK") {
+                    $(this).css("background-color", "#de5a26");
+                }
+                else {
+                    if (status == "KO") {
+                        $(this).css("background-color", "#ff3f3f");
+                    }
+                    else {
+                        $(this).css("background-color", "#a3a3a3");
+                    }
+                }
+            }
+            $(this).find("td").each(function () {
+                $(this).css("color", "#fff");
+            });
+        });
+
+        $("#mco-app-div #CheckAllboxes").change(function () {
+            if ($(this).prop("checked")) {
+                $("#mco-app-div .selected-apps").each(function () {
+                    $(this).prop("checked", true);
+                    $(this).trigger("change");
+                });
+            }
+            else {
+                $("#mco-app-div .selected-apps").each(function () {
+                    $(this).prop("checked", false);
+                    $(this).trigger("change");
+                });
+            }
+        });
+
+        $("#mco-app-div .application-function").click(function () {
+            link = "";
+            appId = $(this).closest("td").find(".action-id-getter").val();
+            execute = false;
+            if ($(this).hasClass("check-launcher")) {
+                execute = confirm("Voulez-vous vraiment récupérer l'état de l'application maintenant?");
+                link = SITENAME + APP_CONTROLLER + 'GetApplicationState/' + appId;
+            }
+            if ($(this).hasClass("item-starter")) {
+                execute = confirm("Attention!! vous êtes sur le point de lancer l'application. Voulez-vous continuer?");
+                link = SITENAME + APP_CONTROLLER + 'StartApplications/' + appId;
+            }
+            if ($(this).hasClass("item-restarter")) {
+                execute = confirm("Attention!! vous êtes sur le point de redémarrer l'application. Voulez-vous continuer?");
+                link = SITENAME + APP_CONTROLLER + 'RestartApplications/' + appId;
+            }
+            if ($(this).hasClass("item-stopper")) {
+                execute = confirm("Attention!! vous êtes sur le point d'arrêter l'application. Voulez-vous continuer?");
+                link = SITENAME + APP_CONTROLLER + 'StopApplications/' + appId;
+            }
+            if (execute) {
+                APP_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: link,
+                    type: "GET",
+                    success: function (response) {
+                        message = "L'opération a retourné le statut " + response.status + " avec les détails suivants";
+                        alert(message + "\n" + response.details);
+                    },
+                    error: function (errorThrown) {
+                        alert("Erreur l'exécution de la demande.");
+                    },
+                    complete: function () {
+                        NAV_APP_FAILED_BTN.trigger("click");
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-app-div .deleter").click(function () {
+            deletor = confirm("Voulez vous réellement supprimer cette application de la liste?");
+            if (deletor) {
+                appId = $(this).closest("td").find(".action-id-getter").val();
+                APP_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: SITENAME + APP_CONTROLLER + 'DeleteApplication/' + appId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        NAV_APP_FAILED_BTN.trigger("click");
+                    }
+                });
+            }
+        });
+
+        $("#mco-app-div .details-viewer").click(function () {
+            appreportId = $(this).closest("td").find(".details-id-getter").val();
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + 'DisplayReportFurtherDetails/' + appreportId,
+                data: { origin: "DisplayFailedApplications" },
+                type: "POST",
+                success: function (data) {
+                    APP_MCO_DIV.html(data);
+                },
+                error: function (errorThrown) {
+                    alert('Erreur lors de communication avec le serveur');
+                },
+                complete: function () { colourTitles(); }
+            });
+        });
+
+        $("#mco-app-div #function-launcher-btn").click(function () {
+            selectedApps = "";
+            selectedNames = "";
+            action = $("#mco-app-div #function-launcher-action").val();
+            $("#mco-app-div .selected-apps").each(function () {
+                if ($(this).is(':checked')) {
+                    selectedApps += $(this).closest("td").find(".action-id-getter").val() + ", ";
+                    selectedNames += $(this).parent().find(".selected-apps").attr("name") + ", ";
+                }
+            });
+            if (selectedApps == "") {
+                alert("Vous devez sélectionner au moins un serveur");
+                return false;
+            }
+            else {
+                execute = confirm("Vous êtes sur le point de lancer un '" + action + "' sur les applications suivantes:\n" + selectedNames + "\n Voulez-vous continuer?");
+                if (execute) {
+                    APP_MCO_DIV.prepend(loadinggif);
+                    $.ajax({
+                        url: SITENAME + APP_CONTROLLER + 'FunctionLauncher/',
+                        type: "POST",
+                        data: { selectedApps: selectedApps, action: action },
+                        success: function (response) {
+                            APP_MCO_DIV.html(response);
+                        },
+                        error: function (error) {
+                            alert(error.responseText);
+                        },
+                        complete: function () {
+                            colourTitles();
+                            //NAV_APP_FAILED_BTN.trigger("click");
+                        }
+                    });
+                }
+                else {
+                    return false;
+                }
+            }
+        });
+    });
+</script>
+<hgroup>
+    <h2 class="page-title">Applications Down</h2>
+</hgroup>
+<div id="failed-application-div" class="failed-application-div">
+    <p class="page-title-info warning"></p>
+    <div class="function-launcher-div">
+        <span>
+            Vous pouvez agir sur plusieurs applications en cochant leur <span class="nav-info">checkbox</span> (case à cocher)
+            <br />et en sélectionnant l'opération souhaitée puis en appuyant le bouton <span class="nav-info">Exécuter</span><br />
+        </span>
+        <input type="checkbox" style="height:15px; width:20px;" id="CheckAllboxes"/>
+        <span>
+            Sélectionner toutes les applications
+        </span>
+        <br />
+        <select id="function-launcher-action" class="function-launcher-btn">
+            <option value="CHECK">VERIFIER</option>
+            <option value="START">DEMARRER</option>
+            <option value="RESTART">REDEMARRER</option>
+            <option value="STOP">ARRETER</option>
+            <option value="DELETE">SUPPRIMER</option>
+        </select>
+        <input id="function-launcher-btn" class="function-launcher-btn" type="button" value="Exécuter" />
+    </div>
+    <div class="failed-application-list">
+        <table id="failed-applicationr-table" class="item-summary failed-application-table">
+        <thead>
+            <tr class="item-summary-thead">
+                <th></th>
+                <th>Applications</th>
+                <th>Etat</th>
+                <th>Connexion URL</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model) {
+        <tr class="item-summary-tr" title="Cliquez pour obtenir plus de détails sur ce résultat : @item.Application.Name">
+            <td class="applicationviewer">
+                @Html.TextBox("action-id-sgetter-" + item.Application.Id, item.Application.Id, new { @disabled = "disabled", @class = "action-id-getter" })
+                @Html.TextBox("details-id-getter-" + item.Id, item.Id, new { @disabled = "disabled", @class = "details-id-getter" })
+                <input type="checkbox" class="selected-apps" name= "@item.Application.Name" />
+            </td>
+            <td class="appname">
+                @Html.DisplayFor(modelItem => item.Application.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.State)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Linkable)
+            </td>
+            <td style="margin=0px;padding=0px;width:30%;">
+                @Html.TextBox("action-id-getter-" + item.Application.Id, item.Application.Id, new { @disabled = "disabled", @class = "action-id-getter" })
+                @Html.TextBox("details-id-getter-" + item.Id, item.Id, new { @disabled = "disabled", @class = "details-id-getter" })
+                <div class="action-div"  style="width:100%;">
+                    <div class="action-icon details-viewer" title="voir plus de details"></div>
+                    <div class="action-icon check-launcher application-function" title="Vérifier l'état de l'application"></div>
+                    <div class="action-icon item-starter application-function" title="Mettre l'application en marche"></div>
+                    <div class="action-icon item-restarter application-function" title="Redémarrer l'application"></div>
+                    <div class="action-icon item-stopper application-function" title="Arrêter l'application"></div>
+                    <div class="action-icon deleter" title="Supprimer l'application"></div>
+                </div>                
+            </td>
+        </tr>
+        }
+    </tbody>
+    </table>
+    </div>
+</div>

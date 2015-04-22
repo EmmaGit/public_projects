@@ -1,0 +1,134 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.AppReport>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        APP_CONTROLLER = "McoApp/";
+        APP_MODULE = "APP";
+
+        var FIRST_ENTRY = 0;
+        var LEFT_ENTRY = 0;
+        var RIGHT_ENTRY = 0;
+        var LAST_ENTRY = 0;
+
+        FIRST_ENTRY = "@ViewBag.First_Entry";
+        LEFT_ENTRY = "@ViewBag.Left_Entry";
+        RIGHT_ENTRY = "@ViewBag.Right_Entry";
+        LAST_ENTRY = "@ViewBag.Last_Entry";
+
+        get_arrows(APP_MCO_DIV, APP_CONTROLLER + "DisplayScheduleReports/", FIRST_ENTRY, LEFT_ENTRY, RIGHT_ENTRY, LAST_ENTRY);
+
+        $("#mco-app-div .file-opener").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            FileWindow = window.open(SITENAME + 'Reports/Download/' + reportId);
+        });
+
+        $("#mco-app-div .details-viewer").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + 'DisplayScheduleReportDetails/' + reportId,
+                type: "GET",
+                success: function (content) {
+                    APP_MCO_DIV.html(content);
+                },
+                error: function (error) { APP_MCO_DIV.html(error.responseText); },
+                complete: function () {
+                    colourTitles();
+                }
+            });
+        });
+
+        $("#mco-app-div .email-sender").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            $.ajax({
+                url: SITENAME + 'Reports/ReSend/' + reportId,
+                type: "GET",
+                success: function (data) {
+                    alert(data);
+                },
+                error: function (errorThrown) {
+                    alert('Erreur lors de communication avec le serveur');
+                }
+            });
+        });
+
+        $("#mco-app-div .email-viewer").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            EmailWindow = window.open(SITENAME + 'Reports/ViewEmail/' + reportId);
+        });
+
+        $("#mco-app-div .deleter").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            parentId = $(this).closest("td").find(".parent-id-getter").val();
+            deletor = confirm("Voulez-vous vraiment supprimer ce rapport?");
+            if (deletor) {
+                $.ajax({
+                    url: SITENAME + APP_CONTROLLER + 'DeleteAppReport/' + reportId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) { APP_MCO_DIV.html(error.responseText); },
+                    complete: function () {
+                        Reload(APP_MCO_DIV, SITENAME + APP_CONTROLLER + 'DisplayScheduleReports/' + parentId);
+                    }
+                });
+            }
+        });
+
+        $("#mco-app-div .previous-link").click(function () {
+            NAV_APP_SCHEDULER_BTN.trigger("click");
+        });
+    });
+</script>
+
+<hgroup>
+    <h2 class="page-title"><%:ViewBag.Message</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<a class="previous-link">Précédent</a>
+<table id="report-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Lancement</th>
+            <th>Durée</th>
+            <th>Erreurs</th>
+            <th>Résultat</th>
+            <th>Auteur</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr class="item-summary-tr">
+            <td>
+                @Html.DisplayFor(modelItem => item.DateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Duration)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalErrors) erreur(s)
+                sur @Html.DisplayFor(modelItem => item.TotalChecked) application(s) vérifiée(s).
+            </td>
+            <td class="file-opener">
+                @Html.TextBox("action-id-getter-" + item.Id, item.Id, new { @disabled = "disabled", @class = "action-id-getter" })
+                @Html.DisplayFor(modelItem => item.ResultPath)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Author)
+            </td>
+            <td style="margin:0px;padding:0px;width:auto;">
+                @Html.TextBox("action-id-getter-" + item.Id, item.Id, new { @disabled = "disabled", @class = "action-id-getter" })
+                @Html.TextBox("parent-id-getter-" + item.ScheduleId, item.ScheduleId, new { @disabled = "disabled", @class = "parent-id-getter" })
+                <div class="action-div">
+                    <div class="action-icon details-viewer" title="voir details"></div>
+                    <div class="action-icon email-viewer" title="voir mail"></div>
+                    <div class="action-icon email-sender" title="renvoyer le mail associé à ce rapport"></div>
+                    <div class="action-icon deleter" title="supprimer"></div>
+                </div>                
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<a class="previous-link">Précédent</a>

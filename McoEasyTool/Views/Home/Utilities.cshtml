@@ -1,0 +1,69 @@
+﻿@{
+    Layout = null;
+}
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        HOME_CONTROLLER = "Home/";
+
+        $("#mco-common-div #mco-tool-encryptor-btn").click(function () {
+            data = "";
+            password = $("#mco-common-div #mco-tool-encryptor-text").val();
+            password = encodeURIComponent(password);
+            if (password != null && password.trim() != "") {
+                $.ajax({
+                    url: SITENAME + HOME_CONTROLLER + 'Encrypt',
+                    type: "POST",
+                    data: "password=" + password,
+                    success: function (data) {
+                        $("#mco-common-div #mco-tool-encrypted-text").text(data);
+                        alert("Recopiez la chaîne encryptée pour l'utiliser");
+                    },
+                    error: function (error) {
+                        alert('Erreur lors de la communication avec le serveur');
+                        NAV_TOOLS_BTN.trigger("click");
+                    },
+                    complete: function () {
+                        colourTitles();
+                    }
+                });
+            }
+            else {
+                alert("Veuillez d'abord entrer une chaîne dans le champ.");
+                return false;
+            }
+        });
+    });
+
+</script>
+
+
+<hgroup>
+    <h2 class="page-title">@ViewBag.Message</h2>
+</hgroup>
+<p class="page-title-info warning">
+    Sur cette page se trouvent divers outils pour vous aider à mieux configurer
+    votre application.
+</p>
+
+<div id="password_encryptor" class="mco-tool-div">
+    <table class="mco-tool-table">
+        <tr>
+            <td><span class="mco-tool-label">Password</span></td>
+            <td><input id="mco-tool-encryptor-text" class="mco-tool-input" type="password" /></td>
+            <td><input id="mco-tool-encryptor-btn" class="mco-tool-btn" type="button" value="Encrypter" /></td>
+        </tr>
+        <tr>
+            <td colspan=3>
+                <span class="mco-tool-label">Encryptez vos mots de passe pour remplir le fichier de configuration</span>
+            </td>
+        </tr>
+        <tr></tr>
+        <tr></tr>
+        <tr>
+            <td><span class="mco-tool-label">A copier</span></td>
+            <td colspan=2>
+                <span id="mco-tool-encrypted-text" class="nav-info"></span>
+            </td>
+        </tr>
+    </table>
+</div>

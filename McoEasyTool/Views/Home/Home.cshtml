@@ -1,0 +1,97 @@
+﻿@{
+    Layout = null;
+}
+<hgroup>
+    <h2 class="page-title">@ViewBag.Message</h2>
+</hgroup>
+<p class="page-title-info warning">
+    <strong>
+        Avertissements<br />
+        Cette application est strictement réservée aux employés de BOUYGUES.<br />
+        Veillez à recevoir une autorisation avant de l'utiliser.
+    </strong>
+</p>
+<h3 class="page-chapter-title">Quelques suggestions:</h3>
+<ol>
+    <li>
+        <h5 class="page-chapter-subtitle">Comment l'utiliser</h5>
+        Cette application est conçue pour permettre l'automatisation des actes MCO; elle inclut
+        les procédures de vérification de replications des contrôleurs de domaine de l'Active Directory
+        de BOUYGUES Construction et les procédures de vérification de sauvegarde Windows.<br />
+        Pour accéder aux fonctionnalités de vérification de l'AD,
+        Allez dans l'onglet <span class="nav-info">Actes MCO</span> et faites votre choix dans <span class="nav-info">Check AD</span>.<br />
+        Pour accéder aux fonctionnalités de vérification de sauvegardes,
+        Allez dans l'onglet <span class="nav-info">Actes MCO</span> et faites votre choix dans <span class="nav-info">Check BESR</span>.
+    </li>
+    <li>
+        <h5 class="page-chapter-subtitle">Vérifier l'état des réplications AD</h5>
+        Pour vérifier l'état des réplications au niveau des contrôleurs de domaine,
+        cliquez sur le bouton <strong>Check AD</strong> sous<br />l'onglet <span class="nav-info">Active Dir</span>
+        de <span class="nav-info">Actes MCO</span>.
+        Le processus démarera automatiquement et analysera l'état des réplications des bases au niveau des contrôleurs
+        de domaine de l'active directory actif.<br />
+        <span class="warning">NB: </span>
+        Le processus s'étant en général sur une vingtaine de minutes.
+    </li>
+    <li>
+        <h5 class="page-chapter-subtitle">Vérifier l'état des sauvegardes BESR</h5>
+        Pour vérifier l'état des sauvegardes au niveau des différents serveurs des Pools du jours,
+        cliquez sur le bouton <strong>Vérifier</strong> sous<br />l'onglet <span class="nav-info">Backup Exec</span>
+        de <span class="nav-info">Actes MCO</span>.
+        Le processus démareré, il se chargera de vérifier sur le partage la présence de fichiers de sauvegarde donc la
+        date devra correspondre à un maximum de 6 jours par rapport au jour où les sauvegardes sont sensées être régénérées sur
+        ce serveur.<br />
+        <span class="warning">NB: </span>
+        Le processus s'étant sur deux (02) voire trois (03) minutes.
+    </li>
+    <li>
+        <h5 class="page-chapter-subtitle">Vérifier l'état des applications</h5>
+        Pour vérifier l'état des applications parmis celles qui ont été rajoutées à l'outil,
+        cliquez sur le bouton <strong>Check APP</strong> sous<br />l'onglet <span class="nav-info">Flash Tests</span>
+        de <span class="nav-info">Actes MCO</span>.
+        Le processus se chargera de vérifier les services, processus et batchs intervenant dans le démarrage d'une application donnée
+        et tentera en dernier lieu une authentification sur l'url de cette dernière (l'application).
+        <span class="warning">NB: </span>
+        En fonction du nombre d'applications à vérifier, le processus peut partir de quelques minutes à une trentaine de minutes.
+    </li>
+    <li>
+        <h5 class="page-chapter-subtitle">Vérifier l'espace disque libre des serveurs</h5>
+        Pour vérifier l'espace libre sur les disques des serveurs,
+        cliquez sur le bouton <strong>Check C.PLN</strong> sous<br />l'onglet <span class="nav-info">Capacity Pln</span>
+        de <span class="nav-info">Actes MCO</span>.
+        Le processus démarera automatiquement et vous informera de la fin de son exécution. Il vérifiera tout simplement l'espace
+        disque encore disponible sur les partitions des serveurs qui auront été renseignées et qui sont accessibles.<br />
+        <span class="warning">NB: </span>
+        Le processus s'étant sur quelques minutes.
+    </li>
+    <li>
+        <h5 class="page-chapter-subtitle">Planifier des vérifications</h5>
+        Vous pouvez planifier le lancement des procédures  de vérification au moins
+        05 (cinq) minutes en avance.<br />Ce type de lancement ne nécessitera aucune interaction
+        de votre part;<br />l'email généré sera automatiquement envoyé aux personnes sélectionnées.
+        Vous pouvez planifier des lancements<br />de sorte à ce que les procédures s'exécutent une seule
+        fois, quotidiennement ou hebdomadairement.
+        <br />Planifier maintenant en cliquant sur le bouton <strong>Planifier</strong> sous n'importe quel onglet
+        relatif à un acte MCO donné
+    </li>
+    <li>
+        <h5 class="page-chapter-subtitle">Consulter l'historique des procédures</h5>
+        Vous pouvez afficher les résultats des procédures qui ont été précédemment effectuées.<br />
+        Ces résultats, triés par date de lancement, vous permettent d'accéder à une copie du mail<br />
+        qui a été généré ou d'accéder au fichier résultat généré lors<br />
+        de l'exécution du processus.<br />
+    </li>
+    <li>
+        <h5 class="page-chapter-subtitle">Destinataires</h5>
+        A la fin de l'exécution de chaque processus, les adresses de destinataires pré-enregistrées
+        sont sélectionnées automatiquement et rajoutées à la liste courante des destinataires du mail.<br />
+        Cette liste est modifiable sous l'option <strong>Destinataires</strong> des Check correspondant.<br />
+        <span class="warning">NB: </span>Les listes des destinataires des Check BESR et AD sont sauvegardées
+        dans des structures différentes. Si vous désirer ajouter un destinataire qui recevrait automatiquement les
+        mails de ces deux Checks,<br />vous devez le rajouter dans chacune des listes des destinataires de actes MCO
+        correspondants.
+    </li>
+</ol>
+
+
+

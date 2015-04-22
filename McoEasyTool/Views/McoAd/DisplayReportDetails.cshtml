@@ -1,0 +1,85 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.FaultyServer_Report>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        AD_CONTROLLER = "McoAd/";
+        AD_MODULE = "AD";
+
+        var FIRST_ENTRY = 0;
+        var LEFT_ENTRY = 0;
+        var RIGHT_ENTRY = 0;
+        var LAST_ENTRY = 0;
+
+        FIRST_ENTRY = "@ViewBag.First_Entry ";
+        LEFT_ENTRY = "@ViewBag.Left_Entry ";
+        RIGHT_ENTRY = "@ViewBag.Right_Entry ";
+        LAST_ENTRY = "@ViewBag.Last_Entry ";
+
+        get_arrows(AD_MCO_DIV, AD_CONTROLLER + "DisplayReportDetails/", FIRST_ENTRY, LEFT_ENTRY, RIGHT_ENTRY, LAST_ENTRY);
+
+
+        AD_ACTUAL = $("#mco-ad-div .parent-id-getter").eq(0).val();
+
+        $("#mco-ad-div .faultyserverviewer").click(function () {
+            serverId = $(this).closest("td").find(".action-id-getter").val();
+            var previous = "<input class='previous-id-getter' value='" + AD_ACTUAL + "' />";
+            $.ajax({
+                url: SITENAME + AD_CONTROLLER + 'DisplayReportVersionFaultyServerDetails/' + serverId,
+                type: "GET",
+                success: function (content) {
+                    AD_MCO_DIV.html(content);
+                },
+                error: function (error) { AD_MCO_DIV.html(error.responseText); },
+                complete: function () {
+                    AD_MCO_DIV.prepend(previous);
+                    colourTitles();
+                }
+            });
+        });
+
+        $("#mco-ad-div .previous-link").click(function () {
+            NAV_AD_REPORTS_BTN.trigger("click");
+        });
+    });
+</script>
+
+<hgroup>
+    <h2 class="page-title">Check du @ViewBag.Message </h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<a class="previous-link">Précédent</a>
+<table id="faultyserverreport-table" class="item-summary sortable">
+    <thead>
+        <tr class="item-summary-thead" style="background-color:#ff3f3f;">
+            <th>Serveur</th>
+            <th>Etat</th>
+            <th>Durée d'absence</th>
+            <th>Ticket</th>
+            <th>Détails</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) { 
+    <tr class="item-summary-tr">
+        <td class="faultyserverviewer">
+            @Html.TextBox("action-id-getter-"+item.FaultyServer.Id, item.FaultyServer.Id, new { @disabled="disabled",@class="action-id-getter"})
+            @Html.TextBox("parent-id-getter-" + item.AdReportId, item.AdReportId, new { @disabled = "disabled", @class = "parent-id-getter" })
+            @Html.DisplayFor(modelItem => item.FaultyServer.Name) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Ping) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AbsenceDuration) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Ticket) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Details) 
+        </td>
+    </tr>
+ 
+</tbody>
+</table>
+<a class="previous-link">Précédent</a>

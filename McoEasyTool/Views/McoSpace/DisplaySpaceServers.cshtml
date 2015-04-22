@@ -1,0 +1,381 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.SpaceServer>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        SPACE_CONTROLLER = "McoSpace/";
+        SPACE_MODULE = "SPACE";
+
+        $("#mco-space-div .colored-cells").each(function () {
+
+            $(this).css("background-color", $(this).text().trim());
+            $(this).css("color", $(this).text().trim());
+        });
+
+        //ColorPalete
+        //first lets start with the table that will contain the palette
+        var selectedcolor = null;
+
+        function ColorInit() {
+            table = "<table>";
+            c = new Array("53", "C4", "B1", "FF");
+            table += "<tr class='big-colorpicker-tr'>";
+            for (j = 2; j < 4; j++) {
+                table += "<td class='big-colorpicker-td'><table class='mini-colorpicker-table'>";
+                for (k = 0; k < 4; k++) {
+                    table += "<tr  class='mini-colorpicker-tr'>";
+                    for (l = 0; l < 4; l++) {
+                        m = c[j] + c[k] + c[l];
+                        table += "<td bgcolor=#" + m + " id='" + m + "' class='mini-colorpicker-td'>" +
+                            "<span class='mini-colorpicker-span'></span></td>";
+                    }
+                    table += "</tr>";
+                }
+                table += "</table></td>";
+            }
+            table += "</tr></table>";
+            $("#mco-space-div #color-servers").html(table);
+        }
+
+        //Fill the div with a color picker table
+        ColorInit();
+
+        $("#mco-space-div .account-manager").click(function () {
+            serverId = $(this).closest("td").find(".action-id-getter").val();
+            AccountEditor(serverId, SPACE_MCO_DIV, SPACE_CONTROLLER + "EditSpaceServerAccounts/" + serverId,
+                SPACE_CONTROLLER + "DisplaySpaceServers", SPACE_CONTROLLER + "GetAccountsList/" + serverId);
+
+        });
+
+        //Color Selection Event
+        $("#mco-space-div .mini-colorpicker-td").click(function () {
+            selectedcolor = $(this);
+            selectedcolor.text("OK");
+            $("#mco-space-div .selected-color").each(function () {
+                $(this).removeClass("selected-color");
+                $(this).text("");
+            });
+            selectedcolor.addClass("selected-color");
+        });
+
+        $("#mco-space-div .include-content-getter").each(function () {
+            cell = $(this).closest("td");
+            if ($(this).val().toLowerCase() == "true") {
+                cell.css("background-color", "green");
+            }
+            else {
+                cell.css("background-color", "red");
+            }
+        });
+
+        $("#mco-space-div .partitions-list").each(function () {
+            list = $(this).find(".partitions-content-getter").val();
+            id = $(this).find(".partitions-content-getter").attr("id");
+            if (list != null && list.trim() != "") {
+                disks_table = "<table cellspacing=0 id='table-" + id + "' class='partitions-list-table'>";
+                partitions = list.split("; ");
+                height = (100.00 / partitions.length);
+                for (index = 0; index < partitions.length; index++) {
+                    if (partitions[index].trim() != "") {
+                        infos = partitions[index].split("|");
+                        disk = infos[0].substr(infos[0].indexOf("=") + 1);
+                        threshold = infos[1].substr(infos[1].indexOf("=") + 1);
+                        disks_table = disks_table + "<tr style='height:" + height + "%;'>" +
+                            "<td style='width:70%;'>" + disk + "</td><td style='width:25%;'>" +
+                            threshold + "</td></tr>";
+                    }
+                }
+                disks_table = disks_table + "</table>";
+                $(this).append(disks_table);
+                $("#table-" + id).css("height", $(this).css("height"));
+            }
+        });
+
+        $("#mco-space-div #servername").blur(function () {
+            servername = $(this).val().trim();
+            $("#serverdisks_threshold_table").html("");
+            $("#serverdisks").html("");
+            if (servername != null && servername != "") {
+                if (!$("#mco-space-div #new-spaceserver").hasClass("bigger")) {
+                    $("#mco-space-div #new-spaceserver").addClass("bigger");
+                }
+                if (!$("#mco-space-div #serverdisks").hasClass("bigger")) {
+                    $("#mco-space-div #serverdisks").addClass("bigger");
+                }
+                if (!$("#mco-space-div #serverdisks_threshold_table").hasClass("bigger")) {
+                    $("#mco-space-div #serverdisks_threshold_table").addClass("bigger");
+                }
+                if (servername.startsWith("\\")) {
+                    get_server_shares_list($("#mco-space-div #serverdisks"), servername);
+                }
+                else {
+                    get_server_disks_list($("#mco-space-div #serverdisks"), servername);
+                }
+                $(this).val(servername.toUpperCase());
+            }
+            else {
+                $("#mco-space-div #serverdisks").html("");
+                $("#mco-space-div #serverdisks_threshold_table").html("");
+            }
+        });
+
+        $("#mco-space-div #serverdisks").change(function () {
+            lines = "";
+            disks = $(this).val();
+            if (disks != null) {
+                for (index = 0; index < disks.length; index++) {
+                    lines = lines + "<tr><td><span>Partition " + disks[index] + "</span> " +
+                        "<input class='new-threshold-input' id='new-threshold_" + disks[index] +
+                        "' type='number' min=0 value='0.1' step='0.01' size=2 onChange='isNumber(this);'/> To</td></tr>";
+                }
+            }
+            $("#mco-space-div #serverdisks_threshold_table").html(lines);
+        });
+
+        //SpaceServer Creator
+        $("#mco-space-div #create-server-btn").click(function () {
+            spaceservername = $("#mco-space-div #servername").val();
+            spaceserverinclude = $("#mco-space-div #include").prop("checked");
+            partitions = "";
+            message = "";
+            $("#mco-space-div .new-threshold-input").each(function () {
+                threshold_id = $(this).attr("id");
+                threshold = $(this).val();
+                if (isNaN(threshold)) {
+                    threshold = 1;
+                }
+                disk = threshold_id.substr(threshold_id.indexOf("_") + 1);
+                partitions = partitions + disk + " || " + threshold + "; ";
+                message = message + "Partition " + disk + ", seuil=" + threshold + "To\n";
+            });
+            if (spaceservername.trim() != "" && partitions != "") {
+                creation = confirm("Voulez-vous confirmer l'ajout d'un serveur avec ces informations? \n" +
+                "Serveur : " + spaceservername + "\n" + message);
+                if (creation) {
+                    data = "servername=" + spaceservername + "&partitions=" + partitions + "&include=" + spaceserverinclude;
+                    if (selectedcolor != null) {
+                        data += "&cellcolor=" + selectedcolor.attr("id");
+                    }
+                    $.ajax({
+                        url: SITENAME + SPACE_CONTROLLER + 'AddSpaceServer/',
+                        type: "POST",
+                        data: data,
+                        success: function (response) {
+                            alert(response);
+                        },
+                        error: function (error) {
+                            alert(error.responseText);
+                        },
+                        complete: function () {
+                            NAV_SPACE_SERVERS_BTN.trigger("click");
+                        }
+                    });
+                }
+            }
+            else {
+                alert("Veuillez au moins entrer le nom du serveur et sélectionner une partition.");
+                $("#mco-space-div #spaceservername").trigger("focus");
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-space-div .deleter").click(function () {
+            deletor = confirm("Voulez vous réellement supprimer ce serveur de la liste?");
+            if (deletor) {
+                spaceserverId = $(this).closest("td").find(".action-id-getter").val();
+                $.ajax({
+                    url: SITENAME + SPACE_CONTROLLER + 'DeleteSpaceServer/' + spaceserverId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        NAV_SPACE_SERVERS_BTN.trigger("click");
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-space-div .details-editor").click(function () {
+            columns = $(this).closest("tr").find("td");
+            include = $(this).closest("tr").find(".include-content-getter").val();
+            $("#mco-space-div #servername").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
+            $("#mco-space-div #servername").trigger("blur");
+            $("#mco-space-div #include").prop("checked", (include == "True"));
+            spaceserverId = $(this).closest("td").find(".action-id-getter").val();
+            $("#mco-space-div #create-server-btn").css("visibility", "hidden");
+            $("#mco-space-div #create-server-btn").css("display", "none");
+            $("#mco-space-div .server-editor-control").css("visibility", "visible");
+            $("#mco-space-div .server-editor-control").css("display", "inline");
+        });
+
+        //----------------------------------------------------------
+        $("#mco-space-div .cancelor").click(function () {
+            $("#mco-space-div #servername").val("");
+            $("#mco-space-div #servername").trigger("blur");
+            $("#mco-space-div #include").prop("checked", true);
+            $("#mco-space-div .server-editor-control").css("visibility", "hidden");
+            $("#mco-space-div .server-editor-control").css("display", "none");
+            $("#mco-space-div #create-server-btn").css("visibility", "visible");
+            $("#mco-space-div #create-server-btn").css("display", "inline");
+        });
+
+        //----------------------
+        //----------------------------------------------------------
+        $("#mco-space-div .editor").click(function () {
+            spaceservername = $("#mco-space-div #servername").val();
+            spaceserverinclude = $("#mco-space-div #include").prop("checked");
+            partitions = "";
+            message = "";
+            $("#mco-space-div .new-threshold-input").each(function () {
+                threshold_id = $(this).attr("id");
+                threshold = $(this).val();
+                if (isNaN(threshold)) {
+                    threshold = 1;
+                }
+                disk = threshold_id.substr(threshold_id.indexOf("_") + 1);
+                partitions = partitions + disk + " || " + threshold + "; ";
+                message = message + "Partition " + disk + ", seuil=" + threshold + "To\n";
+            });
+            if (spaceservername.trim() != "") {
+                creation = confirm("Voulez-vous confirmer les modifications suivantes? \n" +
+                "Serveur : " + spaceservername + "\n" + message);
+                if (creation) {
+                    data = "servername=" + spaceservername + "&partitions=" + partitions + "&include=" + spaceserverinclude;
+                    $.ajax({
+                        url: SITENAME + SPACE_CONTROLLER + 'EditSpaceServer/' + spaceserverId,
+                        type: "POST",
+                        data: data,
+                        success: function (response) {
+                            alert(response);
+                        },
+                        error: function (error) {
+                            alert(error.responseText);
+                        },
+                        complete: function () {
+                            NAV_SPACE_SERVERS_BTN.trigger("click");
+                        }
+                    });
+                }
+            }
+            else {
+                alert("Veuillez au moins entrer le nom du serveur et sélectionner une partition.");
+                $("#mco-space-div #spaceservername").trigger("focus");
+            }
+        });
+
+        $("#mco-space-div .check-launcher").click(function () {
+            success = false;
+            launch = confirm("Voulez-vous réellement lancé le check pour ce serveur maintenant?");
+            if (launch) {
+            }
+        });
+
+        $("#mco-space-div #save-list").click(function () {
+            savelist = confirm("Vous avez cliqué le bouton d'exportation; un fichier Excel contenant la liste des SpaceServers va être généré.\n\n" +
+                "Vous pourrez à tout moment via le fichier exporté, réinitialiser la liste des SpaceServers et les ramener dans leur état actuel.\n\n" +
+                "Voulez-vous exporter la liste des SpaceServers maintenant?");
+            if (savelist) {
+                FileWindow = window.open(SITENAME + SPACE_CONTROLLER + 'Export');
+            }
+        });
+    });
+</script>
+<hgroup>
+    <h2 class="page-title">Gestion des SpaceServers</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<div id="new-spaceserver" class="new-spaceserver">
+    <label><span class="new-server-title">
+        <strong>Rajoutez un serveur à ce module:<br />
+            Commencez par choisir les partitions, puis
+            Inscrivez ensuite la valeur du seuil.
+        </strong>
+    </span></label>
+    <table class="new-spaceserver-table">
+        <tr>
+            <td class='new-spaceserver-label'>
+                <span class="new-server-label">Nom :</span>
+            </td>
+            <td class='new-spaceserver-input'>
+                <input type="text" id="servername" value="" placeholder ="BCNVDEA22 ou \\sharing"/>
+            </td>
+        </tr>
+        <tr>
+            <td class='new-spaceserver-label'>
+            </td>
+            <td>
+                <input type="checkbox" id="include" class="new-spaceserver-checkbox" checked title="Inclure ce serveur dans le check"/>
+                <span class="new-server-label" style="float:right">Inclure dans le check</span>
+            </td>
+        </tr>
+        <tr>
+            <td class='new-spaceserver-label'>
+                <span class="new-server-label">Partitions :</span>
+            </td>
+            <td class='new-spaceserver-input'>
+                <select id="serverdisks" multiple class="select-multiple-list"></select>
+                <table id="serverdisks_threshold_table" class="table-multiple-list"></table>
+            </td>
+        </tr>
+    </table>
+    <br /><br />
+    <input id="create-server-btn" class="server-creator" type="button" value="Ajouter" />
+    <input id="server-btn-editor"  style="float:right" class="server-editor-control editor" type="button" value="Modifier" />
+    <input id="server-btn-cancelor" style="float:left" class="server-editor-control cancelor" type="button" value="Annuler" />
+</div>
+<div id="color-servers" class="mini-color-picker"></div>
+<br /><br />
+<table id="server-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Nom</th>
+            <th>Partitions</th>
+            <th>Inclus</th>
+            <th>Adresse IP</th>
+            <th>Couleur</th>
+            <th>Statut</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+ 
+@foreach (var item in Model) { 
+        <tr class="item-summary-tr" title="Exécution avec @item.ExecutionAccount ; Recherche avec  @item.CheckAccount ">
+        <td>
+            @Html.DisplayFor(modelItem => item.Name) 
+        </td>
+        <td class="partitions-list">
+            @Html.TextBox("partitions-content-getter-" + item.Id, item.Disks, new { @disabled = "disabled", @class = "partitions-content-getter" })
+        </td>
+        <td style="width:5%;">
+            @Html.TextBox("Include-" + item.Name,item.Included,new { @disabled = "disabled", @class = "include-content-getter" })
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IpAddress) 
+        </td>
+        <td class="colored-cells">
+            @Html.DisplayFor(modelItem => item.CellColor) 
+        </td>
+        <td class="reftech_status">
+            @Html.DisplayFor(modelItem => item.Status) 
+        </td>
+        <td style="margin=0px;padding=0px;">
+            @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+            <div class="action-div">
+                <div class="action-icon details-editor" title="modifier destinataire"></div>
+                <div class="action-icon account-manager" title="modifier comptes"></div>
+                <div class="action-icon deleter" title="supprimer"></div>
+            </div>                
+        </td>
+    </tr>
+} 
+    </tbody>
+</table>
+<div id="save-list" class="save-div">
+    <span class="save-span">Exporter la liste des SpaceServers</span><br />
+    <input type="button" id="Save-btn" value ="Exporter" class="save-btn"/>
+</div>

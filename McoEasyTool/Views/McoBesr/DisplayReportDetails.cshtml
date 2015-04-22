@@ -1,0 +1,81 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.BackupServer_Report>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        BESR_CONTROLLER = "McoBesr/";
+        BESR_MODULE = "BESR";
+
+        var FIRST_ENTRY = 0;
+        var LEFT_ENTRY = 0;
+        var RIGHT_ENTRY = 0;
+        var LAST_ENTRY = 0;
+
+        FIRST_ENTRY = "@ViewBag.First_Entry ";
+        LEFT_ENTRY = "@ViewBag.Left_Entry ";
+        RIGHT_ENTRY = "@ViewBag.Right_Entry ";
+        LAST_ENTRY = "@ViewBag.Last_Entry ";
+
+        get_arrows(BESR_MCO_DIV, BESR_CONTROLLER + "DisplayReportDetails/", FIRST_ENTRY, LEFT_ENTRY, RIGHT_ENTRY, LAST_ENTRY);
+
+        $("#mco-besr-div .colored-cells").each(function () {
+            color = $(this).find("td").find(".pool-color-getter").val();
+            $(this).css("background-color", color);
+            $(this).css("color", "#fff");
+        });
+
+        $("#mco-besr-div .previous-link").click(function () {
+            NAV_BESR_REPORTS_BTN.trigger("click");
+        });
+    });
+</script>
+<hgroup>
+    <h2 class="page-title">Check du @ViewBag.Message </h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<a class="previous-link">Précédent</a>
+<table id="faultyserverreport-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Serveur</th>
+            <th>Partitions</th>
+            <th>Etat</th>
+            <th>Ping</th>
+            <th>Erreurs</th>
+            <th>Services</th>
+            <th>Sauvegarde</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) { 
+    <tr class="item-summary-tr colored-cells">
+        <td class="backupserverviewer">
+            @Html.TextBox("pool-color-getter-" + item.Id +"-" 
+                        + item.BackupServer.Pool.CellColor, item.BackupServer.Pool.CellColor, 
+                        new { @disabled = "disabled", @class = "pool-color-getter" })
+            @Html.TextBox("action-id-getter-" + item.BackupServer.Id, item.BackupServer.Id, new { @disabled = "disabled", @class = "action-id-getter" })
+            @Html.TextBox("previous-id-getter-" + item.BackupReport.Id, item.BackupReport.Id, new { @disabled = "disabled", @class = "previous-id-getter" })
+            @Html.DisplayFor(modelItem => item.BackupServer.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.BackupServer.Disks)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.State) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Ping) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Details) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Services) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Relaunched) 
+        </td>
+    </tr>
+ } 
+</tbody>
+</table>
+<a class="previous-link">Précédent</a>

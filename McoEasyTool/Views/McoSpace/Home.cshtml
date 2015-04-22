@@ -1,0 +1,57 @@
+﻿@{Layout = null;}@model IEnumerable<dynamic>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        SPACE_DESC_TABLE = ["@ViewBag.SPACE_DESC_0",
+            "@ViewBag.SPACE_DESC_1",
+            "@ViewBag.SPACE_DESC_2",
+            "@ViewBag.SPACE_DESC_3",
+            "@ViewBag.SPACE_DESC_4"
+        ];
+        SPACE_IMG_BASE = SITENAME + "Images/home-space-";
+        SPACE_IMG_INDEX = 0;
+        SPACE_IMG_EXT = ".gif";
+        SPACE_TIMEOUT = null;
+        SPACE_REPEAT = 100;
+
+        function change_picture() {
+            //alert(SPACE_IMG_INDEX);
+            img = $("#check-space-main-div").find(".mco-home-main-img").eq(0);
+
+            span = $("#check-space-description-div").find(".mco-hom-description-span").eq(0);
+
+            img.attr("src", SPACE_IMG_BASE + SPACE_IMG_INDEX + SPACE_IMG_EXT);
+            var decoded = $('<div/>').html(SPACE_DESC_TABLE[SPACE_IMG_INDEX]).text();
+            span.html(decoded);
+            
+            SPACE_IMG_INDEX++;
+            SPACE_REPEAT--;
+
+            if (SPACE_IMG_INDEX > 4)
+            {
+                SPACE_IMG_INDEX = 0;
+            }
+            SPACE_TIMEOUT = setTimeout(change_picture, 4000);
+            if (SPACE_REPEAT == 0) {
+                clearTimeout(SPACE_TIMEOUT);
+            }
+        }
+
+        change_picture();
+        
+    });
+</script>
+
+<hgroup>
+    <h2 class="page-title">Bienvenue dans le Check Capacity Planning</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<span class="warning">Vérifier le niveau d'espace libre présent sur les serveurs de votre choix</span>
+
+<div id="check-space-main-div" class="mco-home-main-div">
+    <img src="Images/home-space-0.gif" class="mco-home-main-img"/>
+</div>
+<div id="check-space-description-div" class="mco-home-description-div">
+    <span class="mco-hom-description-span"></span>
+</div>
+
+

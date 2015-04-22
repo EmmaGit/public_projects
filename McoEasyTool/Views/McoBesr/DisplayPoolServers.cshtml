@@ -1,0 +1,363 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.BackupServer>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        BESR_CONTROLLER = "McoBesr/";
+        BESR_MODULE = "BESR";
+
+        var FIRST_ENTRY = 0;
+        var LEFT_ENTRY = 0;
+        var RIGHT_ENTRY = 0;
+        var LAST_ENTRY = 0;
+
+        FIRST_ENTRY = "@ViewBag.First_Entry ";
+        LEFT_ENTRY = "@ViewBag.Left_Entry ";
+        RIGHT_ENTRY = "@ViewBag.Right_Entry ";
+        LAST_ENTRY = "@ViewBag.Last_Entry ";
+
+        get_arrows(BESR_MCO_DIV, BESR_CONTROLLER + "DisplayPoolServers/", FIRST_ENTRY, LEFT_ENTRY, RIGHT_ENTRY, LAST_ENTRY);
+
+
+        $("#mco-besr-div .reftech_status").each(function () {
+            $(this).text(get_reftech_status($(this).text()));
+        });
+
+
+        //-----------------------------------------------------------------
+        $("#mco-besr-div #create-server-btn").click(function () {
+            data = "";
+            backupservername = $("#mco-besr-div #servername").val();
+            backupserverdisks = $("#mco-besr-div #serverdisks").val();
+            if (((backupserverdisks.trim() == "") || (backupserverdisks.trim() == " ")) ||
+            ((backupservername.trim() == "") || (backupservername.trim() == " "))) {
+                alert("Veuillez remplir tous les champs avant validation SVP.");
+                return false;
+            }
+            else {
+                BESR_MCO_DIV.prepend(loadinggif);
+                poolId = $("#mco-besr-div #pool-id-getter").text();
+                backupservername = "servername=" + backupservername;
+                backupserverdisks = "serverdisks=" + backupserverdisks;
+                $.ajax({
+                    url: SITENAME + BESR_CONTROLLER + 'AddBackupServer/' + poolId,
+                    type: "POST",
+                    data: backupservername + "&" + backupserverdisks,
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de la communication avec le serveur');
+                    },
+                    complete: function () {
+                        $.ajax({
+                            url: SITENAME + BESR_CONTROLLER + 'DisplayPoolServers/' + poolId,
+                            type: "GET",
+                            success: function (content) {
+                                BESR_MCO_DIV.html(content);
+                            },
+                            error: function (error) {
+                                alert(error.responseText);
+                            },
+                            complete: function () { colourTitles(); }
+                        });
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-besr-div .deleter").click(function () {
+            deletor = confirm("Voulez vous réellement supprimer ce serveur de la liste?");
+            if (deletor) {
+                serverId = $(this).closest("td").find(".action-id-getter").val();
+                BESR_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: SITENAME + BESR_CONTROLLER + 'DeleteBackupServer/' + serverId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        $.ajax({
+                            url: SITENAME + BESR_CONTROLLER + 'DisplayPoolServers/' + poolId,
+                            type: "GET",
+                            success: function (content) {
+                                BESR_MCO_DIV.html(content);
+                            },
+                            error: function (error) {
+                                alert(error.responseText);
+                            },
+                            complete: function () { colourTitles(); }
+                        });
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-besr-div .details-editor").click(function () {
+            columns = $(this).closest("tr").find("td");
+            $("#mco-besr-div #servername").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
+            $("#mco-besr-div #serverdisks").val(columns.eq(1).text().replace(/^\s+|\s+$/g, '') + ", ");
+            serverId = $(this).closest("td").find(".action-id-getter").val();
+            $("#mco-besr-div #create-server-btn").css("visibility", "hidden");
+            $("#mco-besr-div #create-server-btn").css("display", "none");
+            $("#mco-besr-div .server-editor-control").css("visibility", "visible");
+            $("#mco-besr-div .server-editor-control").css("display", "inline");
+        });
+
+        //----------------------------------------------------------
+        $("#mco-besr-div .cancelor").click(function () {
+            $("#mco-besr-div #servername").val("");
+            $("#mco-besr-div #serverdisks").val("");
+            $("#mco-besr-div .server-editor-control").css("visibility", "hidden");
+            $("#mco-besr-div .server-editor-control").css("display", "none");
+            $("#mco-besr-div #create-server-btn").css("visibility", "visible");
+            $("#mco-besr-div #create-server-btn").css("display", "inline");
+        });
+
+        //----------------------------------------------------------
+        $("#mco-besr-div .editor").click(function () {
+            data = "";
+            backupservername = $("#mco-besr-div #servername").val();
+            backupserverdisks = $("#mco-besr-div #serverdisks").val();
+            if (((backupserverdisks.trim() == "") || (backupserverdisks.trim() == " ")) ||
+            ((backupservername.trim() == "") || (backupservername.trim() == " "))) {
+                alert("Veuillez remplir tous les champs avant validation SVP.");
+                return false;
+            }
+            else {
+                BESR_MCO_DIV.prepend(loadinggif);
+                poolId = $("#mco-besr-div #pool-id-getter").text();
+                backupservername = "servername=" + backupservername;
+                backupserverdisks = "serverdisks=" + backupserverdisks;
+                $.ajax({
+                    url: SITENAME + BESR_CONTROLLER + 'EditBackupServer/' + serverId,
+                    type: "POST",
+                    data: backupservername + "&" + backupserverdisks,
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de la communication avec le serveur');
+                    },
+                    complete: function () {
+                        $.ajax({
+                            url: SITENAME + BESR_CONTROLLER + 'DisplayPoolServers/' + poolId,
+                            type: "GET",
+                            success: function (content) {
+                                BESR_MCO_DIV.html(content);
+                            },
+                            error: function (error) {
+                                alert(error.responseText);
+                            },
+                            complete: function () { colourTitles(); }
+                        });
+                    }
+                });
+            }
+        });
+
+        $("#mco-besr-div .previous-link").click(function () {
+            NAV_BESR_POOLS_BTN.trigger("click");
+        });
+
+
+        //-----------
+        $("#mco-besr-div #serverdisks").keypress(function (key) {
+            if (key.which == 32 || key.which == 59 || key.which == 44) {
+                $(this).val($(this).val() + ", ");
+                return false;
+            }
+            else {
+                if ((key.which < 65) || ((key.which > 90) && (key.which < 97))
+                    || (key.keyCode > 122)) {
+                    return false;
+                }
+                $(this).val(validateLetters($(this).val()));
+                if ($(this).val().length >= 3) {
+                    $(this).val(noDoublePartitions($(this).val()));
+                }
+            }
+        });
+
+        $("#mco-besr-div #serverdisks").blur(function () {
+            $(this).val(validateLetters($(this).val()));
+            if ($(this).val().length >= 3) {
+                $(this).val(noDoublePartitions($(this).val()));
+            }
+        });
+
+        function validateLetters(list) {
+            partitions = list.split(", ");
+            checkedlist = "";
+            for (index = 0; index < partitions.length; index++) {
+                if (partitions[index].trim() != "") {
+                    if (partitions[index].length == 1) {
+                        checkedlist += partitions[index].toUpperCase() + ", ";
+                    }
+                }
+            }
+            return checkedlist;
+        }
+
+        function noDoublePartitions(list) {
+            partitions = list.split(", ");
+            checkedlist = [];
+            checkedlist.push(partitions[0]);
+            for (index = 1; index < partitions.length; index++) {
+                if (partitions[index].trim() != "") {
+                    already = false;
+                    for (seeker = 0; seeker < checkedlist.length; seeker++) {
+                        if (checkedlist[seeker] == partitions[index]) {
+                            already = true;
+                            break;
+                        }
+                    }
+                    if (!already) {
+                        checkedlist.push(partitions[index]);
+                    }
+                }
+            }
+            finallist = "";
+            for (index = 0; index < checkedlist.length; index++) {
+                finallist += checkedlist[index] + ", ";
+            }
+            return finallist;
+        }
+
+        $("#mco-besr-div .backup-launcher").click(function () {
+            launch = confirm("Voulez vous vraiment lancer la sauvegarde pour ce serveur maintenant? \n" +
+                "Les anciens fichiers de sauvegardes de ce serveur seront éventuellement supprimés.");
+            if (launch) {
+                serverId = $(this).closest("td").find(".action-id-getter").val();
+                poolId = $(this).closest("td").find(".pool-id-getter").val();
+                success = false;
+                BESR_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: SITENAME + BESR_CONTROLLER + 'ServiceLauncher/' + serverId,
+                    type: "GET",
+                    success: function (content) {
+                        if ((content.indexOf('Backup Exec System Recovery: Running: Manual') != -1) &&
+                                        (content.indexOf('SymSnapService: Running: Manual') != -1)
+                                    ) {
+                            success = true;
+                        }
+                    },
+                    error: function (error) {
+                        alert(error);
+                    },
+                    complete: function () {
+                        if (success) {
+                            $("#mco-besr-div body").toggleClass("wait");
+                            $.ajax({
+                                url: SITENAME + BESR_CONTROLLER + 'BackupExecLauncher/' + serverId,
+                                type: "GET",
+                                success: function (content) {
+                                    alert(content);
+                                },
+                                error: function (error) {
+                                    alert(error.responseText);
+                                },
+                                complete: function () {
+                                    $("#mco-besr-div body").toggleClass("wait");
+                                }
+                            });
+                        }
+                        $.ajax({
+                            url: SITENAME + BESR_CONTROLLER + 'DisplayPoolServers/' + poolId,
+                            type: "GET",
+                            success: function (content) {
+                                BESR_MCO_DIV.html(content);
+                            },
+                            error: function (error) {
+                                alert(error.responseText);
+                            },
+                            complete: function () {
+                                colourTitles();
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                return false;
+            }
+        });
+
+
+    });
+
+</script>
+<hgroup>
+    <h2 class="page-title">@ViewBag.Message </h2>
+    <span id="pool-id-getter" class="pool-id-getter">@ViewBag.poolId </span>
+</hgroup>
+<p class="page-title-info warning"></p>
+<div id="new-server" class="new-server">
+    <a class="previous-link">Précédent</a><br />
+    <label><span class="new-server-title">
+        <strong>Ajoutez un serveur à ce Pool</strong>
+    </span></label>
+    <br /><br />
+    <label><span class="new-server-label">Nom :</span></label>
+    <input type="text" id="servername" value="" placeholder ="BCNVDEA22" class="address-input"/><br /><br />
+    <label><span class="new-server-label">Partitions :</span></label>
+    <input type="text" id="serverdisks" value="" placeholder ="C,D"
+        class="address-input"/>
+    <br /><br />
+    <input id="create-server-btn" class="server-creator" type="button" value="Ajouter" />
+    <input id="server-btn-editor"  style="float:right" class="server-editor-control editor" type="button" value="Modifier" />
+    <input id="server-btn-cancelor" style="float:left" class="server-editor-control cancelor" type="button" value="Annuler" />
+</div>
+<br /><br />
+<table id="server-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Nom</th>
+            <th>Partitions</th>
+            <th>Versions</th>
+            <th>Adresse IP</th>
+            <th>Localisation</th>
+            <th>Statut</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+ 
+@foreach (var item in Model) { 
+        <tr class="item-summary-tr">
+        <td>
+            @Html.DisplayFor(modelItem => item.Name) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Disks) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Version) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IpAddress) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Location) 
+        </td>
+        <td class="reftech_status">
+            @Html.DisplayFor(modelItem => item.Status) 
+        </td>
+        <td style="margin=0px;padding=0px;">
+            @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+            @Html.TextBox("pool-id-getter-" + item.Pool.Id, item.Pool.Id, new { @disabled = "disabled", @class = "pool-id-getter" })
+            <div class="action-div">
+                <div class="action-icon backup-launcher" title="Lancer la sauvegarde pour cet objet"></div>
+                <div class="action-icon details-editor" title="modifier destinataire"></div>
+                <div class="action-icon deleter" title="supprimer"></div>
+            </div>                
+        </td>
+    </tr>
+} 
+    </tbody>
+</table>
+<a class="previous-link">Précédent</a>

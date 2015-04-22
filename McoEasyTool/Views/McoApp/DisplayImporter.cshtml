@@ -1,0 +1,146 @@
+﻿@{Layout = null;}@model IEnumerable<dynamic>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        APP_CONTROLLER = "McoApp/";
+        APP_MODULE = "APP";
+
+        $("#mco-app-div #Form1").attr("action", SITENAME + $("#mco-app-div #Form1").attr("action"));
+
+        $("#mco-app-div #upload-file-path, #upload-launcher").click(function () {
+            $("#mco-app-div .trueFile").trigger("click");
+        });
+
+        $("#mco-app-div .trueFile").change(function () {
+            filepaths = $("#mco-app-div .trueFile").val().split("\\");
+            filepath = filepaths[filepaths.length - 1];
+            extension = filepath.split(".");
+            if (extension[extension.length - 1].indexOf("xlsx") != -1) {
+                $("#mco-app-div #upload-file-path").val(filepath);
+            }
+            else {
+                alert("Veuillez sélectionner un ficher Excel au format xlsx");
+            }
+        });
+
+        $("#mco-app-div #import-launcher").click(function () {
+            if ($("#mco-app-div #upload-file-path").val().trim() != "") {
+                imported = confirm("Voulez-vous réellement réinitialiser la base de donnée APPLICATIONS? \n" +
+                    "Toutes les Applications actuelless seront remplacées par celles contenues dans le fichier" +
+                    "Uploadé.");
+                if (imported) {
+                    $("#mco-app-div .trueUploadButton").trigger("click");
+                    APP_MCO_DIV.prepend(loadinggif);
+                }
+            }
+            else {
+                alert("Veuillez d'abord sélectionner un fichier au format xlsx");
+                return false;
+            }
+        });
+
+        $("#mco-app-div #download-launcher").click(function () {
+            FileWindow = window.open(SITENAME + APP_CONTROLLER + 'DownloadInitFile/');
+        });
+    });
+</script>
+<hgroup>
+    <h2 class="page-title">Alimentation de la base de données APPLICATIONS</h2>
+</hgroup>
+<div class="import-controls">
+    <p class="page-title-info warning"></p>
+    <input id="download-launcher" type="button" class="imports-controls-btn" value="Modèle"
+        title="Télécharger le fichier modèle"/>
+
+    <form id="Form1" runat="server" enctype="multipart/form-data" action="McoApp/UploadInitFile" >
+        <input runat="server" id="file"  name="file" type="file" class="hidden-imports-controls-btn trueFile"/>
+        <asp:Button runat="server" id="btnUpload" text="Upload" class="hidden-imports-controls-btn trueUploadButton"></asp:Button>
+    </form>
+
+    <input id="upload-file-path" type="text" class="imports-controls-btn input-file-info"
+        title="Uploader votre fichier Excel contenant la liste des applications" readonly/>
+    <input id="upload-launcher" type="button" class="imports-controls-btn input-file-btn" value="Choisissez"
+        title="Uploader votre fichier Excel contenant la liste des applications"/>
+    
+
+    <input id="import-launcher" type="button" class="imports-controls-btn" value="Importer"
+        title="Lancher l'importation maintenant"/>
+
+        
+
+    
+    
+</div>
+<br />
+<ol>
+    <li>
+        <h5 class="page-chapter-subtitle">Uploader un fichier</h5>
+        L'alimentation de la base de données se fait via un fichier Excel contenant <span class="warning">(01) une page.</span><br /><br />
+        Celle-ci est nommée <span class="nav-info">Applications</span> et contient la liste des applications sous forme de tableau organisé comme suit:<br /><br />
+            <span class="paragraph-info">
+                Dans la première colonne, le nom de l'application <strong>(Ex: ITSM)</strong>
+            </span><br /><br />
+            <span class="paragraph-info">
+                Dans la seconde colonne, la liste des différents serveurs via lesquels est disponible l'application;
+                à raison d'un serveur par ligne. Ainsi, si une application est dépendante de plusieurs serveurs, le nom
+                de cette application sera repétée dans la première colonne des lignes correspondantes à ces serveurs.
+            </span><br /><br />
+            <span class="paragraph-info">
+                Les troisième et quatrième colonnes contiennent l'ensemble des opérations à mener dans le cadre du démarrage et
+                de l'arrêt d'une application donnée respectivement.
+            </span><br />
+            <span class="paragraph-info">
+                <span class="warning">
+                    Chaque opération est séparéé de la suivante par un point-virgule
+                </span>
+           </span><br /><br />
+            <span class="paragraph-info">
+                La cinquième colonne correspond à l'URL de l'application utilisée pour les tests d'authentification.
+            </span><br /><br />
+            <span class="warning">
+                Les opérations sont traitées selon leur ordre de lecture (gauche à droite) et sont exécutées les unes à la suite des autres.
+            </span><br />
+            Chaque opération doit suivre le format suivant : <span class="nav-info">TYPE|CIBLE|ACTION</span>.
+            <br /><br />
+            Le <span class="nav-info">TYPE</span> désigne le type d'objet qui sera traité dans l'opération: SERVICE, BATCH ou PROCESS.
+            <br /><br />
+            La <span class="nav-info">CIBLE</span> désigne l'entité même qui sera traitée dans l'opération, sa forme dépend du type d'objet
+            <br /><br />
+            <span class="paragraph-info">
+                Dans le cas d'un <span class="warning">SERVICE</span> veillez à noter le nom d'affichage du service plutôt que le nom du service lui-même
+            </span><br /><br />
+            <span class="paragraph-info">
+                Dans le cas d'un <span class="warning">BATCH</span> prenez soin de marquer le chemin absolu du fichier, y compris son extension
+            </span><br /><br />
+            <span class="paragraph-info">
+                Dans le cas d'un <span class="warning">PROCESS</span>, il suffit juste d'achever le nom du process par ".exe"
+            </span><br /><br />
+            L'<span class="nav-info">ACTION</span> désigne l'opération qui sera menée sur l'objet concrètement parlant: START, RESTART, STOP, CHECK
+            <br /><br />
+            <span class="paragraph-info">
+                Pour <span class="warning">START</span>, le service, le processus ou le fichier batch sera lancé (ou démarré)
+            </span><br /><br />
+            <span class="paragraph-info">
+                Pour <span class="warning">RESTART</span>, le service ou le processus seront arrêtés puis démarrés à nouveau, pour un batch cela correspond à une simple exécution
+            </span><br /><br />
+            <span class="paragraph-info">
+                Pour <span class="warning">STOP</span>, le service ou le processus seront arrêtés (Non valable pour un BATCH)
+            </span><br /><br />
+            <span class="paragraph-info">
+                Pour <span class="warning">CHECK</span>, l'état du service ou du processus sera testé; un check est concluant si le service est démarré ou si le process ou le fichier batch est présent sur le serveur cible
+            </span><br /><br />
+            <span class="warning">
+                AVANT TOUTE MODIFICATION SUR LA PAGE APPLICATIONS, PRIERE DE VOUS REFERER AUX INSTRUCTIONS NOTEES CI-DESSUS!
+            </span>
+    <li>
+        <h5 class="page-chapter-subtitle">Fichier modèle</h5>
+        Afin de vous assurer de la validité de votre fichier, vous pouvez télécharger le fichier modèle
+        et suivre son format<br /> ou vous pouvez tout simplement le télécharger, le modifier à votre guise
+        et l'uploader par la suite.
+    </li>
+    <li>
+        <h5 class="page-chapter-subtitle">Importer</h5>
+        Si vous êtes certain que votre fichier rempli tous les prérequis mentionnés ci-dessus,<br /> vous 
+        pouvez l'uploader et cliquer sur <span class="nav-info">Importer</span> afin de réinitialiser la base de données BESR.
+    </li>
+</ol>
+

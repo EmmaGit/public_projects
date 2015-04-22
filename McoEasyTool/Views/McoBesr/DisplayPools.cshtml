@@ -1,0 +1,411 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.Pool>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        BESR_CONTROLLER = "McoBesr/";
+        BESR_MODULE = "BESR";
+
+        $("#mco-besr-div .dayweek").each(function () {
+            var weekday = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Quotidien"];
+            $(this).text(weekday[parseInt($(this).text().trim())]);
+        });
+
+        $("#mco-besr-div .colored-cells").each(function () {
+            $(this).css("background-color", $(this).text().trim());
+            $(this).css("color", $(this).text().trim());
+        });
+
+        //ColorPalete
+        //first lets start with the table that will contain the palette
+        var selectedcolor = null;
+
+        function ColorInit() {
+            table = "<table class='big-colorpicker-table'>";
+            c = new Array("22", "AA", "77", "FF");
+            table += "<tr class='big-colorpicker-tr'>";
+            for (j = 0; j < 4; j++) {
+                table += "<td class='big-colorpicker-td'><table class='mini-colorpicker-table'>";
+                for (k = 0; k < 4; k++) {
+                    table += "<tr  class='mini-colorpicker-tr'>";
+                    for (l = 0; l < 4; l++) {
+                        m = c[j] + c[k] + c[l];
+                        table += "<td bgcolor=#" + m + " id='" + m + "' class='mini-colorpicker-td'>" +
+                            "<span class='mini-colorpicker-span'></span></td>";
+                    }
+                    table += "</tr>";
+                }
+                table += "</table></td>";
+            }
+            table += "</tr></table>";
+            $("#mco-besr-div #color-pools").html(table);
+        }
+
+        //Fill the div with a color picker table
+        ColorInit();
+
+        $("#mco-besr-div .account-manager").click(function () {
+            poolId = $(this).closest("td").find(".action-id-getter").val();
+            AccountEditor(poolId, BESR_MCO_DIV, BESR_CONTROLLER + "EditPoolAccounts/" + poolId,
+                BESR_CONTROLLER + "DisplayPools", BESR_CONTROLLER + "GetAccountsList/" + poolId);
+
+        });
+
+        //----------------------------------------------------------
+        //Color Selection Event
+        $("#mco-besr-div .mini-colorpicker-td").click(function () {
+            selectedcolor = $(this);
+            selectedcolor.text("OK");
+            $("#mco-besr-div .selected-color").each(function () {
+                $(this).removeClass("selected-color");
+                $(this).text("");
+            });
+            selectedcolor.addClass("selected-color");
+        });
+
+        //Pool Creator
+        $("#mco-besr-div #create-pool-btn").click(function () {
+            newpoolname = $("#mco-besr-div #poolname").val();
+            newbackupday = $("#mco-besr-div #backupday").prop("selectedIndex");
+            backupmanager = $("#mco-besr-div #backupmanager").val();
+            checkfolder = $("#mco-besr-div #checkfolder").val();
+            dayname = $("#mco-besr-div #backupday").val();
+            if (newpoolname.trim() != "") {
+                creation = confirm("Voulez vous réellement créer un Pool avec ces informations? \n" +
+                "Nom du Pool : " + newpoolname + "\nJour d'exécution de sauvegarde : " + dayname);
+                if (creation) {
+                    data = "poolname=" + newpoolname + "&backupday=" + newbackupday;
+                    if (selectedcolor != null) {
+                        data += "&cellcolor=" + selectedcolor.attr("id");
+                    }
+                    data += "&backupmanager=" + backupmanager + "&checkfolder=" + checkfolder;
+                    $.ajax({
+                        url: SITENAME + BESR_CONTROLLER + 'AddPool/',
+                        type: "POST",
+                        data: data,
+                        success: function (response) {
+                            alert(response);
+                        },
+                        error: function (error) {
+                            alert(error.responseText);
+                        },
+                        complete: function () {
+                            NAV_BESR_POOLS_BTN.trigger("click");
+                        }
+                    });
+                }
+            }
+            else {
+                alert("Veuillez au moins entrer le nom du Pool.");
+                $("#mco-besr-div #poolname").trigger("focus");
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-besr-div .deleter").click(function () {
+            deletor = confirm("Voulez vous réellement supprimer ce pool de la liste?");
+            if (deletor) {
+                poolId = $(this).closest("td").find(".action-id-getter").val();
+                $.ajax({
+                    url: SITENAME + BESR_CONTROLLER + 'DeletePool/' + poolId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        NAV_BESR_POOLS_BTN.trigger("click");
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-besr-div .details-editor").click(function () {
+            columns = $(this).closest("tr").find("td");
+            $("#mco-besr-div #poolname").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
+            $("#mco-besr-div #backupday").val(columns.eq(1).text().replace(/^\s+|\s+$/g, ''));
+            $("#mco-besr-div #backupmanager").val(columns.eq(4).text().replace(/^\s+|\s+$/g, ''));
+            $("#mco-besr-div #checkfolder").val(columns.eq(5).text().replace(/^\s+|\s+$/g, ''));
+            poolId = $(this).closest("td").find(".action-id-getter").val();
+            $("#mco-besr-div #create-pool-btn").css("visibility", "hidden");
+            $("#mco-besr-div #create-pool-btn").css("display", "none");
+            $("#mco-besr-div .pool-editor-control").css("visibility", "visible");
+            $("#mco-besr-div .pool-editor-control").css("display", "inline");
+        });
+
+        //----------------------------------------------------------
+        $("#mco-besr-div .cancelor").click(function () {
+            $("#mco-besr-div #poolname").val("");
+            $("#mco-besr-div #backupday").val("Dimanche");
+            $("#mco-besr-div .pool-editor-control").css("visibility", "hidden");
+            $("#mco-besr-div .pool-editor-control").css("display", "none");
+            $("#mco-besr-div #create-pool-btn").css("visibility", "visible");
+            $("#mco-besr-div #create-pool-btn").css("display", "inline");
+        });
+
+        //----------------------
+        //----------------------------------------------------------
+        $("#mco-besr-div .editor").click(function () {
+            newpoolname = $("#mco-besr-div #poolname").val();
+            newbackupday = $("#mco-besr-div #backupday").prop("selectedIndex");
+            backupmanager = $("#mco-besr-div #backupmanager").val();
+            checkfolder = $("#mco-besr-div #checkfolder").val();
+            dayname = $("#mco-besr-div #backupday").val();
+            if (newpoolname.trim() != "") {
+                creation = confirm("Voulez vous réellement modifier le Pool avec ces informations? \n" +
+                "Nom du Pool : " + newpoolname + "\nJour d'exécution de sauvegarde : " + dayname);
+                if (creation) {
+                    data = "poolname=" + newpoolname + "&backupday=" + newbackupday;
+                    if (selectedcolor != null) {
+                        data += "&cellcolor=" + selectedcolor.attr("id");
+                    }
+                    data += "&backupmanager=" + backupmanager + "&checkfolder=" + checkfolder;
+                    $.ajax({
+                        url: SITENAME + BESR_CONTROLLER + 'EditPool/' + poolId,
+                        type: "POST",
+                        data: data,
+                        success: function (response) {
+                            alert(response);
+                        },
+                        error: function (error) {
+                            alert(error.responseText);
+                        },
+                        complete: function () {
+                            NAV_BESR_POOLS_BTN.trigger("click");
+                        }
+                    });
+                }
+            }
+            else {
+                alert("Veuillez au moins entrer le nom du Pool.");
+                $("#mco-besr-div #poolname").trigger("focus");
+            }
+        });
+
+        $("#mco-besr-div .details-viewer").click(function () {
+            poolId = $(this).closest("td").find(".action-id-getter").val();
+            $.ajax({
+                url: SITENAME + BESR_CONTROLLER + 'DisplayPoolServers/' + poolId,
+                type: "GET",
+                success: function (content) {
+                    BESR_MCO_DIV.html(content);
+                },
+                error: function (error) {
+                    alert(error.responseText);
+                },
+                complete: function () {
+                    colourTitles();
+                }
+            });
+        });
+
+        $("#mco-besr-div .backup-launcher").click(function () {
+            launch = confirm("Voulez-vous vraiment lancé la sauvegarde pour les serveurs de ce Pool? \n" +
+                "Les anciens fichiers de sauvegardes de chacun de ces serveurs seront éventuellement supprimé.");
+            poolId = $(this).closest("td").find(".action-id-getter").val();
+            if (launch) {
+                BESR_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: SITENAME + BESR_CONTROLLER + 'PoolBackupExecLauncher/' + poolId,
+                    type: "GET",
+                    success: function (content) {
+                        alert(content);
+                    },
+                    error: function (error) {
+                        alert("Erreur lors de la communication avec le serveur");
+                    },
+                    complete: function () {
+                        NAV_BESR_POOLS_BTN.trigger("click");
+                    }
+                });
+            }
+            else {
+                return false;
+            }
+        });
+
+        $("#mco-besr-div .check-launcher").click(function () {
+            success = false;
+            launch = confirm("Voulez-vous réellement lancé le check pour ce Pool maintenant?");
+            if (launch) {
+                BESR_MCO_DIV.prepend(loadinggif);
+                poolId = $(this).closest("td").find(".action-id-getter").val();
+                $.ajax({
+                    url: SITENAME + BESR_CONTROLLER + 'CheckPool/' + poolId,
+                    type: "GET",
+                    success: function (data) {
+                        if (data.response == "OK") {
+                            success = true;
+                            backupemailId = data.email;
+                            email = "" +
+                                    "<label class='ReadyEmail-label'>Destinataires: </label>" +
+                                    " <input type='text' id='input-recipient'class='ReadyEmail-input'/><br />" +
+                                    "<input type='button' id='input-button' onClick='SendPoolEmail(" + backupemailId + ");'class='ReadyEmail-submit' value='Envoyer' />" +
+                                    "<label class='ReadyEmail-label'>Sujet : </label>" +
+                                    "<input type='text' id='input-subject'  class='ReadyEmail-input'/><br />" +
+                                    "<div id='input-body'  class='ReadyEmail-body'>" +
+                                    "<textarea id='input-message' placeholder='Ajoutez un message ici...' " +
+                                    "style='margin-left:10px;width:800px;border:0px solid #000;'" +
+                                    "class='ReadyEmail-input'></textarea></div>";
+                            BESR_MCO_DIV.html(email);
+                            AddressParser();
+                        }
+                        else {
+                            success = false;
+                            alert(data.errors);
+                        }
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de communication avec le serveur');
+                    },
+                    complete: function () {
+                        if (success) {
+                            $.ajax({
+                                url: SITENAME + BESR_CONTROLLER + 'OpenPoolEmail/' + poolId,
+                                type: "POST",
+                                data: { backupemailId: backupemailId },
+                                success: function (content) {
+                                    $("#mco-besr-div #input-recipient").val(content.recipient);
+                                    $("#mco-besr-div #input-subject").val(content.subject);
+                                    $("#mco-besr-div #input-body").append(content.body);
+                                },
+                                error: function (errorThrown) {
+                                    alert('Erreur lors de communication avec le serveur');
+                                },
+                                complete: function () { colourTitles(); }
+                            });
+                        }
+                        else {
+                            NAV_BESR_POOLS_BTN.trigger("click");
+                        }
+                    }
+                });
+            }
+        });
+
+        $("#mco-besr-div #save-list").click(function () {
+            savelist = confirm("Vous avez cliqué le bouton d'exportation; un fichier Excel contenant la liste des Pools va être généré.\n\n" +
+                "Vous pourrez à tout moment via le fichier exporté, réinitialiser la liste des Pools et les ramener dans leur état actuel.\n\n" +
+                "Voulez-vous exporter la liste des Pools maintenant?");
+            if (savelist) {
+                FileWindow = window.open(SITENAME + BESR_CONTROLLER + 'Export');
+            }
+        });
+    });
+
+
+    function SendPoolEmail(EmailId) {
+        BESR_MCO_DIV.prepend(loadinggif);
+        Recipient = $("#mco-besr-div #input-recipient").val();
+        Subject = $("#mco-besr-div #input-subject").val();
+        Message = $("#mco-besr-div #input-message").val();
+        $.ajax({
+            url: SITENAME + 'Emails/Send/' + EmailId,
+            dataType: "JSON",
+            type: "POST",
+            data: { Subject: Subject, Recipient: Recipient, Message: Message },
+            success: function (response) {
+                alert(response.BackupEmail + "\n" + response.Response);
+            },
+            error: function (error) { BESR_MCO_DIV.html(error.responseText); },
+            complete: function () {
+                NAV_BESR_REPORTS_BTN.trigger("click");
+                window.onbeforeunload = null;
+            }
+        });
+    }
+</script>
+<hgroup>
+    <h2 class="page-title">Gestion des Pools</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<div id="pool-div-option" class="pool-mco-besr-div-div">
+    <div id="new-pool" class="new-pool">
+        <label>
+            <span class="new-pool-title">
+                <strong>Ajoutez un Pool à la liste</strong>
+            </span>
+        </label>
+        <br /><br />
+        <label><span class="new-pool-label">Nom du Pool :</span></label>
+        <input type="text" id="poolname" value="" placeholder ="BESR1" class="address-input"/><br /><br />
+        <label><span class="new-pool-label">Jour de sauvegarde :</span></label>
+        <select id="backupday" class="address-input">
+            <option>Dimanche</option><option>Lundi</option><option>Mardi</option>
+            <option>Mercredi</option><option>Jeudi</option><option>Vendredi</option>
+            <option>Samedi</option><option>Quotidien</option>
+        </select><br /><br />
+        <label><span class="new-pool-label">Gestionnaire de sauvegarde :</span></label>
+        <input type="text" id="backupmanager" value="" placeholder ="BCNSSRV229" class="address-input"/><br /><br />
+        <label><span class="new-pool-label">Répertoire de vérification :</span></label>
+        <input type="text" id="checkfolder" value="" placeholder ="\\BCNVDMPOS1\BESR1\" class="address-input"/><br /><br />
+        <br />
+        <input id="create-pool-btn" class="pool-creator" type="button" value="Ajouter" />
+        <input id="pool-btn-editor"  style="float:right" class="pool-editor-control editor" type="button" value="Modifier" />
+        <input id="pool-btn-cancelor" style="float:left" class="pool-editor-control cancelor" type="button" value="Annuler" />
+    </div>
+    <div id="color-pools" class="new-pool color-picker"></div>
+    <div id="pool-list" class="pool-list">
+        <table id="pool-table" class="item-summary pool-table">
+            <thead>
+                <tr>
+                    <th colspan="7">
+                        <span class="page-title-info warning">
+                            Laissez reposer la souris sur une ligne pour connaître les comptes utilisés sur le Pool correspondant.
+                        </span>
+                    </th>
+                </tr>
+                <tr class="item-summary-thead">
+                    <th>Pool</th>
+                    <th>Jour de sauvegarde</th>
+                    <th>Jour de check</th>
+                    <th>Couleur</th>
+                    <th>Gestionnaire</th>
+                    <th>Sortie</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody> 
+            @foreach (var item in Model) { 
+                <tr class="item-summary-tr" title="Exécution avec @item.ExecutionAccount ; Recherche avec  @item.CheckAccount ">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name) 
+                    </td>
+                    <td class="dayweek">
+                        @Html.DisplayFor(modelItem => item.BackupDay)
+                    </td>
+                    <td class="dayweek">
+                        @Html.DisplayFor(modelItem => item.CheckDay)
+                    </td>
+                    <td class="colored-cells">
+                        @Html.DisplayFor(modelItem => item.CellColor) 
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.BackupManager) 
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CheckFolder) 
+                    </td>
+                    <td style="margin=0px;padding=0px;">
+                        @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+                        <div class="action-div">
+                            <div class="action-icon check-launcher" title="Lancer le check pour ce Pool"></div>
+                            <div class="action-icon backup-launcher" title="Lancer la sauvegarde pour tous les serveurs de ce Pool"></div>
+                            <div class="action-icon details-viewer" title="consulter la liste des serveurs"></div>
+                            <div class="action-icon details-editor" title="modifier pool"></div>
+                            <div class="action-icon account-manager" title="modifier comptes"></div>
+                            <div class="action-icon deleter" title="supprimer"></div>
+                        </div>                
+                    </td>
+                </tr>
+            } 
+            </tbody>
+        </table>
+    </div> 
+</div>
+<div id="save-list" class="save-div">
+    <span class="save-span">Exporter la liste des Pools</span><br />
+    <input type="button" id="Save-btn" value ="Exporter" class="save-btn"/>
+</div>

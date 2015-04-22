@@ -1,0 +1,145 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.AdReport>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        AD_CONTROLLER = "McoAd/";
+        AD_MODULE = "AD";
+
+        var FIRST_ENTRY = 0;
+        var LEFT_ENTRY = 0;
+        var RIGHT_ENTRY = 0;
+        var LAST_ENTRY = 0;
+
+        FIRST_ENTRY = "@: ViewBag.First_Entry";
+        LEFT_ENTRY = "@: ViewBag.Left_Entry";
+        RIGHT_ENTRY = "@: ViewBag.Right_Entry";
+        LAST_ENTRY = "@: ViewBag.Last_Entry";
+
+        get_arrows(AD_MCO_DIV, AD_CONTROLLER + "DisplayScheduleReports/", FIRST_ENTRY, LEFT_ENTRY, RIGHT_ENTRY, LAST_ENTRY);
+
+        $("#mco-ad-div .file-opener").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            FileWindow = window.open(SITENAME + 'Reports/Download/' + reportId);
+        });
+
+        $("#mco-ad-div .details-viewer").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            previousScheduleId = $("#mco-ad-div #previous-link-a").attr("href");
+            $.ajax({
+                url: SITENAME + AD_CONTROLLER + 'DisplayScheduleReportDetails/' + reportId,
+                type: "GET",
+                success: function (content) {
+                    AD_MCO_DIV.html(content);
+                },
+                error: function (error) { AD_MCO_DIV.html(error.responseText); },
+                complete: function () {
+                    previous = "<div id='previous-link-div' class='previous-link'>Retour" +
+                        "<a class='previous-link-a' id='previous-link-a' href='" + previousScheduleId + "'>previous</a></div>";
+                    AD_MCO_DIV.prepend(previous);
+                    colourTitles();
+                }
+            });
+        });
+
+        $("#mco-ad-div .email-sender").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            sendagain = confirm("Voulez-vous envoyer ce rapport de nouveaux à ses destinataires?");
+            if (sendagain) {
+                $.ajax({
+                    url: SITENAME + 'Reports/ReSend/' + reportId,
+                    type: "GET",
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de communication avec le serveur');
+                    }
+                });
+            }
+        });
+
+        $("#mco-ad-div .email-viewer").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            EmailWindow = window.open(SITENAME + 'Reports/ViewEmail/' + reportId);
+        });
+
+        $("#mco-ad-div .deleter").click(function () {
+            reportId = $(this).closest("td").find(".action-id-getter").val();
+            parentId = $(this).closest("td").find(".parent-id-getter").val();
+            deletor = confirm("Voulez-vous vraiment supprimer ce rapport?");
+            if (deletor) {
+                $.ajax({
+                    url: SITENAME + AD_CONTROLLER + 'DeleteAdReport/' + reportId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) { AD_MCO_DIV.html(error.responseText); },
+                    complete: function () {
+                        Reload(AD_MCO_DIV, SITENAME + AD_CONTROLLER + 'DisplayScheduleReports/' + parentId);
+                    }
+                });
+            }
+        });
+
+        $("#mco-ad-div .previous-link").click(function () {
+            NAV_AD_SCAN_SCHEDULER_BTN.trigger("click");
+        });
+    });
+</script>
+
+<hgroup>
+    <h2 class="page-title">
+        @: ViewBag.Message
+    </h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<a class="previous-link">Précédent</a>
+<table id="report-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Lancement</th>
+            <th>Durée</th>
+            <th>Contrôleurs défaillant</th>
+            <th>Résultat</th>
+            <th>Auteur</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@ foreach (var item in Model) {
+        <tr class="item-summary-tr">
+            <td>
+                @: Html.DisplayFor(modelItem => item.DateTime)
+            </td>
+            <td>
+                @: Html.DisplayFor(modelItem => item.Duration)
+            </td>
+            <td>
+                @: Html.DisplayFor(modelItem => item.FatalErrors) critique(s)
+                sur @: Html.DisplayFor(modelItem => item.TotalErrors) détecté(s).
+            </td>
+            <td class="file-opener">
+                @: Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+                @: Html.DisplayFor(modelItem => item.ResultPath)
+            </td>
+            <td>
+                @: Html.DisplayFor(modelItem => item.Author)
+            </td>
+            <td style="margin:0px;padding:0px;width:auto;">
+                @: Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+                @: Html.TextBox("parent-id-getter-" + item.ScheduleId, item.ScheduleId, new { @disabled = "disabled", @class = "parent-id-getter" })
+                <div class="action-div">
+                    @ if(item.FaultyServer_Reports.Count() > 0) {
+                        <div class="action-icon details-viewer" title="voir details"></div>    
+                    @}
+                    <div class="action-icon email-viewer" title="voir mail"></div>
+                    <div class="action-icon email-sender" title="renvoyer le mail associé à ce rapport"></div>
+                    <div class="action-icon deleter" title="supprimer"></div>
+                </div>                
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<a class="previous-link">Précédent</a>

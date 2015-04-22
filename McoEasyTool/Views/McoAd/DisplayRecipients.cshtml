@@ -1,0 +1,203 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.Recipient>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        AD_CONTROLLER = "Recipients/";
+        AD_MODULE = "AD";
+
+        $("#mco-ad-div .include-content-getter").each(function () {
+            cell = $(this).closest("td");
+            if ($(this).val().toLowerCase() == "true") {
+                cell.css("background-color", "green");
+            }
+            else {
+                cell.css("background-color", "red");
+            }
+        });
+
+        $("#mco-ad-div #create-recipient-btn").click(function () {
+            data = "";
+            relative = $("#mco-ad-div #internal-address").val();
+            absolute = $("#mco-ad-div #absolute-address").val();
+            included = $("#mco-ad-div #included").prop("checked");
+            if (((relative.trim() == "") || (relative.trim() == " ")) &&
+            ((absolute.trim() == "") || (absolute.trim() == " "))) {
+                alert("Veuillez remplir au moins un champ avant validation SVP.");
+                return false;
+            }
+            else {
+                relative = "relative=" + relative;
+                absolute = "absolute=" + absolute;
+                AD_MODULE = "module=" + AD_MODULE;
+                included = "included=" + included;
+                $.ajax({
+                    url: SITENAME + AD_CONTROLLER + 'Create',
+                    type: "POST",
+                    data: relative + "&" + absolute + "&" + AD_MODULE + "&" + included,
+                    success: function (data) {
+                        alert(data);
+                        NAV_AD_RECIPIENTS_BTN.trigger("click");
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de la communication avec le serveur');
+                    },
+                    complete: function () {
+                        NAV_AD_RECIPIENTS_BTN.trigger("click");
+                        colourTitles();
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-ad-div .deleter").click(function () {
+            deletor = confirm("Voulez vous réellement supprimer ce destinataire de la liste?");
+            if (deletor) {
+                recipientId = $(this).closest("td").find(".action-id-getter").val();
+                $.ajax({
+                    url: SITENAME + AD_CONTROLLER + 'Delete/' + recipientId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        NAV_AD_RECIPIENTS_BTN.trigger("click");
+                        colourTitles();
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-ad-div .details-editor").click(function () {
+            columns = $(this).closest("tr").find("td");
+            include = $(this).closest("tr").find(".include-content-getter").val();
+            $("#mco-ad-div #internal-address").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
+            $("#mco-ad-div #absolute-address").val(columns.eq(1).text().replace(/^\s+|\s+$/g, ''));
+            $("#mco-ad-div #included").prop("checked", (include == "True"));
+            recipientId = $(this).closest("td").find(".action-id-getter").val();
+            $("#mco-ad-div #create-recipient-btn").css("visibility", "hidden");
+            $("#mco-ad-div #create-recipient-btn").css("display", "none");
+            $("#mco-ad-div .recipient-editor-control").css("visibility", "visible");
+            $("#mco-ad-div .recipient-editor-control").css("display", "inline");
+        });
+
+        //----------------------------------------------------------
+        $("#mco-ad-div .cancelor").click(function () {
+            $("#mco-ad-div #internal-address").val("");
+            $("#mco-ad-div #absolute-address").val("");
+            $("#mco-ad-div #included").prop("checked", true);
+            $("#mco-ad-div .recipient-editor-control").css("visibility", "hidden");
+            $("#mco-ad-div .recipient-editor-control").css("display", "none");
+            $("#mco-ad-div #create-recipient-btn").css("visibility", "visible");
+            $("#mco-ad-div #create-recipient-btn").css("display", "inline");
+        });
+
+        //----------------------------------------------------------
+        $("#mco-ad-div .editor").click(function () {
+            data = "";
+            relative = $("#mco-ad-div #internal-address").val();
+            absolute = $("#mco-ad-div #absolute-address").val();
+            included = $("#mco-ad-div #included").prop("checked");
+            if (((relative.trim() == "") || (relative.trim() == " ")) &&
+            ((absolute.trim() == "") || (absolute.trim() == " "))) {
+                alert("Veuillez remplir au moins un champ avant validation SVP.");
+                return false;
+            }
+            else {
+                relative = "relative=" + relative;
+                absolute = "absolute=" + absolute;
+                AD_MODULE = "module=" + AD_MODULE;
+                included = "included=" + included;
+                $.ajax({
+                    url: SITENAME + AD_CONTROLLER + 'Edit/' + recipientId,
+                    type: "POST",
+                    data: relative + "&" + absolute + "&" + AD_MODULE + "&" + included,
+                    success: function (data) {
+                        alert(data);
+                        NAV_AD_RECIPIENTS_BTN.trigger("click");
+                    },
+                    error: function (errorThrown) {
+                        alert('Erreur lors de la communication avec le serveur');
+                    },
+                    complete: function () {
+                        NAV_AD_RECIPIENTS_BTN.trigger("click");
+                        colourTitles();
+                    }
+                });
+            }
+        });
+
+        //----------------------------------------------------------
+        $("#mco-ad-div #absolute-address").blur(function () {
+            if (!validateEmail($("#mco-ad-div #absolute-address").val())) {
+                alert("Cette adresse email n'est pas valide.");
+                $("#mco-ad-div #absolute-address").val("");
+            }
+        });
+    });
+    
+</script>
+<hgroup>
+    <h2 class="page-title">Gestion de la liste des Destinataires Check AD</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<div id="new-recipient" class="new-recipient">
+    <label><span class="new-recipient-title">
+        <strong>Ajoutez un destinataire à la liste</strong>
+        </span></label>
+    <br /><br />
+    <label><span class="new-recipient-label">Adresse interne :</span></label>
+    <input type="text" id="internal-address" value="" placeholder ="ae.gnamian" class="address-input"/><br /><br />
+    <label><span class="new-recipient-label">Adresse complète :</span></label>
+    <input type="text" id="absolute-address" value="" placeholder ="a.gnamian@bouygues-construction.com"
+        class="address-input"/><br /><br />
+    <input type="checkbox" id="included" class="new-recipient-checkbox" checked title="Inclure ce destinataire dans les checks"/>
+    <span class="new-server-label" style="float:right">Inclure dans les checks</span>
+    <br /><br />
+    <input id="create-recipient-btn" class="recipient-creator" type="button" value="Ajouter" />
+    <input id="recipient-btn-editor"  style="float:right" class="recipient-editor-control editor" type="button" value="Modifier" />
+    <input id="recipient-btn-cancelor" style="float:left" class="recipient-editor-control cancelor" type="button" value="Annuler" />
+</div>
+<br /><br />
+<label>
+    <span>
+        Les adresses mails ci-dessous seront automatiquement chargées
+dans la liste des destinataires de chaque email émanant du check AD.
+    </span>
+</label>
+<table id="recipient-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Adresse Interne</th>
+            <th>Adresse Complète</th>
+            <th>Inclus</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+ 
+@foreach (var item in Model) { 
+        <tr class="item-summary-tr">
+        <td>
+            @Html.DisplayFor(modelItem => item.RelativeAddress) 
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AbsoluteAddress) 
+        </td>
+        <td style="width:5%;">
+            @Html.TextBox("Include-" + item.Id,item.Included,new { @disabled = "disabled", @class = "include-content-getter" })
+        </td>
+        <td style="margin=0px;padding=0px;">
+            @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+            <div class="action-div">
+                <div class="action-icon details-editor" title="modifier destinataire"></div>
+                <div class="action-icon deleter" title="supprimer"></div>
+            </div>                
+        </td>
+    </tr>
+} 
+    </tbody>
+</table>

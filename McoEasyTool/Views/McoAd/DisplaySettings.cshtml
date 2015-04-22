@@ -1,0 +1,255 @@
+﻿@{Layout = null;}@model McoEasyTool.AD_Settings
+
+@using (Html.BeginForm()) { 
+@Html.ValidationSummary(true)
+        
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        AD_CONTROLLER = "McoAd/";
+        AD_MODULE = "AD";
+        $("#mco-ad-div #select-server-state").val("@Html.DisplayFor(model => model.State)");
+        $("#mco-ad-div #select-server-state").trigger("change");
+        $("#mco-ad-div #Duration").css("width", "50px");
+        $("#mco-ad-div #Duration,#select-server-state").css("font-size", "18px");
+        $("#mco-ad-div #Duration,#select-server-state,#Errors").css("color", "#0197bc");
+        $("#mco-ad-div #Duration,#select-server-state").css("border", "0px");
+        error_list = "";
+        errors = "@Html.DisplayFor(model => model.MemoryErrors)".split(",");
+        selected_errors = "@Html.DisplayFor(model => model.Errors)";
+        for (e = 0; e < errors.length; e++) {
+            if (selected_errors.indexOf(errors[e]) != -1) {
+                error_list += "<option selected>" + errors[e] + "</option>";
+            }
+            else {
+                error_list += "<option>" + errors[e] + "</option>";
+            }
+        }
+        $("#mco-ad-div #select-server-errors,#new-errors").css("width", "70px");
+        $("#mco-ad-div #select-server-errors").html(error_list);
+
+        $("#mco-ad-div #Duration").change(function () {
+            if ($(this).val().length >= 2) {
+                $(this).val($(this).val().substr(0, 2));
+            }
+            if ($(this).val() <= 0 || isNaN(parseInt($(this).val()))) {
+                $(this).val(1);
+            }
+        });
+
+        $("#mco-ad-div #new-errors").change(function () {
+            if ($(this).val() <= 0 || isNaN(parseInt($(this).val()))) {
+                $(this).val("");
+            }
+            if ($(this).val() != "") {
+                add = confirm("Voulez vous rajouter l'erreur " + $(this).val() + " parmi la liste des erreurs?");
+                if (add) {
+                    code = $(this).val();
+                    while (code.length < 4) {
+                        code = "0" + code;
+                    }
+                    $("#mco-ad-div #select-server-errors").append("<option selected>" + code + "</option>");
+                    $("#mco-ad-div #select-server-errors").trigger("change");
+                }
+            }
+            $(this).val("");
+        });
+
+        $("#mco-ad-div .enabler").each(function () {
+            enabler = $(this);
+            if (!enabler.find("input").prop("checked")) {
+                $(this).parent().find(".values").find("*").each(function () {
+                    $(this).css("background-color", "#e3e3e3");
+                    $(this).css("opacity", 0.5);
+                    $(this).attr("disabled", "disabled");
+                });
+            }
+            $("#mco-ad-div #Errors").attr("disabled", "disabled");
+        })
+
+        $("#mco-ad-div #DurationFilter,#StateFilter,#ErrorFilter").change(function () {
+            if ($(this).prop("checked")) {
+                $(this).parent().parent().find(".values").find("*").css("background-color", "#fff");
+                $(this).parent().parent().find(".values").find("*").css("opacity", 1);
+                $(this).parent().parent().find(".values").find("*").each(function () {
+                    $(this).removeAttr("disabled");
+                });
+            }
+            else {
+                $(this).parent().parent().find(".values").find("*").css("background-color", "#e3e3e3");
+                $(this).parent().parent().find(".values").find("*").css("opacity", 0.5);
+                $(this).parent().parent().find(".values").find("*").attr("disabled", "disabled");
+            }
+            $("#mco-ad-div #Errors").attr("disabled", "disabled");
+        });
+
+        $("#mco-ad-div #ErrorFilter").change(function () {
+            if ($(this).prop("checked")) {
+                $(this).parent().parent().find(".values").find("*").css("background-color", "#fff");
+                $(this).parent().parent().find(".values").find("*").css("opacity", 1);
+                $("#mco-ad-div .double").children().each(function () {
+                    $(this).css("background-color", "#fff");
+                    $(this).find("*").css("background-color", "#fff");
+                    $(this).css("opacity", 1);
+                    $(this).find("*").css("opacity", 1);
+                    $(this).find("*").each(function () {
+                        $(this).removeAttr("disabled");
+                    });
+                });
+                $("#mco-ad-div #select-server-errors").removeAttr("disabled");
+            }
+            else {
+                $(this).parent().parent().find(".values").find("*").css("background-color", "#e3e3e3");
+                $(this).parent().parent().find(".values").find("*").css("opacity", 0.5);
+                $("#mco-ad-div .double").children().each(function () {
+                    $(this).css("background-color", "#e3e3e3");
+                    $(this).find("*").css("background-color", "#e3e3e3");
+                    $(this).css("opacity", 0.5);
+                    $(this).find("*").css("opacity", 0.5);
+                    $(this).find("*").each(function () {
+                        $(this).attr("disabled", "disabled");
+                    });
+                });
+                $("#mco-ad-div #select-server-errors").attr("disabled");
+            }
+            $("#mco-ad-div #Errors").attr("disabled", "disabled");
+        });
+
+        $("#mco-ad-div #select-server-errors").change(function () {
+            select = $(this);
+            codes = "";
+            $("#mco-ad-div #select-server-errors option:selected").each(function () {
+                codes = codes + $(this).val() + ",";
+            });
+            if (codes.length > 0) {
+                $("#mco-ad-div #Errors").val(codes.substr(0, codes.length - 1));
+            }
+            else {
+                $("#mco-ad-div #Errors").val("");
+            }
+        });
+
+        $("#mco-ad-div #save-settings-btn").click(function () {
+            codes = "";
+            $("#mco-ad-div #select-server-errors option").each(function () {
+                codes += $(this).val() + ",";
+            });
+            if (codes.length > 0) {
+                codes = codes.substr(0, codes.length - 1);
+            }
+            $.ajax({
+                url: SITENAME + AD_CONTROLLER + 'SaveSettings/',
+                dataType: "JSON",
+                type: "POST",
+                data: {
+                    DurationFilter: $("#mco-ad-div #DurationFilter").prop("checked"), Duration: $("#mco-ad-div #Duration").val(),
+                    PingFilter: $("#mco-ad-div #PingFilter").prop("checked"), StateFilter: $("#mco-ad-div #StateFilter").prop("checked"),
+                    State: $("#mco-ad-div #select-server-state").val(), ErrorFilter: $("#mco-ad-div #ErrorFilter").prop("checked"), Errors: $("#mco-ad-div #Errors").val(),
+                    MemoryErrors: codes
+                },
+                success: function (content) {
+                    if (content == 1) {
+                        alert("Les modifications ont été enrégistrées");
+                    }
+                    else {
+                        alert("Une erreur est survenue lors de l'enregistrement des modifications");
+                    }
+                },
+                error: function () {
+                    alert("Erreur lors de l'enregistrement des modifications");
+                },
+                complete: function () {
+                    NAV_AD_SETTINGS_BTN.trigger("click");
+                    colourTitles();
+                }
+            });
+        });
+
+    });
+</script>
+<hgroup>
+    <h2 class="page-title">Paramétrage du filtrage Check AD</h2>
+</hgroup>
+<div id="ad-settings" class="ad-settings">
+    <p class="page-title-info warning"></p>
+    <label><span class="ad-settings-title">
+        <strong>Veuillez modifier les réglages</strong>
+    </span></label>
+    <br /><br />
+    <span class="warning">
+        Les paramètres ci-dessous seront pris en compte lors de la génération des rapports pour les Check AD à venir;
+        Prenez soin de ne pas les modifier aléatoirement afin de préserver la cohérence des résultats fournis par l'application.
+    </span>
+    <br /><br />
+    <table id="ad-settings-table">
+        <tr>
+            <td><span class="nav-info">Durée d'absence</span></td>
+            <td class="enabler">
+                @Html.EditorFor(model => model.DurationFilter)
+                @Html.ValidationMessageFor(model => model.DurationFilter)
+            </td>
+            <td>Sont en défaillance critique les contrôleurs qui ont au moins : 
+            @Html.EditorFor(model => model.Duration)
+            @Html.ValidationMessageFor(model => model.Duration) jour(s) d'absence.</td>
+        </tr>
+        <tr>
+            <td><span class="nav-info">Ping</span></td>
+            <td class="enabler">
+                @Html.EditorFor(model => model.PingFilter)
+                @Html.ValidationMessageFor(model => model.PingFilter)
+            </td>
+            <td>Cochez cette case pour déclarer critique les contrôleurs dont le Ping est KO</td>
+        </tr>
+        <tr>
+            <td><span class="nav-info">Etat du serveur</span></td>
+            <td class="enabler">
+                @Html.EditorFor(model => model.StateFilter)
+                @Html.ValidationMessageFor(model => model.StateFilter)
+            </td>
+            <td class="values">Seuls les contrôleurs 
+                <select id="select-server-state">
+                    <option>Operationnel</option>
+                    <option>Retire</option>
+                    <option>A venir</option>
+                </select>
+            respectant toutes les autres conditions sont déclarés critiques</td>
+        </tr>
+        <tr>
+            <td><span class="nav-info">Erreur</span></td>
+            <td class="enabler">
+                @Html.EditorFor(model => model.ErrorFilter)
+                @Html.ValidationMessageFor(model => model.ErrorFilter)
+            </td>
+            <td class="values">Les erreurs suivantes remontées par un contrôleur sont critiques 
+                @Html.EditorFor(model => model.Errors)
+                @Html.ValidationMessageFor(model => model.Errors)
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td class="enabler" style="visibility:hidden;">
+                @Html.EditorFor(model => model.ErrorFilter)
+                @Html.ValidationMessageFor(model => model.ErrorFilter)
+            </td>
+            <td class="values double">
+                <select id="select-server-errors" multiple size="3" style="float:left"></select>
+                <span class="warning" style="margin-left : 50px; max-width: 100px;">
+                    Il s'agit des codes d'erreurs remontées par Repadmin.
+                </span><br />
+                <span style="margin-left : 50px; max-width: 100px;"> 
+                    Rajoutez-en si vous le souhaitez: <input maxlength="4" id='new-errors'/>
+                </span><br />
+                <span style="margin-left : 50px; max-width: 100px;"> 
+                    (Cliquez hors de la zone de texte pour valider l'ajout.)
+                </span>
+            </td>
+        </tr>
+    </table>
+    <br />
+    <div style="text-align:center;">
+        <input id="save-settings-btn" class="save-settings-btn" type="button" value="Sauvegarder" />
+    </div>
+    }
+
+</div>
+}
+

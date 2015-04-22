@@ -1,0 +1,58 @@
+﻿@{Layout = null;}@model IEnumerable<dynamic>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+
+        AD_DESC_TABLE = ["@ViewBag.AD_DESC_0",
+            "@ViewBag.AD_DESC_1",
+        "@ViewBag.AD_DESC_2",
+        "@ViewBag.AD_DESC_3",
+        "@ViewBag.AD_DESC_4"
+    ];
+        AD_IMG_BASE = SITENAME + "Images/home-ad-";
+        AD_IMG_INDEX = 0;
+        AD_IMG_EXT = ".gif";
+        AD_TIMEOUT = null;
+        AD_REPEAT = 100;
+
+        function change_picture() {
+            //alert(AD_IMG_INDEX);
+            img = $("#check-ad-main-div").find(".mco-home-main-img").eq(0);
+
+            span = $("#check-ad-description-div").find(".mco-hom-description-span").eq(0);
+
+            img.attr("src", AD_IMG_BASE + AD_IMG_INDEX + AD_IMG_EXT);
+            var decoded = $('<div/>').html(AD_DESC_TABLE[AD_IMG_INDEX]).text();
+            span.html(decoded);
+
+            AD_IMG_INDEX++;
+            AD_REPEAT--;
+
+            if (AD_IMG_INDEX > 4)
+            {
+                AD_IMG_INDEX = 0;
+            }
+            AD_TIMEOUT = setTimeout(change_picture, 4000);
+            if (AD_REPEAT == 0) {
+                clearTimeout(AD_TIMEOUT);
+            }
+        }
+
+        change_picture();
+
+    });
+</script>
+
+<hgroup>
+    <h2 class="page-title">Bienvenue dans le Check Active Directory</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<span class="warning">Vérifier l'état des réplications sur les contrôleurs de domaines de l'Active Directory</span>
+
+<div id="check-ad-main-div" class="mco-home-main-div">
+    <img src="Images/home-ad-0.gif" class="mco-home-main-img"/>
+</div>
+<div id="check-ad-description-div" class="mco-home-description-div">
+    <div class="mco-hom-description-span"></div>
+</div>
+
+

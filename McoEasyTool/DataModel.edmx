@@ -1,0 +1,1842 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="DataModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="DataModelStoreContainer">
+    <EntitySet Name="FaultyServerReports" EntityType="DataModel.Store.FaultyServerReports" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Recipients" EntityType="DataModel.Store.Recipients" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ReftechServers" EntityType="DataModel.Store.ReftechServers" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Pools" EntityType="DataModel.Store.Pools" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="BackupServerReports" EntityType="DataModel.Store.BackupServerReports" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="AD_Settings" EntityType="DataModel.Store.AD_Settings" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Applications" EntityType="DataModel.Store.Applications" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ApplicationAppReports" EntityType="DataModel.Store.ApplicationAppReports" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="AppServerAppReports" EntityType="DataModel.Store.AppServerAppReports" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="AppHtmlElements" EntityType="DataModel.Store.AppHtmlElements" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ScheduledApplications" EntityType="DataModel.Store.ScheduledApplications" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Emails" EntityType="DataModel.Store.Emails" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Reports" EntityType="DataModel.Store.Reports" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Schedules" EntityType="DataModel.Store.Schedules" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Servers" EntityType="DataModel.Store.Servers" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="AppDomains" EntityType="DataModel.Store.AppDomains" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="SpaceServer_Reports" EntityType="DataModel.Store.SpaceServer_Reports" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Accounts" EntityType="DataModel.Store.Accounts" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Reports_AdReport" EntityType="DataModel.Store.Reports_AdReport" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Servers_FaultyServer" EntityType="DataModel.Store.Servers_FaultyServer" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Servers_BackupServer" EntityType="DataModel.Store.Servers_BackupServer" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Reports_BackupReport" EntityType="DataModel.Store.Reports_BackupReport" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Reports_AppReport" EntityType="DataModel.Store.Reports_AppReport" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Schedules_AppSchedule" EntityType="DataModel.Store.Schedules_AppSchedule" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Servers_AppServer" EntityType="DataModel.Store.Servers_AppServer" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Servers_SpaceServer" EntityType="DataModel.Store.Servers_SpaceServer" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Reports_SpaceReport" EntityType="DataModel.Store.Reports_SpaceReport" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Schedules_AdSchedule" EntityType="DataModel.Store.Schedules_AdSchedule" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Schedules_BackupSchedule" EntityType="DataModel.Store.Schedules_BackupSchedule" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Schedules_SpaceSchedule" EntityType="DataModel.Store.Schedules_SpaceSchedule" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="AdReportFaultyServer_Report" Association="DataModel.Store.AdReportFaultyServer_Report">
+      <End Role="AdReport" EntitySet="Reports_AdReport" />
+      <End Role="FaultyServer_Report" EntitySet="FaultyServerReports" />
+    </AssociationSet>
+    <AssociationSet Name="FaultyServerFaultyServer_Report" Association="DataModel.Store.FaultyServerFaultyServer_Report">
+      <End Role="FaultyServer" EntitySet="Servers_FaultyServer" />
+      <End Role="FaultyServer_Report" EntitySet="FaultyServerReports" />
+    </AssociationSet>
+    <AssociationSet Name="PoolBackupServer" Association="DataModel.Store.PoolBackupServer">
+      <End Role="Pool" EntitySet="Pools" />
+      <End Role="BackupServer" EntitySet="Servers_BackupServer" />
+    </AssociationSet>
+    <AssociationSet Name="BackupReportBackupServer_Report" Association="DataModel.Store.BackupReportBackupServer_Report">
+      <End Role="BackupReport" EntitySet="Reports_BackupReport" />
+      <End Role="BackupServer_Report" EntitySet="BackupServerReports" />
+    </AssociationSet>
+    <AssociationSet Name="AppReportApplication_Report" Association="DataModel.Store.AppReportApplication_Report">
+      <End Role="AppReport" EntitySet="Reports_AppReport" />
+      <End Role="Application_Report" EntitySet="ApplicationAppReports" />
+    </AssociationSet>
+    <AssociationSet Name="AppScheduleScheduled_Application" Association="DataModel.Store.AppScheduleScheduled_Application">
+      <End Role="AppSchedule" EntitySet="Schedules_AppSchedule" />
+      <End Role="Scheduled_Application" EntitySet="ScheduledApplications" />
+    </AssociationSet>
+    <AssociationSet Name="ApplicationApplication_Report" Association="DataModel.Store.ApplicationApplication_Report">
+      <End Role="Application" EntitySet="Applications" />
+      <End Role="Application_Report" EntitySet="ApplicationAppReports" />
+    </AssociationSet>
+    <AssociationSet Name="ApplicationAppHtmlElement" Association="DataModel.Store.ApplicationAppHtmlElement">
+      <End Role="Application" EntitySet="Applications" />
+      <End Role="AppHtmlElement" EntitySet="AppHtmlElements" />
+    </AssociationSet>
+    <AssociationSet Name="ApplicationScheduled_Application" Association="DataModel.Store.ApplicationScheduled_Application">
+      <End Role="Application" EntitySet="Applications" />
+      <End Role="Scheduled_Application" EntitySet="ScheduledApplications" />
+    </AssociationSet>
+    <AssociationSet Name="Application_AppServer" Association="DataModel.Store.Application_AppServer">
+      <End Role="Application" EntitySet="Applications" />
+      <End Role="AppServer" EntitySet="Servers_AppServer" />
+    </AssociationSet>
+    <AssociationSet Name="AppServer_AppServerReport" Association="DataModel.Store.AppServer_AppServerReport">
+      <End Role="AppServer" EntitySet="Servers_AppServer" />
+      <End Role="AppServer_Report" EntitySet="AppServerAppReports" />
+    </AssociationSet>
+    <AssociationSet Name="Application_ReportAppServer_Report" Association="DataModel.Store.Application_ReportAppServer_Report">
+      <End Role="Application_Report" EntitySet="ApplicationAppReports" />
+      <End Role="AppServer_Report" EntitySet="AppServerAppReports" />
+    </AssociationSet>
+    <AssociationSet Name="ReportEmail" Association="DataModel.Store.ReportEmail">
+      <End Role="Report" EntitySet="Reports" />
+      <End Role="Email" EntitySet="Emails" />
+    </AssociationSet>
+    <AssociationSet Name="ScheduleReport" Association="DataModel.Store.ScheduleReport">
+      <End Role="Schedule" EntitySet="Schedules" />
+      <End Role="Report" EntitySet="Reports" />
+    </AssociationSet>
+    <AssociationSet Name="SpaceServerSpaceServer_Report" Association="DataModel.Store.SpaceServerSpaceServer_Report">
+      <End Role="SpaceServer" EntitySet="Servers_SpaceServer" />
+      <End Role="SpaceServer_Report" EntitySet="SpaceServer_Reports" />
+    </AssociationSet>
+    <AssociationSet Name="SpaceReportSpaceServer_Report" Association="DataModel.Store.SpaceReportSpaceServer_Report">
+      <End Role="SpaceReport" EntitySet="Reports_SpaceReport" />
+      <End Role="SpaceServer_Report" EntitySet="SpaceServer_Reports" />
+    </AssociationSet>
+    <AssociationSet Name="BackupServerBackupServer_Report" Association="DataModel.Store.BackupServerBackupServer_Report">
+      <End Role="BackupServer" EntitySet="Servers_BackupServer" />
+      <End Role="BackupServer_Report" EntitySet="BackupServerReports" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AdReport_inherits_Report" Association="DataModel.Store.FK_AdReport_inherits_Report">
+      <End Role="Report" EntitySet="Reports" />
+      <End Role="AdReport" EntitySet="Reports_AdReport" />
+    </AssociationSet>
+    <AssociationSet Name="FK_FaultyServer_inherits_Server" Association="DataModel.Store.FK_FaultyServer_inherits_Server">
+      <End Role="Server" EntitySet="Servers" />
+      <End Role="FaultyServer" EntitySet="Servers_FaultyServer" />
+    </AssociationSet>
+    <AssociationSet Name="FK_BackupServer_inherits_Server" Association="DataModel.Store.FK_BackupServer_inherits_Server">
+      <End Role="Server" EntitySet="Servers" />
+      <End Role="BackupServer" EntitySet="Servers_BackupServer" />
+    </AssociationSet>
+    <AssociationSet Name="FK_BackupReport_inherits_Report" Association="DataModel.Store.FK_BackupReport_inherits_Report">
+      <End Role="Report" EntitySet="Reports" />
+      <End Role="BackupReport" EntitySet="Reports_BackupReport" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AppReport_inherits_Report" Association="DataModel.Store.FK_AppReport_inherits_Report">
+      <End Role="Report" EntitySet="Reports" />
+      <End Role="AppReport" EntitySet="Reports_AppReport" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AppSchedule_inherits_Schedule" Association="DataModel.Store.FK_AppSchedule_inherits_Schedule">
+      <End Role="Schedule" EntitySet="Schedules" />
+      <End Role="AppSchedule" EntitySet="Schedules_AppSchedule" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AppServer_inherits_Server" Association="DataModel.Store.FK_AppServer_inherits_Server">
+      <End Role="Server" EntitySet="Servers" />
+      <End Role="AppServer" EntitySet="Servers_AppServer" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SpaceServer_inherits_Server" Association="DataModel.Store.FK_SpaceServer_inherits_Server">
+      <End Role="Server" EntitySet="Servers" />
+      <End Role="SpaceServer" EntitySet="Servers_SpaceServer" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SpaceReport_inherits_Report" Association="DataModel.Store.FK_SpaceReport_inherits_Report">
+      <End Role="Report" EntitySet="Reports" />
+      <End Role="SpaceReport" EntitySet="Reports_SpaceReport" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AdSchedule_inherits_Schedule" Association="DataModel.Store.FK_AdSchedule_inherits_Schedule">
+      <End Role="Schedule" EntitySet="Schedules" />
+      <End Role="AdSchedule" EntitySet="Schedules_AdSchedule" />
+    </AssociationSet>
+    <AssociationSet Name="FK_BackupSchedule_inherits_Schedule" Association="DataModel.Store.FK_BackupSchedule_inherits_Schedule">
+      <End Role="Schedule" EntitySet="Schedules" />
+      <End Role="BackupSchedule" EntitySet="Schedules_BackupSchedule" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SpaceSchedule_inherits_Schedule" Association="DataModel.Store.FK_SpaceSchedule_inherits_Schedule">
+      <End Role="Schedule" EntitySet="Schedules" />
+      <End Role="SpaceSchedule" EntitySet="Schedules_SpaceSchedule" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="FaultyServerReports">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Ping" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Details" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="AbsenceDuration" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Ticket" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="AdReportId" Type="int" Nullable="false" />
+    <Property Name="FaultyServerId" Type="int" Nullable="false" />
+    <Property Name="AdReport_Id" Type="int" Nullable="false" />
+    <Property Name="FaultyServer_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Recipients">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="RelativeAddress" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="AbsoluteAddress" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Module" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Included" Type="bit" Nullable="true" />
+  </EntityType>
+  <EntityType Name="ReftechServers">
+    <Key>
+      <PropertyRef Name="IdServeur" />
+      <PropertyRef Name="NomMachineServeur" />
+      <PropertyRef Name="Environnement" />
+      <PropertyRef Name="Perimetre" />
+      <PropertyRef Name="CodeDomaine" />
+      <PropertyRef Name="IsDedie" />
+      <PropertyRef Name="IsMaquette" />
+      <PropertyRef Name="EtatServeur" />
+      <PropertyRef Name="DateInsertServeur" />
+      <PropertyRef Name="IsPCI" />
+    </Key>
+    <Property Name="IdServeur" Type="int" Nullable="false" />
+    <Property Name="NomMachineServeur" Type="varchar" Nullable="false" MaxLength="30" />
+    <Property Name="NomLogiqueServeur" Type="varchar" Nullable="true" MaxLength="100" />
+    <Property Name="ServiceMajeur" Type="char" Nullable="true" MaxLength="15" />
+    <Property Name="Environnement" Type="char" Nullable="false" MaxLength="15" />
+    <Property Name="Perimetre" Type="char" Nullable="false" MaxLength="15" />
+    <Property Name="CodeDomaine" Type="char" Nullable="false" MaxLength="3" />
+    <Property Name="IsDedie" Type="char" Nullable="false" MaxLength="1" />
+    <Property Name="IsHauteDispo" Type="char" Nullable="true" MaxLength="1" />
+    <Property Name="IsMaquette" Type="char" Nullable="false" MaxLength="1" />
+    <Property Name="NumSerie" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="EtatServeur" Type="char" Nullable="false" MaxLength="1" />
+    <Property Name="IdSite" Type="varchar" Nullable="true" MaxLength="130" />
+    <Property Name="LocalisationPhysique" Type="varchar" Nullable="true" MaxLength="30" />
+    <Property Name="IdUserExploitLocal" Type="int" Nullable="true" />
+    <Property Name="RemarquesServeur" Type="varchar" Nullable="true" MaxLength="400" />
+    <Property Name="DateInsertServeur" Type="datetime" Nullable="false" />
+    <Property Name="IP" Type="varchar" Nullable="true" MaxLength="30" />
+    <Property Name="DateUpdateServeur" Type="datetime" Nullable="true" />
+    <Property Name="IsPCI" Type="char" Nullable="false" MaxLength="1" />
+    <Property Name="IdTypeSupervision" Type="int" Nullable="true" />
+    <Property Name="NiveauSupervision" Type="int" Nullable="true" />
+    <Property Name="IdExploitantServeur" Type="int" Nullable="true" />
+    <Property Name="IdKM" Type="varchar" Nullable="true" MaxLength="20" />
+    <Property Name="IdServeurParent" Type="int" Nullable="true" />
+    <Property Name="IdTypeServeur" Type="int" Nullable="true" />
+  </EntityType>
+  <EntityType Name="Pools">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="BackupDay" Type="int" Nullable="false" />
+    <Property Name="CheckDay" Type="int" Nullable="false" />
+    <Property Name="CellColor" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="CheckFolder" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="BackupManager" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="ExecutionAccount" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="CheckAccount" Type="nvarchar(max)" Nullable="true" />
+  </EntityType>
+  <EntityType Name="BackupServerReports">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="State" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Ping" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Services" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Relaunched" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Details" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="BackupReportId" Type="int" Nullable="false" />
+    <Property Name="BackupServerId" Type="int" Nullable="false" />
+    <Property Name="BackupReport_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="AD_Settings">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="DurationFilter" Type="bit" Nullable="false" />
+    <Property Name="StateFilter" Type="bit" Nullable="false" />
+    <Property Name="PingFilter" Type="bit" Nullable="false" />
+    <Property Name="ErrorFilter" Type="bit" Nullable="false" />
+    <Property Name="Duration" Type="int" Nullable="false" />
+    <Property Name="State" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Errors" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="MemoryErrors" Type="nvarchar(max)" Nullable="true" />
+  </EntityType>
+  <EntityType Name="Applications">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Url" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Domain" Type="int" Nullable="true" />
+    <Property Name="Navigator" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ApplicationAppReports">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="State" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Details" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Linkable" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Authentified" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="AppReportId" Type="int" Nullable="false" />
+    <Property Name="ApplicationId" Type="int" Nullable="false" />
+    <Property Name="AppReport_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="AppServerAppReports">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Ping" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="State" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Details" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Application_ReportId" Type="int" Nullable="false" />
+    <Property Name="AppServerId" Type="int" Nullable="false" />
+    <Property Name="AppServer_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="AppHtmlElements">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TagName" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="AttrId" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="AttrName" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="AttrClass" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Value" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Type" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="ApplicationId" Type="int" Nullable="false" />
+    <Property Name="AttrXpath" Type="nvarchar(max)" Nullable="true" />
+  </EntityType>
+  <EntityType Name="ScheduledApplications">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="AppScheduleId" Type="int" Nullable="false" />
+    <Property Name="ApplicationId" Type="int" Nullable="false" />
+    <Property Name="AppSchedule_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Emails">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Recipients" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Sender" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Subject" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Body" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Module" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Sent" Type="bit" Nullable="true" />
+  </EntityType>
+  <EntityType Name="Reports">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="DateTime" Type="datetime" Nullable="false" />
+    <Property Name="Duration" Type="time" Nullable="true" />
+    <Property Name="TotalChecked" Type="int" Nullable="true" />
+    <Property Name="TotalErrors" Type="int" Nullable="true" />
+    <Property Name="ResultPath" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Module" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="ScheduleId" Type="int" Nullable="true" />
+    <Property Name="Author" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Email_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Schedules">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="CreationTime" Type="datetime" Nullable="false" />
+    <Property Name="Multiplicity" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="TaskName" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Generator" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Executed" Type="int" Nullable="true" />
+    <Property Name="NextExecution" Type="datetime" Nullable="true" />
+    <Property Name="State" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Module" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Servers">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IpAddress" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Status" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Location" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Version" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="ActiveDirecotryDomain" Type="nvarchar(max)" Nullable="true" />
+  </EntityType>
+  <EntityType Name="AppDomains">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Applications" Type="int" Nullable="true" />
+  </EntityType>
+  <EntityType Name="SpaceServer_Reports">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="State" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Ping" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Details" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="SpaceReportId" Type="int" Nullable="false" />
+    <Property Name="SpaceServerId" Type="int" Nullable="false" />
+    <Property Name="SpaceServer_Id" Type="int" Nullable="false" />
+    <Property Name="SpaceReport_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Accounts">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Domain" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Username" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Password" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="DisplayName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="IsSystem" Type="bit" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Reports_AdReport">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="FatalErrors" Type="int" Nullable="true" />
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Servers_FaultyServer">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="IdSite" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Site" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Servers_BackupServer">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Disks" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="PoolId" Type="int" Nullable="false" />
+    <Property Name="Included" Type="bit" Nullable="true" />
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Reports_BackupReport">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="WeekNumber" Type="int" Nullable="false" />
+    <Property Name="LastUpdate" Type="datetime" Nullable="false" />
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Reports_AppReport">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Schedules_AppSchedule">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="AutoRelaunch" Type="bit" Nullable="false" />
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Servers_AppServer">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="StartOrder" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="StopOrder" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="ApplicationId" Type="int" Nullable="false" />
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Servers_SpaceServer">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Included" Type="bit" Nullable="true" />
+    <Property Name="Disks" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="IsShare" Type="bit" Nullable="false" />
+    <Property Name="CellColor" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="ExecutionAccount" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="CheckAccount" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Reports_SpaceReport">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Schedules_AdSchedule">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="AutoCorrect" Type="bit" Nullable="false" />
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Schedules_BackupSchedule">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="AutoRelaunch" Type="bit" Nullable="false" />
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Schedules_SpaceSchedule">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="AdReportFaultyServer_Report">
+    <End Role="AdReport" Type="DataModel.Store.Reports_AdReport" Multiplicity="1" />
+    <End Role="FaultyServer_Report" Type="DataModel.Store.FaultyServerReports" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AdReport">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="FaultyServer_Report">
+        <PropertyRef Name="AdReport_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FaultyServerFaultyServer_Report">
+    <End Role="FaultyServer" Type="DataModel.Store.Servers_FaultyServer" Multiplicity="1" />
+    <End Role="FaultyServer_Report" Type="DataModel.Store.FaultyServerReports" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="FaultyServer">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="FaultyServer_Report">
+        <PropertyRef Name="FaultyServer_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="PoolBackupServer">
+    <End Role="Pool" Type="DataModel.Store.Pools" Multiplicity="1" />
+    <End Role="BackupServer" Type="DataModel.Store.Servers_BackupServer" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Pool">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="BackupServer">
+        <PropertyRef Name="PoolId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="BackupReportBackupServer_Report">
+    <End Role="BackupReport" Type="DataModel.Store.Reports_BackupReport" Multiplicity="1" />
+    <End Role="BackupServer_Report" Type="DataModel.Store.BackupServerReports" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="BackupReport">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="BackupServer_Report">
+        <PropertyRef Name="BackupReport_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="AppReportApplication_Report">
+    <End Role="AppReport" Type="DataModel.Store.Reports_AppReport" Multiplicity="1" />
+    <End Role="Application_Report" Type="DataModel.Store.ApplicationAppReports" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AppReport">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Application_Report">
+        <PropertyRef Name="AppReport_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="AppScheduleScheduled_Application">
+    <End Role="AppSchedule" Type="DataModel.Store.Schedules_AppSchedule" Multiplicity="1" />
+    <End Role="Scheduled_Application" Type="DataModel.Store.ScheduledApplications" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AppSchedule">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Scheduled_Application">
+        <PropertyRef Name="AppSchedule_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ApplicationApplication_Report">
+    <End Role="Application" Type="DataModel.Store.Applications" Multiplicity="1" />
+    <End Role="Application_Report" Type="DataModel.Store.ApplicationAppReports" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Application">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Application_Report">
+        <PropertyRef Name="ApplicationId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ApplicationAppHtmlElement">
+    <End Role="Application" Type="DataModel.Store.Applications" Multiplicity="1" />
+    <End Role="AppHtmlElement" Type="DataModel.Store.AppHtmlElements" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Application">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="AppHtmlElement">
+        <PropertyRef Name="ApplicationId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ApplicationScheduled_Application">
+    <End Role="Application" Type="DataModel.Store.Applications" Multiplicity="1" />
+    <End Role="Scheduled_Application" Type="DataModel.Store.ScheduledApplications" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Application">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Scheduled_Application">
+        <PropertyRef Name="ApplicationId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="Application_AppServer">
+    <End Role="Application" Type="DataModel.Store.Applications" Multiplicity="1" />
+    <End Role="AppServer" Type="DataModel.Store.Servers_AppServer" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Application">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="AppServer">
+        <PropertyRef Name="ApplicationId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="AppServer_AppServerReport">
+    <End Role="AppServer" Type="DataModel.Store.Servers_AppServer" Multiplicity="1" />
+    <End Role="AppServer_Report" Type="DataModel.Store.AppServerAppReports" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AppServer">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="AppServer_Report">
+        <PropertyRef Name="AppServer_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="Application_ReportAppServer_Report">
+    <End Role="Application_Report" Type="DataModel.Store.ApplicationAppReports" Multiplicity="1" />
+    <End Role="AppServer_Report" Type="DataModel.Store.AppServerAppReports" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Application_Report">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="AppServer_Report">
+        <PropertyRef Name="Application_ReportId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ReportEmail">
+    <End Role="Report" Type="DataModel.Store.Reports" Multiplicity="*" />
+    <End Role="Email" Type="DataModel.Store.Emails" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Email">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Report">
+        <PropertyRef Name="Email_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ScheduleReport">
+    <End Role="Schedule" Type="DataModel.Store.Schedules" Multiplicity="0..1" />
+    <End Role="Report" Type="DataModel.Store.Reports" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Schedule">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Report">
+        <PropertyRef Name="ScheduleId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="SpaceServerSpaceServer_Report">
+    <End Role="SpaceServer" Type="DataModel.Store.Servers_SpaceServer" Multiplicity="1" />
+    <End Role="SpaceServer_Report" Type="DataModel.Store.SpaceServer_Reports" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="SpaceServer">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="SpaceServer_Report">
+        <PropertyRef Name="SpaceServer_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="SpaceReportSpaceServer_Report">
+    <End Role="SpaceReport" Type="DataModel.Store.Reports_SpaceReport" Multiplicity="1" />
+    <End Role="SpaceServer_Report" Type="DataModel.Store.SpaceServer_Reports" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="SpaceReport">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="SpaceServer_Report">
+        <PropertyRef Name="SpaceReport_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="BackupServerBackupServer_Report">
+    <End Role="BackupServer" Type="DataModel.Store.Servers_BackupServer" Multiplicity="1" />
+    <End Role="BackupServer_Report" Type="DataModel.Store.BackupServerReports" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="BackupServer">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="BackupServer_Report">
+        <PropertyRef Name="BackupServerId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AdReport_inherits_Report">
+    <End Role="Report" Type="DataModel.Store.Reports" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="AdReport" Type="DataModel.Store.Reports_AdReport" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Report">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="AdReport">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_FaultyServer_inherits_Server">
+    <End Role="Server" Type="DataModel.Store.Servers" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="FaultyServer" Type="DataModel.Store.Servers_FaultyServer" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Server">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="FaultyServer">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_BackupServer_inherits_Server">
+    <End Role="Server" Type="DataModel.Store.Servers" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="BackupServer" Type="DataModel.Store.Servers_BackupServer" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Server">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="BackupServer">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_BackupReport_inherits_Report">
+    <End Role="Report" Type="DataModel.Store.Reports" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="BackupReport" Type="DataModel.Store.Reports_BackupReport" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Report">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="BackupReport">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AppReport_inherits_Report">
+    <End Role="Report" Type="DataModel.Store.Reports" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="AppReport" Type="DataModel.Store.Reports_AppReport" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Report">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="AppReport">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AppSchedule_inherits_Schedule">
+    <End Role="Schedule" Type="DataModel.Store.Schedules" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="AppSchedule" Type="DataModel.Store.Schedules_AppSchedule" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Schedule">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="AppSchedule">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AppServer_inherits_Server">
+    <End Role="Server" Type="DataModel.Store.Servers" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="AppServer" Type="DataModel.Store.Servers_AppServer" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Server">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="AppServer">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SpaceServer_inherits_Server">
+    <End Role="Server" Type="DataModel.Store.Servers" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="SpaceServer" Type="DataModel.Store.Servers_SpaceServer" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Server">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="SpaceServer">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SpaceReport_inherits_Report">
+    <End Role="Report" Type="DataModel.Store.Reports" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="SpaceReport" Type="DataModel.Store.Reports_SpaceReport" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Report">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="SpaceReport">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AdSchedule_inherits_Schedule">
+    <End Role="Schedule" Type="DataModel.Store.Schedules" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="AdSchedule" Type="DataModel.Store.Schedules_AdSchedule" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Schedule">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="AdSchedule">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_BackupSchedule_inherits_Schedule">
+    <End Role="Schedule" Type="DataModel.Store.Schedules" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="BackupSchedule" Type="DataModel.Store.Schedules_BackupSchedule" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Schedule">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="BackupSchedule">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SpaceSchedule_inherits_Schedule">
+    <End Role="Schedule" Type="DataModel.Store.Schedules" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="SpaceSchedule" Type="DataModel.Store.Schedules_SpaceSchedule" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Schedule">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="SpaceSchedule">
+        <PropertyRef Name="Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="DataModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="DataModelContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="FaultyServerReports" EntityType="DataModel.FaultyServer_Report" />
+          <EntitySet Name="Recipients" EntityType="DataModel.Recipient" />
+          <EntitySet Name="ReftechServers" EntityType="DataModel.ReftechServers" />
+          <EntitySet Name="Pools" EntityType="DataModel.Pool" />
+          <EntitySet Name="BackupServerReports" EntityType="DataModel.BackupServer_Report" />
+          <EntitySet Name="AD_Settings" EntityType="DataModel.AD_Settings" />
+          <EntitySet Name="Applications" EntityType="DataModel.Application" />
+          <EntitySet Name="ApplicationAppReports" EntityType="DataModel.Application_Report" />
+          <EntitySet Name="AppServerAppReports" EntityType="DataModel.AppServer_Report" />
+          <EntitySet Name="AppHtmlElements" EntityType="DataModel.AppHtmlElement" />
+          <EntitySet Name="ScheduledApplications" EntityType="DataModel.Scheduled_Application" />
+          <EntitySet Name="Emails" EntityType="DataModel.Email" />
+          <EntitySet Name="Reports" EntityType="DataModel.Report" />
+          <EntitySet Name="Schedules" EntityType="DataModel.Schedule" />
+          <EntitySet Name="Servers" EntityType="DataModel.Server" />
+          <EntitySet Name="AppDomains" EntityType="DataModel.AppDomain" />
+          <EntitySet Name="SpaceServer_Reports" EntityType="DataModel.SpaceServer_Report" />
+          <EntitySet Name="Accounts" EntityType="DataModel.Account" />
+          <AssociationSet Name="AdReportFaultyServer_Report" Association="DataModel.AdReportFaultyServer_Report">
+            <End Role="AdReport" EntitySet="Reports" />
+            <End Role="FaultyServer_Report" EntitySet="FaultyServerReports" />
+          </AssociationSet>
+          <AssociationSet Name="FaultyServerFaultyServer_Report" Association="DataModel.FaultyServerFaultyServer_Report">
+            <End Role="FaultyServer" EntitySet="Servers" />
+            <End Role="FaultyServer_Report" EntitySet="FaultyServerReports" />
+          </AssociationSet>
+          <AssociationSet Name="PoolBackupServer" Association="DataModel.PoolBackupServer">
+            <End Role="Pool" EntitySet="Pools" />
+            <End Role="BackupServer" EntitySet="Servers" />
+          </AssociationSet>
+          <AssociationSet Name="BackupReportBackupServer_Report" Association="DataModel.BackupReportBackupServer_Report">
+            <End Role="BackupReport" EntitySet="Reports" />
+            <End Role="BackupServer_Report" EntitySet="BackupServerReports" />
+          </AssociationSet>
+          <AssociationSet Name="AppReportApplication_Report" Association="DataModel.AppReportApplication_Report">
+            <End Role="AppReport" EntitySet="Reports" />
+            <End Role="Application_Report" EntitySet="ApplicationAppReports" />
+          </AssociationSet>
+          <AssociationSet Name="AppScheduleScheduled_Application" Association="DataModel.AppScheduleScheduled_Application">
+            <End Role="AppSchedule" EntitySet="Schedules" />
+            <End Role="Scheduled_Application" EntitySet="ScheduledApplications" />
+          </AssociationSet>
+          <AssociationSet Name="ApplicationApplication_Report" Association="DataModel.ApplicationApplication_Report">
+            <End Role="Application" EntitySet="Applications" />
+            <End Role="Application_Report" EntitySet="ApplicationAppReports" />
+          </AssociationSet>
+          <AssociationSet Name="ApplicationAppHtmlElement" Association="DataModel.ApplicationAppHtmlElement">
+            <End Role="Application" EntitySet="Applications" />
+            <End Role="AppHtmlElement" EntitySet="AppHtmlElements" />
+          </AssociationSet>
+          <AssociationSet Name="ApplicationScheduled_Application" Association="DataModel.ApplicationScheduled_Application">
+            <End Role="Application" EntitySet="Applications" />
+            <End Role="Scheduled_Application" EntitySet="ScheduledApplications" />
+          </AssociationSet>
+          <AssociationSet Name="Application_AppServer" Association="DataModel.Application_AppServer">
+            <End Role="Application" EntitySet="Applications" />
+            <End Role="AppServer" EntitySet="Servers" />
+          </AssociationSet>
+          <AssociationSet Name="AppServer_AppServerReport" Association="DataModel.AppServer_AppServerReport">
+            <End Role="AppServer" EntitySet="Servers" />
+            <End Role="AppServer_Report" EntitySet="AppServerAppReports" />
+          </AssociationSet>
+          <AssociationSet Name="Application_ReportAppServer_Report" Association="DataModel.Application_ReportAppServer_Report">
+            <End Role="Application_Report" EntitySet="ApplicationAppReports" />
+            <End Role="AppServer_Report" EntitySet="AppServerAppReports" />
+          </AssociationSet>
+          <AssociationSet Name="ReportEmail" Association="DataModel.ReportEmail">
+            <End Role="Report" EntitySet="Reports" />
+            <End Role="Email" EntitySet="Emails" />
+          </AssociationSet>
+          <AssociationSet Name="ScheduleReport" Association="DataModel.ScheduleReport">
+            <End Role="Schedule" EntitySet="Schedules" />
+            <End Role="Report" EntitySet="Reports" />
+          </AssociationSet>
+          <AssociationSet Name="SpaceServerSpaceServer_Report" Association="DataModel.SpaceServerSpaceServer_Report">
+            <End Role="SpaceServer" EntitySet="Servers" />
+            <End Role="SpaceServer_Report" EntitySet="SpaceServer_Reports" />
+          </AssociationSet>
+          <AssociationSet Name="SpaceReportSpaceServer_Report" Association="DataModel.SpaceReportSpaceServer_Report">
+            <End Role="SpaceReport" EntitySet="Reports" />
+            <End Role="SpaceServer_Report" EntitySet="SpaceServer_Reports" />
+          </AssociationSet>
+          <AssociationSet Name="BackupServerBackupServer_Report" Association="DataModel.BackupServerBackupServer_Report">
+            <End Role="BackupServer" EntitySet="Servers" />
+            <End Role="BackupServer_Report" EntitySet="BackupServerReports" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="AdReport" BaseType="DataModel.Report">
+          <Property Name="FatalErrors" Type="Int32" Nullable="true" />
+          <NavigationProperty Name="FaultyServer_Reports" Relationship="DataModel.AdReportFaultyServer_Report" FromRole="AdReport" ToRole="FaultyServer_Report" />
+        </EntityType>
+        <EntityType Name="FaultyServer" BaseType="DataModel.Server">
+          <Property Name="IdSite" Type="String" Nullable="true" />
+          <Property Name="Site" Type="String" Nullable="true" />
+          <NavigationProperty Name="FaultyServer_Reports" Relationship="DataModel.FaultyServerFaultyServer_Report" FromRole="FaultyServer" ToRole="FaultyServer_Report" />
+        </EntityType>
+        <EntityType Name="FaultyServer_Report">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Ping" Type="String" Nullable="true" />
+          <Property Name="Details" Type="String" Nullable="true" />
+          <Property Name="AbsenceDuration" Type="String" Nullable="true" />
+          <Property Name="Ticket" Type="String" Nullable="true" />
+          <Property Name="AdReportId" Type="Int32" Nullable="false" />
+          <Property Name="FaultyServerId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="AdReport" Relationship="DataModel.AdReportFaultyServer_Report" FromRole="FaultyServer_Report" ToRole="AdReport" />
+          <NavigationProperty Name="FaultyServer" Relationship="DataModel.FaultyServerFaultyServer_Report" FromRole="FaultyServer_Report" ToRole="FaultyServer" />
+        </EntityType>
+        <EntityType Name="Recipient">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RelativeAddress" Type="String" Nullable="true" />
+          <Property Name="AbsoluteAddress" Type="String" Nullable="true" />
+          <Property Name="Name" Type="String" Nullable="true" />
+          <Property Name="Module" Type="String" Nullable="false" />
+          <Property Name="Included" Type="Boolean" Nullable="true" />
+        </EntityType>
+        <EntityType Name="AdSchedule" BaseType="DataModel.Schedule">
+          <Property Name="AutoCorrect" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ReftechServers">
+          <Key>
+            <PropertyRef Name="IdServeur" />
+            <PropertyRef Name="NomMachineServeur" />
+            <PropertyRef Name="Environnement" />
+            <PropertyRef Name="Perimetre" />
+            <PropertyRef Name="CodeDomaine" />
+            <PropertyRef Name="IsDedie" />
+            <PropertyRef Name="IsMaquette" />
+            <PropertyRef Name="EtatServeur" />
+            <PropertyRef Name="DateInsertServeur" />
+            <PropertyRef Name="IsPCI" />
+          </Key>
+          <Property Name="IdServeur" Type="Int32" Nullable="false" />
+          <Property Name="NomMachineServeur" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NomLogiqueServeur" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ServiceMajeur" Type="String" MaxLength="15" FixedLength="true" Unicode="false" />
+          <Property Name="Environnement" Type="String" Nullable="false" MaxLength="15" FixedLength="true" Unicode="false" />
+          <Property Name="Perimetre" Type="String" Nullable="false" MaxLength="15" FixedLength="true" Unicode="false" />
+          <Property Name="CodeDomaine" Type="String" Nullable="false" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="IsDedie" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="IsHauteDispo" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="IsMaquette" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="NumSerie" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="EtatServeur" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="IdSite" Type="String" MaxLength="130" FixedLength="false" Unicode="false" />
+          <Property Name="LocalisationPhysique" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="IdUserExploitLocal" Type="Int32" />
+          <Property Name="RemarquesServeur" Type="String" MaxLength="400" FixedLength="false" Unicode="false" />
+          <Property Name="DateInsertServeur" Type="DateTime" Nullable="false" />
+          <Property Name="IP" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="DateUpdateServeur" Type="DateTime" />
+          <Property Name="IsPCI" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="IdTypeSupervision" Type="Int32" />
+          <Property Name="NiveauSupervision" Type="Int32" />
+          <Property Name="IdExploitantServeur" Type="Int32" />
+          <Property Name="IdKM" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="IdServeurParent" Type="Int32" />
+          <Property Name="IdTypeServeur" Type="Int32" />
+        </EntityType>
+        <EntityType Name="Pool">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="BackupDay" Type="Int32" Nullable="false" />
+          <Property Name="CheckDay" Type="Int32" Nullable="false" />
+          <Property Name="CellColor" Type="String" Nullable="true" />
+          <Property Name="CheckFolder" Type="String" Nullable="true" />
+          <Property Name="BackupManager" Type="String" Nullable="true" />
+          <Property Name="ExecutionAccount" Type="String" Nullable="true" />
+          <Property Name="CheckAccount" Type="String" Nullable="true" />
+          <NavigationProperty Name="BackupServers" Relationship="DataModel.PoolBackupServer" FromRole="Pool" ToRole="BackupServer" />
+        </EntityType>
+        <EntityType Name="BackupServer" BaseType="DataModel.Server">
+          <Property Name="Disks" Type="String" Nullable="true" />
+          <Property Name="PoolId" Type="Int32" Nullable="false" />
+          <Property Name="Included" Type="Boolean" Nullable="true" />
+          <NavigationProperty Name="Pool" Relationship="DataModel.PoolBackupServer" FromRole="BackupServer" ToRole="Pool" />
+          <NavigationProperty Name="BackupServer_Reports" Relationship="DataModel.BackupServerBackupServer_Report" FromRole="BackupServer" ToRole="BackupServer_Report" />
+        </EntityType>
+        <EntityType Name="BackupReport" BaseType="DataModel.Report">
+          <Property Name="WeekNumber" Type="Int32" Nullable="false" />
+          <Property Name="LastUpdate" Type="DateTime" Nullable="false" />
+          <NavigationProperty Name="BackupServer_Reports" Relationship="DataModel.BackupReportBackupServer_Report" FromRole="BackupReport" ToRole="BackupServer_Report" />
+        </EntityType>
+        <EntityType Name="BackupServer_Report">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="State" Type="String" Nullable="false" />
+          <Property Name="Ping" Type="String" Nullable="false" />
+          <Property Name="Services" Type="String" Nullable="false" />
+          <Property Name="Relaunched" Type="String" Nullable="false" />
+          <Property Name="Details" Type="String" Nullable="false" />
+          <Property Name="BackupReportId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="BackupReport" Relationship="DataModel.BackupReportBackupServer_Report" FromRole="BackupServer_Report" ToRole="BackupReport" />
+          <NavigationProperty Name="BackupServer" Relationship="DataModel.BackupServerBackupServer_Report" FromRole="BackupServer_Report" ToRole="BackupServer" />
+          <Property Name="BackupServerId" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="BackupSchedule" BaseType="DataModel.Schedule">
+          <Property Name="AutoRelaunch" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AD_Settings">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="DurationFilter" Type="Boolean" Nullable="false" />
+          <Property Name="StateFilter" Type="Boolean" Nullable="false" />
+          <Property Name="PingFilter" Type="Boolean" Nullable="false" />
+          <Property Name="ErrorFilter" Type="Boolean" Nullable="false" />
+          <Property Name="Duration" Type="Int32" Nullable="false" />
+          <Property Name="State" Type="String" Nullable="true" />
+          <Property Name="Errors" Type="String" Nullable="true" />
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="MemoryErrors" Type="String" Nullable="true" />
+        </EntityType>
+        <EntityType Name="AppReport" BaseType="DataModel.Report">
+          <NavigationProperty Name="Application_Reports" Relationship="DataModel.AppReportApplication_Report" FromRole="AppReport" ToRole="Application_Report" />
+        </EntityType>
+        <EntityType Name="AppSchedule" BaseType="DataModel.Schedule">
+          <Property Name="AutoRelaunch" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Scheduled_Applications" Relationship="DataModel.AppScheduleScheduled_Application" FromRole="AppSchedule" ToRole="Scheduled_Application" />
+        </EntityType>
+        <EntityType Name="Application">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Url" Type="String" Nullable="true" />
+          <Property Name="Domain" Type="Int32" Nullable="true" />
+          <Property Name="Navigator" Type="String" Nullable="false" />
+          <NavigationProperty Name="Application_Reports" Relationship="DataModel.ApplicationApplication_Report" FromRole="Application" ToRole="Application_Report" />
+          <NavigationProperty Name="AppHtmlElements" Relationship="DataModel.ApplicationAppHtmlElement" FromRole="Application" ToRole="AppHtmlElement" />
+          <NavigationProperty Name="Scheduled_Applications" Relationship="DataModel.ApplicationScheduled_Application" FromRole="Application" ToRole="Scheduled_Application" />
+          <NavigationProperty Name="AppServers" Relationship="DataModel.Application_AppServer" FromRole="Application" ToRole="AppServer" />
+        </EntityType>
+        <EntityType Name="Application_Report">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="State" Type="String" Nullable="false" />
+          <Property Name="Details" Type="String" Nullable="true" />
+          <Property Name="Linkable" Type="String" Nullable="true" />
+          <Property Name="Authentified" Type="String" Nullable="true" />
+          <Property Name="AppReportId" Type="Int32" Nullable="false" />
+          <Property Name="ApplicationId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="AppReport" Relationship="DataModel.AppReportApplication_Report" FromRole="Application_Report" ToRole="AppReport" />
+          <NavigationProperty Name="Application" Relationship="DataModel.ApplicationApplication_Report" FromRole="Application_Report" ToRole="Application" />
+          <NavigationProperty Name="AppServer_Reports" Relationship="DataModel.Application_ReportAppServer_Report" FromRole="Application_Report" ToRole="AppServer_Report" />
+        </EntityType>
+        <EntityType Name="AppServer" BaseType="DataModel.Server">
+          <Property Name="StartOrder" Type="String" Nullable="false" />
+          <Property Name="StopOrder" Type="String" Nullable="true" />
+          <Property Name="ApplicationId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Application" Relationship="DataModel.Application_AppServer" FromRole="AppServer" ToRole="Application" />
+          <NavigationProperty Name="AppServer_Reports" Relationship="DataModel.AppServer_AppServerReport" FromRole="AppServer" ToRole="AppServer_Report" />
+        </EntityType>
+        <EntityType Name="AppServer_Report">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Ping" Type="String" Nullable="false" />
+          <Property Name="State" Type="String" Nullable="false" />
+          <Property Name="Details" Type="String" Nullable="false" />
+          <Property Name="Application_ReportId" Type="Int32" Nullable="false" />
+          <Property Name="AppServerId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="AppServer" Relationship="DataModel.AppServer_AppServerReport" FromRole="AppServer_Report" ToRole="AppServer" />
+          <NavigationProperty Name="Application_Report" Relationship="DataModel.Application_ReportAppServer_Report" FromRole="AppServer_Report" ToRole="Application_Report" />
+        </EntityType>
+        <EntityType Name="AppHtmlElement">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TagName" Type="String" Nullable="true" />
+          <Property Name="AttrId" Type="String" Nullable="true" />
+          <Property Name="AttrName" Type="String" Nullable="true" />
+          <Property Name="AttrClass" Type="String" Nullable="true" />
+          <Property Name="Value" Type="String" Nullable="true" />
+          <Property Name="Type" Type="String" Nullable="false" />
+          <Property Name="ApplicationId" Type="Int32" Nullable="false" />
+          <Property Name="AttrXpath" Type="String" Nullable="true" />
+          <NavigationProperty Name="Application" Relationship="DataModel.ApplicationAppHtmlElement" FromRole="AppHtmlElement" ToRole="Application" />
+        </EntityType>
+        <EntityType Name="Scheduled_Application">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AppScheduleId" Type="Int32" Nullable="false" />
+          <Property Name="ApplicationId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="AppSchedule" Relationship="DataModel.AppScheduleScheduled_Application" FromRole="Scheduled_Application" ToRole="AppSchedule" />
+          <NavigationProperty Name="Application" Relationship="DataModel.ApplicationScheduled_Application" FromRole="Scheduled_Application" ToRole="Application" />
+        </EntityType>
+        <EntityType Name="Email">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Recipients" Type="String" Nullable="true" />
+          <Property Name="Sender" Type="String" Nullable="true" />
+          <Property Name="Subject" Type="String" Nullable="true" />
+          <Property Name="Body" Type="String" Nullable="true" />
+          <Property Name="Module" Type="String" Nullable="false" />
+          <Property Name="Sent" Type="Boolean" Nullable="true" />
+          <NavigationProperty Name="Report" Relationship="DataModel.ReportEmail" FromRole="Email" ToRole="Report" />
+        </EntityType>
+        <EntityType Name="Report">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DateTime" Type="DateTime" Nullable="false" />
+          <Property Name="Duration" Type="Time" Nullable="true" />
+          <Property Name="TotalChecked" Type="Int32" Nullable="true" />
+          <Property Name="TotalErrors" Type="Int32" Nullable="true" />
+          <Property Name="ResultPath" Type="String" Nullable="true" />
+          <Property Name="Module" Type="String" Nullable="false" />
+          <Property Name="ScheduleId" Type="Int32" Nullable="true" />
+          <Property Name="Author" Type="String" Nullable="true" />
+          <NavigationProperty Name="Email" Relationship="DataModel.ReportEmail" FromRole="Report" ToRole="Email" />
+          <NavigationProperty Name="Schedule" Relationship="DataModel.ScheduleReport" FromRole="Report" ToRole="Schedule" />
+        </EntityType>
+        <EntityType Name="Schedule">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CreationTime" Type="DateTime" Nullable="false" />
+          <Property Name="Multiplicity" Type="String" Nullable="false" />
+          <Property Name="TaskName" Type="String" />
+          <Property Name="Generator" Type="String" Nullable="true" />
+          <Property Name="Executed" Type="Int32" Nullable="true" />
+          <Property Name="NextExecution" Type="DateTime" Nullable="true" />
+          <Property Name="State" Type="String" Nullable="false" />
+          <Property Name="Module" Type="String" Nullable="false" />
+          <NavigationProperty Name="Reports" Relationship="DataModel.ScheduleReport" FromRole="Schedule" ToRole="Report" />
+        </EntityType>
+        <EntityType Name="Server">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IpAddress" Type="String" Nullable="true" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Status" Type="String" Nullable="true" />
+          <Property Name="Location" Type="String" Nullable="true" />
+          <Property Name="Version" Type="String" Nullable="true" />
+          <Property Name="ActiveDirecotryDomain" Type="String" Nullable="true" />
+        </EntityType>
+        <EntityType Name="AppDomain">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Applications" Type="Int32" Nullable="true" />
+        </EntityType>
+        <EntityType Name="SpaceServer" BaseType="DataModel.Server">
+          <Property Name="Included" Type="Boolean" Nullable="true" />
+          <Property Name="Disks" Type="String" Nullable="false" />
+          <Property Name="IsShare" Type="Boolean" Nullable="false" />
+          <Property Name="CellColor" Type="String" Nullable="true" />
+          <Property Name="ExecutionAccount" Type="String" Nullable="true" />
+          <Property Name="CheckAccount" Type="String" Nullable="true" />
+          <NavigationProperty Name="SpaceServer_Reports" Relationship="DataModel.SpaceServerSpaceServer_Report" FromRole="SpaceServer" ToRole="SpaceServer_Report" />
+        </EntityType>
+        <EntityType Name="SpaceSchedule" BaseType="DataModel.Schedule" />
+        <EntityType Name="SpaceReport" BaseType="DataModel.Report">
+          <NavigationProperty Name="SpaceServer_Reports" Relationship="DataModel.SpaceReportSpaceServer_Report" FromRole="SpaceReport" ToRole="SpaceServer_Report" />
+        </EntityType>
+        <EntityType Name="SpaceServer_Report">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="State" Type="String" Nullable="false" />
+          <Property Name="Ping" Type="String" Nullable="true" />
+          <Property Name="Details" Type="String" Nullable="true" />
+          <Property Name="SpaceReportId" Type="Int32" Nullable="false" />
+          <Property Name="SpaceServerId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="SpaceServer" Relationship="DataModel.SpaceServerSpaceServer_Report" FromRole="SpaceServer_Report" ToRole="SpaceServer" />
+          <NavigationProperty Name="SpaceReport" Relationship="DataModel.SpaceReportSpaceServer_Report" FromRole="SpaceServer_Report" ToRole="SpaceReport" />
+        </EntityType>
+        <EntityType Name="Account">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Domain" Type="String" Nullable="false" />
+          <Property Name="Username" Type="String" Nullable="false" />
+          <Property Name="Password" Type="String" Nullable="false" />
+          <Property Name="DisplayName" Type="String" Nullable="false" />
+          <Property Name="IsSystem" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <Association Name="AdReportFaultyServer_Report">
+          <End Type="DataModel.AdReport" Role="AdReport" Multiplicity="1" />
+          <End Type="DataModel.FaultyServer_Report" Role="FaultyServer_Report" Multiplicity="*" />
+        </Association>
+        <Association Name="FaultyServerFaultyServer_Report">
+          <End Type="DataModel.FaultyServer" Role="FaultyServer" Multiplicity="1" />
+          <End Type="DataModel.FaultyServer_Report" Role="FaultyServer_Report" Multiplicity="*" />
+        </Association>
+        <Association Name="PoolBackupServer">
+          <End Type="DataModel.Pool" Role="Pool" Multiplicity="1" />
+          <End Type="DataModel.BackupServer" Role="BackupServer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Pool">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="BackupServer">
+              <PropertyRef Name="PoolId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="BackupReportBackupServer_Report">
+          <End Type="DataModel.BackupReport" Role="BackupReport" Multiplicity="1" />
+          <End Type="DataModel.BackupServer_Report" Role="BackupServer_Report" Multiplicity="*" />
+        </Association>
+        <Association Name="AppReportApplication_Report">
+          <End Type="DataModel.AppReport" Role="AppReport" Multiplicity="1" />
+          <End Type="DataModel.Application_Report" Role="Application_Report" Multiplicity="*" />
+        </Association>
+        <Association Name="AppScheduleScheduled_Application">
+          <End Type="DataModel.AppSchedule" Role="AppSchedule" Multiplicity="1" />
+          <End Type="DataModel.Scheduled_Application" Role="Scheduled_Application" Multiplicity="*" />
+        </Association>
+        <Association Name="ApplicationApplication_Report">
+          <End Type="DataModel.Application" Role="Application" Multiplicity="1" />
+          <End Type="DataModel.Application_Report" Role="Application_Report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Application">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Application_Report">
+              <PropertyRef Name="ApplicationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ApplicationAppHtmlElement">
+          <End Type="DataModel.Application" Role="Application" Multiplicity="1" />
+          <End Type="DataModel.AppHtmlElement" Role="AppHtmlElement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Application">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppHtmlElement">
+              <PropertyRef Name="ApplicationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ApplicationScheduled_Application">
+          <End Type="DataModel.Application" Role="Application" Multiplicity="1" />
+          <End Type="DataModel.Scheduled_Application" Role="Scheduled_Application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Application">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Scheduled_Application">
+              <PropertyRef Name="ApplicationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Application_AppServer">
+          <End Type="DataModel.Application" Role="Application" Multiplicity="1" />
+          <End Type="DataModel.AppServer" Role="AppServer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Application">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppServer">
+              <PropertyRef Name="ApplicationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="AppServer_AppServerReport">
+          <End Type="DataModel.AppServer" Role="AppServer" Multiplicity="1" />
+          <End Type="DataModel.AppServer_Report" Role="AppServer_Report" Multiplicity="*" />
+        </Association>
+        <Association Name="Application_ReportAppServer_Report">
+          <End Type="DataModel.Application_Report" Role="Application_Report" Multiplicity="1" />
+          <End Type="DataModel.AppServer_Report" Role="AppServer_Report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Application_Report">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AppServer_Report">
+              <PropertyRef Name="Application_ReportId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ReportEmail">
+          <End Type="DataModel.Report" Role="Report" Multiplicity="1" />
+          <End Type="DataModel.Email" Role="Email" Multiplicity="1" />
+        </Association>
+        <Association Name="ScheduleReport">
+          <End Type="DataModel.Schedule" Role="Schedule" Multiplicity="0..1" />
+          <End Type="DataModel.Report" Role="Report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Schedule">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Report">
+              <PropertyRef Name="ScheduleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="SpaceServerSpaceServer_Report">
+          <End Type="DataModel.SpaceServer" Role="SpaceServer" Multiplicity="1" />
+          <End Type="DataModel.SpaceServer_Report" Role="SpaceServer_Report" Multiplicity="*" />
+        </Association>
+        <Association Name="SpaceReportSpaceServer_Report">
+          <End Type="DataModel.SpaceReport" Role="SpaceReport" Multiplicity="1" />
+          <End Type="DataModel.SpaceServer_Report" Role="SpaceServer_Report" Multiplicity="*" />
+        </Association>
+        <Association Name="BackupServerBackupServer_Report">
+          <End Type="DataModel.BackupServer" Role="BackupServer" Multiplicity="1" />
+          <End Type="DataModel.BackupServer_Report" Role="BackupServer_Report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BackupServer">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="BackupServer_Report">
+              <PropertyRef Name="BackupServerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="DataModelStoreContainer" CdmEntityContainer="DataModelContainer">
+    <EntitySetMapping Name="FaultyServerReports">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.FaultyServer_Report)">
+        <MappingFragment StoreEntitySet="FaultyServerReports">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Ping" ColumnName="Ping" />
+          <ScalarProperty Name="Details" ColumnName="Details" />
+          <ScalarProperty Name="AbsenceDuration" ColumnName="AbsenceDuration" />
+          <ScalarProperty Name="Ticket" ColumnName="Ticket" />
+          <ScalarProperty Name="AdReportId" ColumnName="AdReportId" />
+          <ScalarProperty Name="FaultyServerId" ColumnName="FaultyServerId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Recipients">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.Recipient)">
+        <MappingFragment StoreEntitySet="Recipients">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="RelativeAddress" ColumnName="RelativeAddress" />
+          <ScalarProperty Name="AbsoluteAddress" ColumnName="AbsoluteAddress" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Module" ColumnName="Module" />
+          <ScalarProperty Name="Included" ColumnName="Included" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ReftechServers">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.ReftechServers)">
+        <MappingFragment StoreEntitySet="ReftechServers">
+          <ScalarProperty Name="IdServeur" ColumnName="IdServeur" />
+          <ScalarProperty Name="NomMachineServeur" ColumnName="NomMachineServeur" />
+          <ScalarProperty Name="Environnement" ColumnName="Environnement" />
+          <ScalarProperty Name="Perimetre" ColumnName="Perimetre" />
+          <ScalarProperty Name="CodeDomaine" ColumnName="CodeDomaine" />
+          <ScalarProperty Name="IsDedie" ColumnName="IsDedie" />
+          <ScalarProperty Name="IsMaquette" ColumnName="IsMaquette" />
+          <ScalarProperty Name="EtatServeur" ColumnName="EtatServeur" />
+          <ScalarProperty Name="DateInsertServeur" ColumnName="DateInsertServeur" />
+          <ScalarProperty Name="IsPCI" ColumnName="IsPCI" />
+          <ScalarProperty Name="NomLogiqueServeur" ColumnName="NomLogiqueServeur" />
+          <ScalarProperty Name="ServiceMajeur" ColumnName="ServiceMajeur" />
+          <ScalarProperty Name="IsHauteDispo" ColumnName="IsHauteDispo" />
+          <ScalarProperty Name="NumSerie" ColumnName="NumSerie" />
+          <ScalarProperty Name="IdSite" ColumnName="IdSite" />
+          <ScalarProperty Name="LocalisationPhysique" ColumnName="LocalisationPhysique" />
+          <ScalarProperty Name="IdUserExploitLocal" ColumnName="IdUserExploitLocal" />
+          <ScalarProperty Name="RemarquesServeur" ColumnName="RemarquesServeur" />
+          <ScalarProperty Name="IP" ColumnName="IP" />
+          <ScalarProperty Name="DateUpdateServeur" ColumnName="DateUpdateServeur" />
+          <ScalarProperty Name="IdTypeSupervision" ColumnName="IdTypeSupervision" />
+          <ScalarProperty Name="NiveauSupervision" ColumnName="NiveauSupervision" />
+          <ScalarProperty Name="IdExploitantServeur" ColumnName="IdExploitantServeur" />
+          <ScalarProperty Name="IdKM" ColumnName="IdKM" />
+          <ScalarProperty Name="IdServeurParent" ColumnName="IdServeurParent" />
+          <ScalarProperty Name="IdTypeServeur" ColumnName="IdTypeServeur" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Pools">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.Pool)">
+        <MappingFragment StoreEntitySet="Pools">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="BackupDay" ColumnName="BackupDay" />
+          <ScalarProperty Name="CheckDay" ColumnName="CheckDay" />
+          <ScalarProperty Name="CellColor" ColumnName="CellColor" />
+          <ScalarProperty Name="CheckFolder" ColumnName="CheckFolder" />
+          <ScalarProperty Name="BackupManager" ColumnName="BackupManager" />
+          <ScalarProperty Name="ExecutionAccount" ColumnName="ExecutionAccount" />
+          <ScalarProperty Name="CheckAccount" ColumnName="CheckAccount" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="BackupServerReports">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.BackupServer_Report)">
+        <MappingFragment StoreEntitySet="BackupServerReports">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="State" ColumnName="State" />
+          <ScalarProperty Name="Ping" ColumnName="Ping" />
+          <ScalarProperty Name="Services" ColumnName="Services" />
+          <ScalarProperty Name="Relaunched" ColumnName="Relaunched" />
+          <ScalarProperty Name="Details" ColumnName="Details" />
+          <ScalarProperty Name="BackupReportId" ColumnName="BackupReportId" />
+          <ScalarProperty Name="BackupServerId" ColumnName="BackupServerId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="AD_Settings">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.AD_Settings)">
+        <MappingFragment StoreEntitySet="AD_Settings">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="DurationFilter" ColumnName="DurationFilter" />
+          <ScalarProperty Name="StateFilter" ColumnName="StateFilter" />
+          <ScalarProperty Name="PingFilter" ColumnName="PingFilter" />
+          <ScalarProperty Name="ErrorFilter" ColumnName="ErrorFilter" />
+          <ScalarProperty Name="Duration" ColumnName="Duration" />
+          <ScalarProperty Name="State" ColumnName="State" />
+          <ScalarProperty Name="Errors" ColumnName="Errors" />
+          <ScalarProperty Name="MemoryErrors" ColumnName="MemoryErrors" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Applications">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.Application)">
+        <MappingFragment StoreEntitySet="Applications">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Url" ColumnName="Url" />
+          <ScalarProperty Name="Domain" ColumnName="Domain" />
+          <ScalarProperty Name="Navigator" ColumnName="Navigator" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ApplicationAppReports">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.Application_Report)">
+        <MappingFragment StoreEntitySet="ApplicationAppReports">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="State" ColumnName="State" />
+          <ScalarProperty Name="Details" ColumnName="Details" />
+          <ScalarProperty Name="Linkable" ColumnName="Linkable" />
+          <ScalarProperty Name="Authentified" ColumnName="Authentified" />
+          <ScalarProperty Name="AppReportId" ColumnName="AppReportId" />
+          <ScalarProperty Name="ApplicationId" ColumnName="ApplicationId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="AppServerAppReports">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.AppServer_Report)">
+        <MappingFragment StoreEntitySet="AppServerAppReports">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Ping" ColumnName="Ping" />
+          <ScalarProperty Name="State" ColumnName="State" />
+          <ScalarProperty Name="Details" ColumnName="Details" />
+          <ScalarProperty Name="Application_ReportId" ColumnName="Application_ReportId" />
+          <ScalarProperty Name="AppServerId" ColumnName="AppServerId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="AppHtmlElements">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.AppHtmlElement)">
+        <MappingFragment StoreEntitySet="AppHtmlElements">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="TagName" ColumnName="TagName" />
+          <ScalarProperty Name="AttrId" ColumnName="AttrId" />
+          <ScalarProperty Name="AttrName" ColumnName="AttrName" />
+          <ScalarProperty Name="AttrClass" ColumnName="AttrClass" />
+          <ScalarProperty Name="Value" ColumnName="Value" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="ApplicationId" ColumnName="ApplicationId" />
+          <ScalarProperty Name="AttrXpath" ColumnName="AttrXpath" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ScheduledApplications">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.Scheduled_Application)">
+        <MappingFragment StoreEntitySet="ScheduledApplications">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="AppScheduleId" ColumnName="AppScheduleId" />
+          <ScalarProperty Name="ApplicationId" ColumnName="ApplicationId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Emails">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.Email)">
+        <MappingFragment StoreEntitySet="Emails">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Recipients" ColumnName="Recipients" />
+          <ScalarProperty Name="Sender" ColumnName="Sender" />
+          <ScalarProperty Name="Subject" ColumnName="Subject" />
+          <ScalarProperty Name="Body" ColumnName="Body" />
+          <ScalarProperty Name="Module" ColumnName="Module" />
+          <ScalarProperty Name="Sent" ColumnName="Sent" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Reports">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.Report)">
+        <MappingFragment StoreEntitySet="Reports">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="DateTime" ColumnName="DateTime" />
+          <ScalarProperty Name="Duration" ColumnName="Duration" />
+          <ScalarProperty Name="TotalChecked" ColumnName="TotalChecked" />
+          <ScalarProperty Name="TotalErrors" ColumnName="TotalErrors" />
+          <ScalarProperty Name="ResultPath" ColumnName="ResultPath" />
+          <ScalarProperty Name="Module" ColumnName="Module" />
+          <ScalarProperty Name="ScheduleId" ColumnName="ScheduleId" />
+          <ScalarProperty Name="Author" ColumnName="Author" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.AdReport)">
+        <MappingFragment StoreEntitySet="Reports_AdReport">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="FatalErrors" ColumnName="FatalErrors" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.BackupReport)">
+        <MappingFragment StoreEntitySet="Reports_BackupReport">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="WeekNumber" ColumnName="WeekNumber" />
+          <ScalarProperty Name="LastUpdate" ColumnName="LastUpdate" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.AppReport)">
+        <MappingFragment StoreEntitySet="Reports_AppReport">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.SpaceReport)">
+        <MappingFragment StoreEntitySet="Reports_SpaceReport">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Schedules">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.Schedule)">
+        <MappingFragment StoreEntitySet="Schedules">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="CreationTime" ColumnName="CreationTime" />
+          <ScalarProperty Name="Multiplicity" ColumnName="Multiplicity" />
+          <ScalarProperty Name="TaskName" ColumnName="TaskName" />
+          <ScalarProperty Name="Generator" ColumnName="Generator" />
+          <ScalarProperty Name="Executed" ColumnName="Executed" />
+          <ScalarProperty Name="NextExecution" ColumnName="NextExecution" />
+          <ScalarProperty Name="State" ColumnName="State" />
+          <ScalarProperty Name="Module" ColumnName="Module" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.AppSchedule)">
+        <MappingFragment StoreEntitySet="Schedules_AppSchedule">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="AutoRelaunch" ColumnName="AutoRelaunch" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.AdSchedule)">
+        <MappingFragment StoreEntitySet="Schedules_AdSchedule">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="AutoCorrect" ColumnName="AutoCorrect" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.BackupSchedule)">
+        <MappingFragment StoreEntitySet="Schedules_BackupSchedule">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="AutoRelaunch" ColumnName="AutoRelaunch" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.SpaceSchedule)">
+        <MappingFragment StoreEntitySet="Schedules_SpaceSchedule">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Servers">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.Server)">
+        <MappingFragment StoreEntitySet="Servers">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="IpAddress" ColumnName="IpAddress" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="Location" ColumnName="Location" />
+          <ScalarProperty Name="Version" ColumnName="Version" />
+          <ScalarProperty Name="ActiveDirecotryDomain" ColumnName="ActiveDirecotryDomain" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.FaultyServer)">
+        <MappingFragment StoreEntitySet="Servers_FaultyServer">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="IdSite" ColumnName="IdSite" />
+          <ScalarProperty Name="Site" ColumnName="Site" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.BackupServer)">
+        <MappingFragment StoreEntitySet="Servers_BackupServer">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Disks" ColumnName="Disks" />
+          <ScalarProperty Name="PoolId" ColumnName="PoolId" />
+          <ScalarProperty Name="Included" ColumnName="Included" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.AppServer)">
+        <MappingFragment StoreEntitySet="Servers_AppServer">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="StartOrder" ColumnName="StartOrder" />
+          <ScalarProperty Name="StopOrder" ColumnName="StopOrder" />
+          <ScalarProperty Name="ApplicationId" ColumnName="ApplicationId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.SpaceServer)">
+        <MappingFragment StoreEntitySet="Servers_SpaceServer">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Included" ColumnName="Included" />
+          <ScalarProperty Name="Disks" ColumnName="Disks" />
+          <ScalarProperty Name="IsShare" ColumnName="IsShare" />
+          <ScalarProperty Name="CellColor" ColumnName="CellColor" />
+          <ScalarProperty Name="ExecutionAccount" ColumnName="ExecutionAccount" />
+          <ScalarProperty Name="CheckAccount" ColumnName="CheckAccount" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="AppDomains">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.AppDomain)">
+        <MappingFragment StoreEntitySet="AppDomains">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Applications" ColumnName="Applications" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SpaceServer_Reports">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.SpaceServer_Report)">
+        <MappingFragment StoreEntitySet="SpaceServer_Reports">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="State" ColumnName="State" />
+          <ScalarProperty Name="Ping" ColumnName="Ping" />
+          <ScalarProperty Name="Details" ColumnName="Details" />
+          <ScalarProperty Name="SpaceReportId" ColumnName="SpaceReportId" />
+          <ScalarProperty Name="SpaceServerId" ColumnName="SpaceServerId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Accounts">
+      <EntityTypeMapping TypeName="IsTypeOf(DataModel.Account)">
+        <MappingFragment StoreEntitySet="Accounts">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Domain" ColumnName="Domain" />
+          <ScalarProperty Name="Username" ColumnName="Username" />
+          <ScalarProperty Name="Password" ColumnName="Password" />
+          <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
+          <ScalarProperty Name="IsSystem" ColumnName="IsSystem" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="AdReportFaultyServer_Report" TypeName="DataModel.AdReportFaultyServer_Report" StoreEntitySet="FaultyServerReports">
+      <EndProperty Name="AdReport">
+        <ScalarProperty Name="Id" ColumnName="AdReport_Id" />
+      </EndProperty>
+      <EndProperty Name="FaultyServer_Report">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="FaultyServerFaultyServer_Report" TypeName="DataModel.FaultyServerFaultyServer_Report" StoreEntitySet="FaultyServerReports">
+      <EndProperty Name="FaultyServer">
+        <ScalarProperty Name="Id" ColumnName="FaultyServer_Id" />
+      </EndProperty>
+      <EndProperty Name="FaultyServer_Report">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="BackupReportBackupServer_Report" TypeName="DataModel.BackupReportBackupServer_Report" StoreEntitySet="BackupServerReports">
+      <EndProperty Name="BackupReport">
+        <ScalarProperty Name="Id" ColumnName="BackupReport_Id" />
+      </EndProperty>
+      <EndProperty Name="BackupServer_Report">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="AppReportApplication_Report" TypeName="DataModel.AppReportApplication_Report" StoreEntitySet="ApplicationAppReports">
+      <EndProperty Name="AppReport">
+        <ScalarProperty Name="Id" ColumnName="AppReport_Id" />
+      </EndProperty>
+      <EndProperty Name="Application_Report">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="AppScheduleScheduled_Application" TypeName="DataModel.AppScheduleScheduled_Application" StoreEntitySet="ScheduledApplications">
+      <EndProperty Name="AppSchedule">
+        <ScalarProperty Name="Id" ColumnName="AppSchedule_Id" />
+      </EndProperty>
+      <EndProperty Name="Scheduled_Application">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="AppServer_AppServerReport" TypeName="DataModel.AppServer_AppServerReport" StoreEntitySet="AppServerAppReports">
+      <EndProperty Name="AppServer">
+        <ScalarProperty Name="Id" ColumnName="AppServer_Id" />
+      </EndProperty>
+      <EndProperty Name="AppServer_Report">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="ReportEmail" TypeName="DataModel.ReportEmail" StoreEntitySet="Reports">
+      <EndProperty Name="Email">
+        <ScalarProperty Name="Id" ColumnName="Email_Id" />
+      </EndProperty>
+      <EndProperty Name="Report">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="SpaceServerSpaceServer_Report" TypeName="DataModel.SpaceServerSpaceServer_Report" StoreEntitySet="SpaceServer_Reports">
+      <EndProperty Name="SpaceServer">
+        <ScalarProperty Name="Id" ColumnName="SpaceServer_Id" />
+      </EndProperty>
+      <EndProperty Name="SpaceServer_Report">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="SpaceReportSpaceServer_Report" TypeName="DataModel.SpaceReportSpaceServer_Report" StoreEntitySet="SpaceServer_Reports">
+      <EndProperty Name="SpaceReport">
+        <ScalarProperty Name="Id" ColumnName="SpaceReport_Id" />
+      </EndProperty>
+      <EndProperty Name="SpaceServer_Report">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Aucun" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

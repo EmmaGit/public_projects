@@ -1,0 +1,192 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.Application>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        APP_CONTROLLER = "McoApp/";
+        APP_MODULE = "APP";
+
+        var FIRST_ENTRY = 0;
+        var LEFT_ENTRY = 0;
+        var RIGHT_ENTRY = 0;
+        var LAST_ENTRY = 0;
+
+        FIRST_ENTRY = "@ViewBag.First_Entry";
+        LEFT_ENTRY = "@ViewBag.Left_Entry";
+        RIGHT_ENTRY = "@ViewBag.Right_Entry";
+        LAST_ENTRY = "@ViewBag.Last_Entry";
+
+        get_arrows(APP_MCO_DIV, APP_CONTROLLER + "DisplayScheduledApplicationsList/", FIRST_ENTRY, LEFT_ENTRY, RIGHT_ENTRY, LAST_ENTRY);
+
+        function InitList() {
+            scheduleId = $("#mco-app-div #scheduleId").val();
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + "GetApplicationsList/" + scheduleId,
+                type: "GET",
+                success: function (response) {
+                    applicationsList = response.split(";");
+                    for (index = 0; index < applicationsList.length; index++) {
+                        $("#mco-app-div #application-" + applicationsList[index]).prop("checked", true);
+                        $("#mco-app-div #application-" + applicationsList[index]).trigger("change");
+                    }
+                },
+                error: function (errorThrown) { },
+                complete: function () { }
+            });
+        }
+        InitList();
+
+        $("#mco-app-div .uncheckedapp td, .checkedapp td").click(function () {
+            if ($(this).find(".checkapp").length == 0) {
+                checkbox = $(this).closest("tr").find("td").find(".checkapp");
+                checkbox.trigger("click");
+            }
+        });
+
+        $("#mco-app-div .checkapp").change(function () {
+            line = $(this).closest("tr");
+            if ($(this).prop("checked") == true) {
+                line.removeClass("uncheckedapp");
+                line.addClass("checkedapp");
+            }
+            else {
+                line.removeClass("checkedapp");
+                line.addClass("uncheckedapp");
+                $("#mco-app-div #CheckAllboxes").prop("checked", false);
+            }
+        });
+
+        $("#mco-app-div #CheckAllboxes").change(function () {
+            if ($(this).prop("checked")) {
+                $("#mco-app-div .checkapp").each(function () {
+                    $(this).prop("checked", true);
+                    $(this).trigger("change");
+                });
+            }
+            else {
+                $("#mco-app-div .checkapp").each(function () {
+                    $(this).prop("checked", false);
+                    $(this).trigger("change");
+                });
+            }
+        });
+
+        $("#mco-app-div .cancelor").click(function () {
+            NAV_APP_SCHEDULER_BTN.trigger("click");
+        });
+
+        $("#mco-app-div #search-input").keyup(function (key) {
+            var search = $(this).val().toLowerCase();
+            $("#mco-app-div .visible").each(function () {
+                var name = $(this).find("td").eq(0).text().trim().toLowerCase();
+                if (name.startsWith(search)) {
+                    $(this).show();
+                }
+                else {
+                    $(this).hide();
+                }
+            });
+        });
+
+        $("#mco-app-div #search-input").change(function () {
+            var search = $(this).val().toLowerCase();
+            if (search.trim() == "") {
+                $("#mco-app-div .visible").each(function () {
+                    $(this).show();
+                });
+            }
+        });
+
+        $("#mco-app-div #list-saver").click(function () {
+            scheduleId = $("#mco-app-div #scheduleId").val();
+            list = "";
+            names = "";
+            $("#mco-app-div .checkapp").each(function () {
+                if ($(this).prop("checked") == true) {
+                    list += $(this).attr("id") + ";";
+                    names += $(this).val() + "\n";
+                }
+            })
+            if (list == "") {
+                alert("Vous devez sélectionner au moins une Application");
+                return false;
+            }
+            list = list.substr(0, list.length - 1);
+            message = "Voulez-vous inclure ces Applications dans les checks de cette tâche planifiée? \n" + names;
+            launch = confirm(message);
+            if (!launch) {
+                return false;
+            }
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + "SaveList/" + scheduleId,
+                type: "POST",
+                data: { list: list },
+                success: function (response) {
+                    alert(response);
+                    NAV_APP_SCHEDULER_BTN.trigger("click");
+                },
+                error: function (errorThrown) {
+                    alert("Erreur l'exécution de la demande.");
+                },
+                complete: function () { }
+            });
+            success = false;
+        });
+
+    });
+</script>
+
+<hgroup>
+    <h2 class="page-title">Liste des applications à tester dans @ViewBag.Message</h2>
+    <input class="action-id-getter" type="button" style="background-color: #ccc;" id="scheduleId" value="<%:ViewBag.ScheduleId"/>
+</hgroup>
+<div id="search-div" class="search-div">
+    <p class="page-title-info warning"></p>
+    <table class="search-table">
+        <tr>
+            <td style="width:20%;">
+                <span class="search-span">Retrouvez une application:</span>
+            </td>
+            <td style="width:30%;">
+                <input type="search" id="search-input" placeholder ="Entrez le nom d'une application existente" class="search-input"/>
+            </td>
+            <td style="width:50%;">
+                <input type="checkbox" style="height:15px; width:20px;" id="CheckAllboxes"/>
+                <span>
+                    Sélectionner toutes les applications
+                </span>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="div-app-list">
+    <p class="page-title-info warning"></p>
+    <input class="app-controls-btn cancelor" type="button" style="background-color: #ccc;" id="previous-link" value="Précédent"/>
+    <input id="list-saver" type="button" class="app-controls-btn" value="Enrégistrer"
+        title="Valider la liste des Applications sélectionnées"/><br /><br />
+    <table id="app-table" style="width:100%;">
+        <thead>
+            <tr class="item-summary-thead">
+                <th>Application</th>
+                <th> </th>
+                <th>Serveurs</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OrderBy(app => app.Name)) {
+            <tr class="uncheckedapp visible">
+                <td style="width:60%;">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td style="width:10%;">
+                    <input type="checkbox" style="height:15px; width:20px;" name="application-@Html.DisplayFor(modelItem => item.Id)"
+                        class="checkapp" value="@Html.DisplayFor(modelItem => item.Name)"
+                        id="application-@Html.DisplayFor(modelItem => item.Id)"/>
+                </td>
+                <td style="width:30%;">
+                        @Html.DisplayFor(modelItem => item.AppServers.Count) Serveur(s)
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table> 
+    <br /><a class="previous-link cancelor">Précédent</a>
+</div>

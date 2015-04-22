@@ -1,0 +1,96 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.FaultyServer>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        AD_CONTROLLER = "McoAd/";
+        AD_MODULE = "AD";
+
+        $("#mco-ad-div .details-viewer").click(function () {
+            faultyserverId = $(this).closest("td").find(".action-id-getter").val();
+            $.ajax({
+                url: SITENAME + AD_CONTROLLER + 'DisplayFaultyServerDetails/' + faultyserverId,
+                type: "GET",
+                success: function (content) {
+                    AD_MCO_DIV.html(content);
+                },
+                error: function (error) {
+                    alert("Une erreur est survenue lors de la communication avec le serveur");
+                },
+                complete: function () {
+                    NAV_AD_FAULTYSERVERS_BTN.trigger("Click");
+                    colourTitles();
+                }
+            });
+        });
+
+        $("#mco-ad-div .deleter").click(function () {
+            faultyserverId = $(this).closest("td").find(".action-id-getter").val();
+            confirm_delete = confirm("Voulez-vous vraiment supprimer cet objet?\n" +
+            "Seront supprimés également tous les rapports faisant référence à cet objet.");
+            if (!confirm_delete) {
+                return false;
+            }
+            $.ajax({
+                url: SITENAME + AD_CONTROLLER + 'DeleteFaultyServer/' + faultyserverId,
+                type: "GET",
+                success: function (content) {
+                    alert(content);
+                },
+                error: function (error) {
+                    alert("Une erreur est survenue lors de la communication avec le serveur");
+                },
+                complete: function () {
+                    NAV_AD_FAULTYSERVERS_BTN.trigger("click");
+                    colourTitles();
+                }
+            });
+        });
+
+        $("#mco-ad-div #server-statistic-btn").click(function () {
+            StatisticWindow = window.open(SITENAME + AD_CONTROLLER + "DisplayFaultyServerStatistics");
+        });
+    });
+</script>
+<hgroup>
+    <h2 class="page-title">Serveurs défaillant</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<input id="server-statistic-btn" type="button" value="Statistiques" class="statistics-btn" title=
+    "Appuyez ici pour afficher les statistques" />
+<br /><br />
+<table id="faultyserver-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Nom</th>
+            <th>Adresse IP</th>
+            <th>Statut</th>
+            <th>Site</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+    <tr class="item-summary-tr">
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IpAddress)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Status)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Location)
+        </td>
+        <td style="margin:0px;padding:0px;">
+                @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})%>
+                <div class="action-div">
+                    <div class="action-icon details-viewer" title="voir details"></div>
+                    <div class="action-icon deleter" title="supprimer"></div>
+                </div>                
+            </td>
+    </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,59 @@
+﻿@{Layout = null;}@model IEnumerable<dynamic>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+
+        BESR_DESC_TABLE = ["@ViewBag.BESR_DESC_0",
+            "@ViewBag.BESR_DESC_1",
+            "@ViewBag.BESR_DESC_2",
+            "@ViewBag.BESR_DESC_3",
+            "@ViewBag.BESR_DESC_4"
+        ];
+        BESR_IMG_BASE = SITENAME + "Images/home-besr-";
+        BESR_IMG_INDEX = 0;
+        BESR_IMG_EXT = ".gif";
+        BESR_TIMEOUT = null;
+        BESR_REPEAT = 100;
+
+        function change_picture() {
+            //alert(BESR_IMG_INDEX);
+            img = $("#check-besr-main-div").find(".mco-home-main-img").eq(0);
+
+            span = $("#check-besr-description-div").find(".mco-hom-description-span").eq(0);
+
+            img.attr("src", BESR_IMG_BASE + BESR_IMG_INDEX + BESR_IMG_EXT);
+            var decoded = $('<div/>').html(BESR_DESC_TABLE[BESR_IMG_INDEX]).text();
+            span.html(decoded);
+
+
+            BESR_IMG_INDEX++;
+            BESR_REPEAT--;
+
+            if (BESR_IMG_INDEX > 4)
+            {
+                BESR_IMG_INDEX = 0;
+            }
+            BESR_TIMEOUT = setTimeout(change_picture, 4000);
+            if (BESR_REPEAT == 0) {
+                clearTimeout(BESR_TIMEOUT);
+            }
+        }
+
+        change_picture();
+        
+    });
+</script>
+
+<hgroup>
+    <h2 class="page-title">Bienvenue dans le Check Active Directory</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<span class="warning">Vérifier l'état des réplications sur les contrôleurs de domaines de l'Active Directory</span>
+
+<div id="check-besr-main-div" class="mco-home-main-div">
+    <img src="Images/home-besr-0.gif" class="mco-home-main-img"/>
+</div>
+<div id="check-besr-description-div" class="mco-home-description-div">
+    <span class="mco-hom-description-span"></span>
+</div>
+
+

@@ -1,0 +1,89 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.AppServer_Report>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        APP_CONTROLLER = "McoApp/";
+        APP_MODULE = "APP";
+
+        $("#mco-app-div .item-summary-tr").each(function () {
+            status = $(this).find("td").eq(1).text().trim();
+            if (status == "OK") {
+                $(this).css("background-color", "#22b14c");
+            }
+            else {
+                $(this).css("background-color", "#ff3f3f");
+            }
+            $(this).find("td").each(function () {
+                $(this).css("color", "#fff");
+            });
+        });
+
+        $("#mco-app-div .previous-link").click(function () {
+            previousScheduleId = "";
+            previous = "";
+            if ($("#mco-app-div #previous-link-div") != null) {
+                previousScheduleId = $("#mco-app-div #previous-link-a").attr("href");
+                previous = "<div id='previous-link-div' class='previous-link'>Retour" +
+                        "<a class='previous-link-a' id='previous-link-a' href='" + previousScheduleId + "'>previous</a></div>";
+            }
+            $.ajax({
+                url: SITENAME + APP_CONTROLLER + '<%:ViewBag.Report',
+                type: "GET",
+                success: function (data) {
+                    APP_MCO_DIV.html(data);
+                },
+                error: function (errorThrown) {
+                    alert('Erreur lors de communication avec le serveur');
+                },
+                complete: function () {
+                    if (previous != "") {
+                        APP_MCO_DIV.prepend(previous);
+                    }
+                    colourTitles();
+                }
+            });
+            return false;
+        });
+    });
+</script>
+
+<hgroup>
+    <h2 class="page-title">Détails @ViewBag.ApplicationName ; Check du @ViewBag.Date</h2>
+</hgroup>
+<p class="page-title-info warning"></p>
+<a class="previous-link">Précédent</a>
+<br />
+<span>
+    Etat global de l'application : @Html.DisplayFor(model => model.FirstOrDefault().Application_Report.State) <br />
+    Tentative d'authentification : @Html.DisplayFor(model => model.FirstOrDefault().Application_Report.Authentified) <br />
+</span>
+
+
+<table id="appreport-table" class="item-summary">
+    <thead>
+        <tr class="item-summary-thead">
+            <th>Serveurs</th>
+            <th>Etat</th>
+            <th>Ping</th>
+            <th>Détails</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) {
+        <tr class="item-summary-tr">
+            <td style="width:15%;">
+                @Html.DisplayFor(modelItem => item.AppServer.Name)
+            </td>
+            <td style="width:6%;">
+                @Html.DisplayFor(modelItem => item.State)
+            </td style="width:6%;">
+            <td>
+                @Html.DisplayFor(modelItem => item.Ping)
+            </td>
+            <td style="width:73%;">
+                @Html.DisplayFor(modelItem => item.Details)
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<a class="previous-link">Précédent</a>

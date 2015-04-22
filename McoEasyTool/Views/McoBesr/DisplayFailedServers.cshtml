@@ -1,0 +1,227 @@
+﻿@{Layout = null;}@model IEnumerable<McoEasyTool.BackupServer_Report>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        BESR_CONTROLLER = "McoBesr/";
+        BESR_MODULE = "BESR";
+
+        $("#mco-besr-div .colored-cells").each(function () {
+            color = $(this).find("td").find(".pool-color-getter").val();
+            $(this).css("background-color", color);
+            $(this).css("color", "#fff");
+        });
+
+        //----------------------------------------------------------
+        $("#mco-besr-div .deleter").click(function () {
+            deletor = confirm("Voulez vous réellement supprimer ce serveur de la liste?");
+            if (deletor) {
+                serverId = $(this).closest("td").find(".action-id-getter").val();
+                BESR_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: SITENAME + BESR_CONTROLLER + 'DeleteBackupServer/' + serverId,
+                    type: "GET",
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        NAV_BESR_FAILED_BTN.trigger("click");
+                    }
+                });
+            }
+        });
+
+        $("#mco-besr-div .backup-launcher").click(function () {
+            launch = confirm("Voulez vous vraiment lancer la sauvegarde pour ce serveur maintenant? \n" +
+                "Les anciens fichiers de sauvegardes de ce serveur seront éventuellement supprimés.");
+            if (launch) {
+                serverId = $(this).closest("td").find(".action-id-getter").val();
+                success = false;
+                BESR_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: SITENAME + BESR_CONTROLLER + 'ServiceLauncher/' + serverId,
+                    type: "GET",
+                    success: function (content) {
+                        if ((content.indexOf('Backup Exec System Recovery: Running: Manual') != -1) &&
+                                        (content.indexOf('SymSnapService: Running: Manual') != -1)
+                                    ) {
+                            success = true;
+                        }
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        if (success) {
+                            $.ajax({
+                                url: SITENAME + BESR_CONTROLLER + 'BackupExecLauncher/' + serverId,
+                                type: "GET",
+                                success: function (content) {
+                                    alert(content);
+                                },
+                                error: function (error) {
+                                    alert(error.responseText);
+                                },
+                                complete: function () {
+                                    NAV_BESR_FAILED_BTN.trigger("click");
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+            else {
+                return false;
+            }
+        });
+
+        $("#mco-besr-div #CheckAllboxes").change(function () {
+            if ($(this).prop("checked")) {
+                $("#mco-besr-div .selected-servers").each(function () {
+                    $(this).prop("checked", true);
+                    $(this).trigger("change");
+                });
+            }
+            else {
+                $("#mco-besr-div .selected-servers").each(function () {
+                    $(this).prop("checked", false);
+                    $(this).trigger("change");
+                });
+            }
+        });
+
+        $("#mco-besr-div .selected-servers").change(function () {
+            line = $(this).parent().parent();
+            if ($(this).prop("checked") == true) {
+                line.css("background-color", "#68b3ff");
+                line.find("td").each(function () {
+                    $(this).css("color", "#fff");
+                })
+            }
+            else {
+                color = $(this).closest("tr").find("td").find(".pool-color-getter").val();
+                line.css("background-color", color);
+                line.find("td").each(function () {
+                    $(this).css("color", "#000");
+                })
+                $("#mco-besr-div #CheckAllboxes").prop("checked", false);
+            }
+        });
+
+        $("#mco-besr-div .colored-cells td").click(function () {
+            if ($(this).find(".selected-servers").length == 0) {
+                checkbox = $(this).closest("tr").find("td").find(".selected-servers");
+                checkbox.trigger("click");
+            }
+        });
+
+        $("#mco-besr-div .backup-launcher-btn").click(function () {
+            selectedServers = "";
+
+            $("#mco-besr-div .selected-servers").each(function () {
+                if ($(this).is(':checked')) {
+                    selectedServers += $(this).closest("td").find(".action-id-getter").val() + ", ";
+                }
+            });
+
+            if (selectedServers == "") {
+                alert("Vous devez sélectionner au moins un serveur");
+                return false;
+            }
+            else {
+                BESR_MCO_DIV.prepend(loadinggif);
+                $.ajax({
+                    url: SITENAME + BESR_CONTROLLER + 'BackupExecLauncherServers/',
+                    type: "POST",
+                    data: { selectedServers: selectedServers },
+                    success: function (content) {
+                        alert(content);
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    },
+                    complete: function () {
+                        NAV_BESR_FAILED_BTN.trigger("click");
+                    }
+                });
+            }
+        });
+
+    });
+</script>
+<hgroup>
+    <h2 class="page-title">Serveurs en échec de sauvegarde</h2>
+</hgroup>
+<div id="failed-backupservers-div" class="failed-backupservers-div">
+    <div class="backup-launcher-div">
+        <span>
+            Vous pouvez relancer la sauvegarde sur plusieurs serveurs en cochant leur <span class="nav-info">checkbox</span> (case à cocher)
+            <br />et en appuyant le bouton <span class="nav-info">lancer sauvegarde</span><br />
+        </span>
+        <input id="backup-launcher-btn" class="backup-launcher-btn" type="button" value="Lancer Sauvegarde" /><br />
+        <input type="checkbox" style="height:15px; width:20px;" id="CheckAllboxes"/>
+        <span>
+           Sélectionner tous tous les serveurs
+        </span>
+    </div>
+    <div class="failed-backupserver-list">
+        <table id="failed-backupserver-table" class="item-summary failed-backupserver-table">
+        <thead>
+            <tr class="item-summary-thead">
+                <th></th>
+                <th>BESR</th>
+                <th>Serveur</th>
+                <th>Date du check</th>
+                <th>Etat</th>
+                <th>Erreurs</th>
+                <th>Ping</th>
+                <th>Sauvegardes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody> 
+        @foreach (var item in Model) { 
+            <tr class="item-summary-tr colored-cells">
+                <td>
+                    @Html.TextBox("action-id-sgetter-" + item.BackupServer.Id, item.BackupServer.Id, new { @disabled = "disabled", @class = "action-id-getter" })
+                    <input type="checkbox" class="selected-servers" name= "@item.BackupServer.Name " />
+                </td>
+                <td>
+                    @Html.TextBox("pool-color-getter-" + item.BackupReportId + "-" 
+                        + item.BackupServer.Pool.CellColor, item.BackupServer.Pool.CellColor, 
+                        new { @disabled = "disabled", @class = "pool-color-getter" })
+                    @Html.DisplayFor(modelItem => item.BackupServer.Pool.Name) 
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BackupServer.Name) 
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BackupReport.LastUpdate) 
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.State) 
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Details) 
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ping) 
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Relaunched) 
+                </td>
+                
+                <td style="margin=0px;padding=0px;">
+                    @Html.TextBox("action-id-getter-" + item.BackupServer.Id, item.BackupServer.Id, new { @disabled = "disabled", @class = "action-id-getter" })
+                    <div class="action-div">
+                        <div class="action-icon backup-launcher" title="Relancer la sauvegarde pour ce serveur"></div>
+                        <div class="action-icon deleter" title="supprimer"></div>
+                    </div>                
+                </td>
+            </tr>
+        } 
+        </tbody>
+        </table>
+    </div>
+</div>
