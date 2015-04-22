@@ -1403,7 +1403,7 @@ namespace McoEasyTool.Controllers
                 MySheet.Name = "Check" + DateTime.Now.ToString("dd") +
                     DateTime.Now.ToString("MM") + DateTime.Now.ToString("yyyy");
                 MySheet.Activate();
-                //TEST
+                
                 AppReport report = db.AppReports.Create();
                 report.DateTime = DateTime.Now;
                 report.TotalChecked = 0;
