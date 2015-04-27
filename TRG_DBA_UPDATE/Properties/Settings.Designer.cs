@@ -27,36 +27,81 @@ namespace TRG_DBA_UPDATE.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Data Source=AEGNAMIAN\\SQLSERVER;Initial Catalog=McoEasyTool_v3_DB;Integrated Secu" +
             "rity=true;")]
-        public string ConnectionString {
+        public string CONNECTION_STRING {
             get {
-                return ((string)(this["ConnectionString"]));
+                return ((string)(this["CONNECTION_STRING"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("D:\\Temp\\TRG_DBA_UPDATE_Log.csv")]
-        public string LogFile {
+        public string LOG_FILE {
             get {
-                return ((string)(this["LogFile"]));
+                return ((string)(this["LOG_FILE"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Trigger_Log")]
-        public string TableName {
+        public string TABLE_NAME {
             get {
-                return ((string)(this["TableName"]));
+                return ((string)(this["TABLE_NAME"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("D:\\Temp\\TRG_DBA_UPDATE.csv")]
-        public string MemoFile {
+        public string MEMO_FILE {
             get {
-                return ((string)(this["MemoFile"]));
+                return ((string)(this["MEMO_FILE"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("vipexch.bouygues-construction.com")]
+        public string MAIL_HOST_SERVER {
+            get {
+                return ((string)(this["MAIL_HOST_SERVER"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("25")]
+        public int MAIL_PORT_NUMBER {
+            get {
+                return ((int)(this["MAIL_PORT_NUMBER"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Exploitation-Support@bouygues-construction.com")]
+        public string MAIL_ADDRESS_SENDER {
+            get {
+                return ((string)(this["MAIL_ADDRESS_SENDER"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("a.gnamian@bouygues-construction.com")]
+        public string MAIL_RECIPIENTS_LIST {
+            get {
+                return ((string)(this["MAIL_RECIPIENTS_LIST"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Aucune entrée n\'a été trouvée; vérifiez que tout fonctionne correctement SVP.")]
+        public string MAIL_BODY {
+            get {
+                return ((string)(this["MAIL_BODY"]));
             }
         }
     }

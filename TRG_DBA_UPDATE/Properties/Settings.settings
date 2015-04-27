@@ -2,17 +2,32 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TRG_DBA_UPDATE.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="ConnectionString" Type="System.String" Scope="Application">
+    <Setting Name="CONNECTION_STRING" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Data Source=AEGNAMIAN\SQLSERVER;Initial Catalog=McoEasyTool_v3_DB;Integrated Security=true;</Value>
     </Setting>
-    <Setting Name="LogFile" Type="System.String" Scope="Application">
+    <Setting Name="LOG_FILE" Type="System.String" Scope="Application">
       <Value Profile="(Default)">D:\Temp\TRG_DBA_UPDATE_Log.csv</Value>
     </Setting>
-    <Setting Name="TableName" Type="System.String" Scope="Application">
+    <Setting Name="TABLE_NAME" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Trigger_Log</Value>
     </Setting>
-    <Setting Name="MemoFile" Type="System.String" Scope="Application">
+    <Setting Name="MEMO_FILE" Type="System.String" Scope="Application">
       <Value Profile="(Default)">D:\Temp\TRG_DBA_UPDATE.csv</Value>
+    </Setting>
+    <Setting Name="MAIL_HOST_SERVER" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">vipexch.bouygues-construction.com</Value>
+    </Setting>
+    <Setting Name="MAIL_PORT_NUMBER" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">25</Value>
+    </Setting>
+    <Setting Name="MAIL_ADDRESS_SENDER" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Exploitation-Support@bouygues-construction.com</Value>
+    </Setting>
+    <Setting Name="MAIL_RECIPIENTS_LIST" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">a.gnamian@bouygues-construction.com</Value>
+    </Setting>
+    <Setting Name="MAIL_BODY" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Aucune entrée n'a été trouvée; vérifiez que tout fonctionne correctement SVP.</Value>
     </Setting>
   </Settings>
 </SettingsFile>
