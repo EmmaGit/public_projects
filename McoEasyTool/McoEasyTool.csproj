@@ -328,6 +328,7 @@
     </Content>
     <Content Include="McoToolSettings.config" />
     <Content Include="Content\OLD_bootstrap.min.css" />
+    <None Include="Properties\PublishProfiles\PackagingMco.pubxml" />
     <None Include="Scripts\jquery-2.1.3.intellisense.js" />
     <Content Include="Scripts\Gruntfile.js" />
     <Content Include="Scripts\Highcharts-4.0.1\js\adapters\standalone-framework.js" />
@@ -405,7 +406,9 @@
     <Content Include="Views\Home\OLD_Index.aspx" />
     <None Include="Views\McoAd\DisplayFaultyServerDetails.cshtml" />
     <Content Include="Views\Shared\Error.aspx" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
