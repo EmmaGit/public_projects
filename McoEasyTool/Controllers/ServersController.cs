@@ -15,6 +15,7 @@ using System.Web.Mvc;
 
 namespace McoEasyTool.Controllers
 {
+    [AllowAnonymous]
     public class ServersController : Controller
     {
         private DataModelContainer db = new DataModelContainer();

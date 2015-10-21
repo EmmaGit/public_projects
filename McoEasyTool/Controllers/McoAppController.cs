@@ -18,6 +18,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace McoEasyTool.Controllers
 {
+    [AllowAnonymous]
     public class McoAppController : Controller
     {
         private DataModelContainer db = new DataModelContainer();
@@ -1021,6 +1022,10 @@ namespace McoEasyTool.Controllers
                 Lines = Request.Form["Procedures"].ToString();
                 string[] Procedures = Lines.Split(';');
                 string[] ReverseProcedures = Procedures.Reverse().ToArray();
+                if (db.AppServers.Where(ser => ser.Name == Name.ToUpper() && ser.ApplicationId == application.Id).Count() != 0)
+                {
+                    return "KO : Le serveur " + Name.ToUpper() + " existe déjà pour cette application, modifiez le directement SVP.";
+                }
                 Dictionary<int, ServersController.VirtualizedServer> FOREST = ServersController.GetInformationsFromForestDomains();
                 ReftechServers[] REFTECH_SERVERS = null;
                 try

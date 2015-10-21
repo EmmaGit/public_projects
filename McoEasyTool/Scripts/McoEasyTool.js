@@ -65,7 +65,6 @@ function AccountEditor(id, target, url, origin, account_url) {
     GetAccountsList($("#CheckAccount-" + id), account_url);
 }
 
-
 function isNumber(input) {
     number = input.value;
     if (isNaN(number)) {
@@ -435,6 +434,59 @@ function update_nav_tabs(id) {
     }
 }
 
+function HasUnachieviedReport(controller, funct, args) {
+    link = SITENAME + controller + "HasUnachieviedReport";
+    erase = false;
+    $("body").toggleClass("wait");
+    $.ajax({
+        url: link,
+        type: "GET",
+        success: function (data) {
+            if (data != "OK") {
+                erase = confirm(data);
+            }
+            else {
+                funct(args);
+            }
+        },
+        error: function (error) {
+            alert('Erreur lors de la communication avec le serveur\n'
+                + error.responseText);
+        },
+        complete: function () {
+            if (erase) {
+                CancelReport(controller, funct, args);
+            }
+            else {
+                $("body").toggleClass("wait");
+            }
+
+        }
+    });
+}
+
+function CancelReport(controller, funct, args) {
+    deleted = "";
+    $.ajax({
+        url: SITENAME + controller + "Purge",
+        type: "GET",
+        success: function (data) {
+            deleted = data;
+        },
+        error: function (error) {
+            alert('Erreur lors de la communication avec le serveur');
+        },
+        complete: function () {
+            $("body").toggleClass("wait");
+            if (deleted.trim() == "") {
+                deleted = "Aucun rapport supprimé";
+            }
+            alert(deleted);
+            funct(args);
+        }
+    });
+}
+
 
 jQuery(document).ready(function () {
 
@@ -783,6 +835,11 @@ jQuery(document).ready(function () {
         if (!scannow) {
             return false;
         }
+        var args = {}
+        HasUnachieviedReport("McoSpace/", SpaceLaunch, args);
+    });
+
+    function SpaceLaunch(args) {
         SPACE_MCO_DIV.prepend(loadinggif);
         $.ajax({
             url: SITENAME + 'McoSpace/CheckCapacityPlanning',
@@ -823,13 +880,18 @@ jQuery(document).ready(function () {
                 NAV_HOME_BTN.trigger("click");
             }
         });
-    });
+    }
 
     $("#scan-launcher").click(function Check() {
         scannow = confirm("Voulez-vous lancer le Check AD maintenant?\n L'analyse prendra une vingtaine de minutes");
         if (!scannow) {
             return false;
         }
+        var args = {}
+        HasUnachieviedReport("McoAd/", AdLaunch, args);
+    });
+
+    function AdLaunch(args) {
         AD_MCO_DIV.prepend(loadinggif);
         $.ajax({
             url: SITENAME + 'McoAd/CheckActiveDirectory',
@@ -871,7 +933,7 @@ jQuery(document).ready(function () {
                 NAV_HOME_BTN.trigger("click");
             }
         });
-    });
+    }
 });
 
 

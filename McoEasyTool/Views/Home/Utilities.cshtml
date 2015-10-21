@@ -36,34 +36,38 @@
 
 </script>
 
+<h2 class="page-title">@ViewBag.Message</h2>
 
-<hgroup>
-    <h2 class="page-title">@ViewBag.Message</h2>
-</hgroup>
-<p class="page-title-info warning">
-    Sur cette page se trouvent divers outils pour vous aider à mieux configurer
-    votre application.
-</p>
+<section>
+    <br />
+    <header>
+        <h3 class="page-chapter-subtitle">
+            Utilisez cet outil pour modifier les mots de passe enrégistrés dans les fichiers de configurations de l'application.
+        </h3>
+    </header>
+    
+    <div id="password_encryptor" class="mco-tool-div">
 
-<div id="password_encryptor" class="mco-tool-div">
-    <table class="mco-tool-table">
-        <tr>
-            <td><span class="mco-tool-label">Password</span></td>
-            <td><input id="mco-tool-encryptor-text" class="mco-tool-input" type="password" /></td>
-            <td><input id="mco-tool-encryptor-btn" class="mco-tool-btn" type="button" value="Encrypter" /></td>
-        </tr>
-        <tr>
-            <td colspan=3>
-                <span class="mco-tool-label">Encryptez vos mots de passe pour remplir le fichier de configuration</span>
-            </td>
-        </tr>
-        <tr></tr>
-        <tr></tr>
-        <tr>
-            <td><span class="mco-tool-label">A copier</span></td>
-            <td colspan=2>
-                <span id="mco-tool-encrypted-text" class="nav-info"></span>
-            </td>
-        </tr>
-    </table>
-</div>
+        <table class="mco-tool-table">
+            <tr>
+                <td><span class="mco-tool-label">Password</span></td>
+                <td><input id="mco-tool-encryptor-text" class="mco-tool-input" type="password" /></td>
+                <td><input id="mco-tool-encryptor-btn" class="mco-tool-btn" type="button" value="Encrypter" /></td>
+            </tr>
+            <tr>
+                <td colspan=3>
+                    <span class="mco-tool-label">Encryptez vos mots de passe pour remplir le fichier de configuration</span>
+                </td>
+            </tr>
+            <tr></tr>
+            <tr></tr>
+            <tr>
+                <td><span class="mco-tool-label">A copier</span></td>
+                <td colspan=2>
+                    <span id="mco-tool-encrypted-text" class="nav-info"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</section>

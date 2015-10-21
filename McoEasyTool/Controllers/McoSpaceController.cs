@@ -11,6 +11,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace McoEasyTool.Controllers
 {
+    [AllowAnonymous]
     public class McoSpaceController : Controller
     {
         private DataModelContainer db = new DataModelContainer();
@@ -952,7 +953,9 @@ namespace McoEasyTool.Controllers
 
                 SpaceServer_Report serverreport = db.SpaceServerReports.Create();
                 serverreport.Details = serverreport.Ping = serverreport.State = "";
+                serverreport.SpaceReport = report;
                 serverreport.SpaceReportId = report.Id;
+                serverreport.SpaceServer = server;
                 serverreport.SpaceServerId = server.Id;
                 List<ServersController.VirtualizedPartition> partitions;
                 partitions = GetRemainingSpace(server);
@@ -1895,5 +1898,16 @@ namespace McoEasyTool.Controllers
             }
             McoUtilities.Specific_Logging(exception, action, HomeController.SPACE_MODULE, level, author);
         }
+
+        public string HasUnachieviedReport()
+        {
+            int unachievied = db.AdReports.Where(rep => rep.Duration == null || rep.ResultPath == null).Count();
+            if (unachievied > 0)
+            {
+                return "Il y a " + unachievied + " rapport(s) inachevé(s)\nVoulez-vous les supprimer?";
+            }
+            return "OK";
+        }
+
     }
 }

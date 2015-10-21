@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace McoEasyTool.Controllers
 {
+    [AllowAnonymous]
     public class EmailsController : Controller
     {
         private DataModelContainer db = new DataModelContainer();

@@ -14,6 +14,7 @@ using System.Resources;
 
 namespace McoEasyTool.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         public const string AD_MODULE = "AD";
@@ -142,26 +143,26 @@ namespace McoEasyTool.Controllers
         public static string SPACE_DOMAIN_AND_USERNAME_IMPERSONNATION = SPACE_DOMAIN_IMPERSONNATION + "\\" +
             SPACE_USERNAME_IMPERSONNATION;
 
-        public static string DEFAULT_RDP_FILE = BATCHES_FOLDER + McoToolConfig.Settings.DEFAULT_RDP_FILE;
-        public static string DEFAULT_RDP_HOSTNAME_KEY = McoToolConfig.Settings.DEFAULT_RDP_HOSTNAME_KEY;
+        public static string SPACE_DEFAULT_LOCAL_MAPPED_DRIVE_LETTER = BATCHES_FOLDER + McoToolConfig.Settings.SPACE_DEFAULT_LOCAL_MAPPED_DRIVE_LETTER;
+        public static double LOG_SIZE_LIMIT = McoToolConfig.Settings.LOG_SIZE_LIMIT;
 
         //END SPACE FOLDERS & VARIABLES
         //----------------------------------------------------------------------------------------
 
-        [HttpGet]
+        /*[HttpGet]
         public ActionResult Index(string cultureName = null)
         {
             //Modify current thread's culture  
             ViewBag.Message = "Bienvenue dans l'application d'automatisation des procédures";
             return View();
-        }
+        }*/
 
-        /*public ActionResult Index()
+        public ActionResult Index()
         {
             ViewBag.Message = "Bienvenue dans l'application d'automatisation des procédures";
 
             return View();
-        }*/
+        }
 
         public ActionResult Home()
         {

@@ -51,10 +51,12 @@
     <input id="download-launcher" type="button" class="imports-controls-btn" value="Modèle"
         title="Télécharger le fichier modèle"/>
 
-    <form id="Form1" runat="server" enctype="multipart/form-data" action="McoApp/UploadInitFile" >
-        <input runat="server" id="file"  name="file" type="file" class="hidden-imports-controls-btn trueFile"/>
-        <asp:Button runat="server" id="btnUpload" text="Upload" class="hidden-imports-controls-btn trueUploadButton"></asp:Button>
-    </form>
+    @using (Ajax.BeginForm("UploadInitFile", "McoApp", new AjaxOptions() { HttpMethod = "POST" }, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        <input id="file" name="file" type="file" class="hidden-imports-controls-btn trueFile" />
+        <input type="submit" id="btnUpload" text="Upload" class="hidden-imports-controls-btn trueUploadButton" />
+    }
 
     <input id="upload-file-path" type="text" class="imports-controls-btn input-file-info"
         title="Uploader votre fichier Excel contenant la liste des applications" readonly/>
@@ -64,10 +66,6 @@
 
     <input id="import-launcher" type="button" class="imports-controls-btn" value="Importer"
         title="Lancher l'importation maintenant"/>
-
-        
-
-    
     
 </div>
 <br />

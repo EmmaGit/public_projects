@@ -14,6 +14,7 @@ using DotNet.Highcharts.Options;
 
 namespace McoEasyTool.Controllers
 {
+    [AllowAnonymous]
     public class McoAdController : Controller
     {
         private DataModelContainer db = new DataModelContainer();
@@ -905,32 +906,32 @@ namespace McoEasyTool.Controllers
                                 Int32.TryParse(serverlist[servername].Split('-')[1], out location);
                                 if (serverlist[servername].Split('-')[0] == "criticals")
                                 {
-                                    if (GetMaxDuration(serverinfos[location].Absence, serverabsence) != serverinfos[location].Absence)
-                                    {
-                                        //CORRECT CRITICAL
-                                        serverinfos[location] = virtual_server;
-                                    }
+                                    serverinfos[location] = (GetMaxDuration(serverinfos[location].Absence, virtual_server.Absence) != serverinfos[location].Absence) ?
+                                                virtual_server : serverinfos[location];
                                 }
                                 else
                                 {
                                     serverinfos.Add(serverinfosIndex, virtual_server);
                                     serverlist[servername] = "criticals-" + serverinfosIndex.ToString();
                                     serverinfosIndex++;
-                                    //CORRECT NO CRITICAL
-                                    if (location == noserverinfos.Count - 1)
+
+                                    //CLEAN NO SERVER INFO
+                                    for (int index = 0; index < noserverinfos.Count - 1; index++)
                                     {
-                                        noserverinfos.Remove(location);
-                                        noserverinfosIndex--;
-                                    }
-                                    else
-                                    {
-                                        for (int index = location; index < noserverinfos.Count - 1; index++)
+                                        if (noserverinfos[index].Server_Result.AD_Server.Name == virtual_server.Server_Result.AD_Server.Name)
                                         {
-                                            noserverinfos[index] = noserverinfos[index + 1];
+                                            location = index;
+                                            noserverinfos.Remove(index);
+                                            break;
                                         }
-                                        noserverinfos.Remove(noserverinfos.Count - 1);
-                                        noserverinfosIndex--;
                                     }
+                                    for (int index = location; index < noserverinfos.Count - 1; index++)
+                                    {
+                                        noserverinfos[index] = noserverinfos[index + 1];
+                                        serverlist[noserverinfos[index].Server_Result.AD_Server.Name] = "nocriticals-" + index.ToString();
+                                    }
+                                    noserverinfos.Remove(noserverinfos.Count-1);
+                                    noserverinfosIndex--;
                                 }
                             }
                             else
@@ -944,15 +945,13 @@ namespace McoEasyTool.Controllers
                         {
                             if (serverlist.ContainsKey(servername))
                             {
+
                                 int location = 0;
                                 Int32.TryParse(serverlist[servername].Split('-')[1], out location);
                                 if (serverlist[servername].Split('-')[0] == "nocriticals")
                                 {
-                                    if (GetMaxDuration(serverlist[servername], virtual_server.Absence) != serverlist[servername])
-                                    {
-                                        //CORRECT NO CRITICAL
-                                        noserverinfos[location] = virtual_server;
-                                    }
+                                    noserverinfos[location] = (GetMaxDuration(noserverinfos[location].Absence, virtual_server.Absence) != noserverinfos[location].Absence) ?
+                                                virtual_server : noserverinfos[location];
                                 }
                             }
                             else
@@ -994,6 +993,12 @@ namespace McoEasyTool.Controllers
                 for (int index = 0; index < serverinfos.Count(); index++)
                 {
                     bool founded = false;
+                    FaultyServer_Report faultyserverreport = db.FaultyServerReports.Create();
+                    faultyserverreport.AdReportId = reportId;
+                    faultyserverreport.AdReport = report;
+                    faultyserverreport.AbsenceDuration = serverinfos[index].Absence;
+                    faultyserverreport.Details = serverinfos[index].Errors;
+                    faultyserverreport.Ping = serverinfos[index].Server_Result.Ping;
                     if (faultyservers != null && faultyservers.Length > 0)
                     {
                         foreach (FaultyServer server in faultyservers)
@@ -1011,6 +1016,7 @@ namespace McoEasyTool.Controllers
                                 {
                                     server.IpAddress = serverinfos[index].Server_Result.AD_Server.IpAddress;
                                 }
+                                faultyserverreport.FaultyServer = server;
                                 break;
                             }
                         }
@@ -1024,15 +1030,14 @@ namespace McoEasyTool.Controllers
                             db.FaultyServers.Add(NewServer);
                             db.SaveChanges();
                             serverId = NewServer.Id;
+                            faultyserverreport.FaultyServer = NewServer;
                         }
                     }
-                    FaultyServer_Report faultyserverreport = db.FaultyServerReports.Create();
+                    
                     faultyserverreport.FaultyServerId = serverId;
-                    faultyserverreport.AdReportId = reportId;
-                    faultyserverreport.AbsenceDuration = serverinfos[index].Absence;
-                    faultyserverreport.Details = serverinfos[index].Errors;
-                    faultyserverreport.Ping = serverinfos[index].Server_Result.Ping;
-
+                    
+                    
+                    
                     try
                     {
                         if (ModelState.IsValid)
@@ -1205,7 +1210,7 @@ namespace McoEasyTool.Controllers
 
             string PathDirectory = HomeController.AD_RESULTS_FOLDER;
             Process process = new Process();
-            process.StartInfo.FileName = HomeController.BATCHES_FOLDER + "RepadminLauncher.bat";
+            process.StartInfo.FileName = HomeController.BATCHES_FOLDER + "Repadmin_Launcher_v4.bat";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = false;
             process.StartInfo.WorkingDirectory = PathDirectory;
@@ -1817,20 +1822,15 @@ namespace McoEasyTool.Controllers
             McoUtilities.Specific_Logging(exception, action, HomeController.AD_MODULE, level, author);
         }
 
-        /*public string test() 
+        public string HasUnachieviedReport()
         {
-            McoUtilities.CreateRdpFile("BCNSSRV926");
-            
-            bool logged  = McoUtilities.CheckIfLoggedOn(@"BCNDOMAIN\SRVEXPLOIT");
-            McoUtilities.CreateDesktop();
-            if (!logged)
+            int unachievied = db.AdReports.Where(rep => rep.Duration == null || rep.ResultPath == null).Count();
+            if (unachievied > 0)
             {
-                //Process process = McoUtilities.OpenRdpConnection("AEGNAMIAN");
-                //return McoUtilities.CloseRdpConnection(process).ToString();
+                return "Il y a " + unachievied + " rapport(s) inachevé(s)\nVoulez-vous les supprimer?";
             }
-            
             return "OK";
-        }*/
+        }
 
     }
 }

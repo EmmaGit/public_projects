@@ -28,6 +28,7 @@ namespace McoEasyTool.Controllers
                 {
                     AcceptUntrustedCertificates = true,
                     EnableNativeEvents = true,
+                    AssumeUntrustedCertificateIssuer = false,
                     AlwaysLoadNoFocusLibrary = true
                 };
                 //profile.SetPreference("general.useragent.override", "Mozilla/4.0 (compatible; MSIE 8.0; Win32)");
@@ -44,6 +45,7 @@ namespace McoEasyTool.Controllers
                     IgnoreZoomLevel = true,
                     EnableNativeEvents = true,
                     RequireWindowFocus = false,
+                    BrowserAttachTimeout = new TimeSpan(0,0,40),
                     EnsureCleanSession = true,
                     EnablePersistentHover = true,
                     ElementScrollBehavior = InternetExplorerElementScrollBehavior.Top,

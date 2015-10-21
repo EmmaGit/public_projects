@@ -429,6 +429,19 @@ namespace McoEasyTool
             }
         }
 
+        [ConfigurationProperty("LOG_SIZE_LIMIT", IsRequired = true)]
+        public double LOG_SIZE_LIMIT
+        {
+            get
+            {
+                NumberFormatInfo provider = new NumberFormatInfo();
+                provider.NumberDecimalSeparator = ".";
+                double increment = 100;
+                increment = Convert.ToDouble(this["LOG_SIZE_LIMIT"].ToString(), provider);
+                return increment;
+            }
+        }
+
         [ConfigurationProperty("SPACE_MAX_CHARTS_LINES_NUMBER", IsRequired = true)]
         public int SPACE_MAX_CHARTS_LINES_NUMBER
         {
@@ -437,6 +450,15 @@ namespace McoEasyTool
                 int number = 14;
                 int.TryParse(this["SPACE_MAX_CHARTS_LINES_NUMBER"].ToString(), out number);
                 return number;
+            }
+        }
+
+        [ConfigurationProperty("SPACE_DEFAULT_LOCAL_MAPPED_DRIVE_LETTER", IsRequired = true)]
+        public string SPACE_DEFAULT_LOCAL_MAPPED_DRIVE_LETTER
+        {
+            get
+            {
+                return this["SPACE_DEFAULT_LOCAL_MAPPED_DRIVE_LETTER"] as string;
             }
         }
 
@@ -485,22 +507,5 @@ namespace McoEasyTool
             }
         }
 
-        [ConfigurationProperty("DEFAULT_RDP_FILE", IsRequired = true)]
-        public string DEFAULT_RDP_FILE
-        {
-            get
-            {
-                return this["DEFAULT_RDP_FILE"] as string;
-            }
-        }
-
-        [ConfigurationProperty("DEFAULT_RDP_HOSTNAME_KEY", IsRequired = true)]
-        public string DEFAULT_RDP_HOSTNAME_KEY
-        {
-            get
-            {
-                return this["DEFAULT_RDP_HOSTNAME_KEY"] as string;
-            }
-        }
     }
 }

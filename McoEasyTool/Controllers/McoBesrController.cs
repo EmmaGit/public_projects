@@ -21,6 +21,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace McoEasyTool.Controllers
 {
+    [AllowAnonymous]
     public class McoBesrController : Controller
     {
         private DataModelContainer db = new DataModelContainer();

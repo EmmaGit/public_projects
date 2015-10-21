@@ -5,6 +5,7 @@ using System;
 
 namespace McoEasyTool.Controllers
 {
+    [AllowAnonymous]
     public class RecipientsController : Controller
     {
         private DataModelContainer db = new DataModelContainer();

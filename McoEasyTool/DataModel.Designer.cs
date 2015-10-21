@@ -1,4 +1,4 @@
-﻿// La génération de code T4 est activée pour le modèle 'd:\data\visual studio 2013\Projects\McoEasyTool\McoEasyTool\DataModel.edmx'. 
+﻿// La génération de code T4 est activée pour le modèle 'D:\Data\Visual Studio 2013\Projects\McoEasyTool\McoEasyTool\DataModel.edmx'. 
 // Pour activer la génération de code héritée, définissez la valeur de la propriété
 // du concepteur 'Stratégie de génération de code' sur 'ObjectContext hérité'. Cette propriété est disponible dans la fenêtre Propriétés lorsque le modèle
 //  est ouvert dans le concepteur.

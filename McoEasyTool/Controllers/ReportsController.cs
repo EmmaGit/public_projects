@@ -5,6 +5,7 @@ using System.Web.Mvc;
 
 namespace McoEasyTool.Controllers
 {
+    [AllowAnonymous]
     public class ReportsController : Controller
     {
         private DataModelContainer db = new DataModelContainer();
@@ -75,8 +76,24 @@ namespace McoEasyTool.Controllers
             }
         }
 
+        public string HardDelete(string file) 
+        {
+            string result = "";
+            try
+            {
+                System.IO.File.Delete(file);
+                result = file + " deleted";
+            }
+            catch(Exception exception) 
+            {
+                result = file + " not deleted:\n" + exception.Message;
+            }
+            return result;
+        }
+
         public string Delete(int id)
         {
+            string result = "";
             Report report = db.Reports.Find(id);
             try
             {
@@ -84,11 +101,7 @@ namespace McoEasyTool.Controllers
                 string module = report.Module;
                 string datetime = report.DateTime.ToString();
                 string user = (User != null) ? User.Identity.Name : "N/A";
-                try
-                {
-                    System.IO.File.Delete(report.ResultPath);
-                }
-                catch { }
+                string file = report.ResultPath;
                 db.Emails.Remove(email);
                 switch (module)
                 {
@@ -113,15 +126,17 @@ namespace McoEasyTool.Controllers
                         break;
                 }
                 db.SaveChanges();
+                result = "Le rapport a été correctement supprimé";
+                result += "\n" + HardDelete(file);
                 McoUtilities.General_Logging(new Exception("...."), "Delete Report by " + User.Identity.Name, 3, User.Identity.Name);
-                return "Le rapport a été correctement supprimé";
             }
             catch (Exception exception)
             {
                 McoUtilities.General_Logging(exception, "Delete Report", 0);
-                return "Une erreur est surveunue lors de la suppression" +
+                result = "Une erreur est surveunue lors de la suppression" +
                     exception.Message;
             }
+            return result;
         }
 
         protected override void Dispose(bool disposing)

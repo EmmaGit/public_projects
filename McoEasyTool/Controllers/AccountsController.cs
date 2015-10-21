@@ -14,6 +14,7 @@ using DotNet.Highcharts.Options;
 
 namespace McoEasyTool.Controllers
 {
+    [AllowAnonymous]
     public class AccountsController : Controller
     {
         private DataModelContainer db = new DataModelContainer();
@@ -97,7 +98,7 @@ namespace McoEasyTool.Controllers
                 account.IsSystem = false;
                 if (!McoUtilities.IsValidLoginPassword(account.DisplayName, account.Password))
                 {
-                    //    return "Erreur, le couple user/password ne correpond pas.";
+                    return "Erreur, le couple user/password ne correpond pas.";
                 }
                 if (Exists(account))
                 {

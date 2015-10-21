@@ -5,6 +5,7 @@ using Microsoft.Win32.TaskScheduler;
 
 namespace McoEasyTool.Controllers
 {
+    [AllowAnonymous]
     public class SchedulesController : Controller
     {
         private DataModelContainer db = new DataModelContainer();
