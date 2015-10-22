@@ -27,6 +27,26 @@ namespace McoEasyTool.Controllers
                 recipient.Name = name;
                 recipient.Module = module;
                 recipient.Included = (included == null) ? true : (included == "true");
+                string response = null;
+                if (absolute != null && absolute.Trim() != "")
+                {
+                    response = (db.Recipients.Where(rec => rec.Module == module &&
+                        rec.AbsoluteAddress.ToLower() == absolute.ToLower()).Count() > 0) ?
+                        "L'adresse " + absolute + " existe déjà pour ce module." : null;
+                }
+                else 
+                {
+                    if (relative != null && relative.Trim() != "")
+                    {
+                        response = (db.Recipients.Where(rec => rec.Module == module &&
+                            rec.RelativeAddress.ToLower() == relative.ToLower()).Count() > 0) ?
+                            "L'adresse " + relative + " existe déjà pour ce module." : null;
+                    }
+                }
+                if(response != null)
+                {
+                    return response;
+                }
                 if (ModelState.IsValid)
                 {
                     db.Recipients.Add(recipient);
@@ -64,7 +84,27 @@ namespace McoEasyTool.Controllers
                 {
                     recipient.Included = (included == "true");
                 }
-
+                string response = null;
+                if (absolute != null && absolute.Trim() != "" && absolute.Trim() != recipient.AbsoluteAddress)
+                {
+                    response = (db.Recipients.Where(rec => rec.Module == module &&
+                        rec.AbsoluteAddress.ToLower() == absolute.ToLower()).Count() > 0) ?
+                        "L'adresse " + absolute + " existe déjà pour ce module." : null;
+                }
+                else
+                {
+                    if(relative != null && relative.Trim() != "" && relative.Trim() != recipient.RelativeAddress)
+                    {
+                        response = (db.Recipients.Where(rec => rec.Module == module &&
+                            rec.RelativeAddress.ToLower() == relative.ToLower()).Count() > 0) ?
+                            "L'adresse " + relative + " existe déjà pour ce module." : null;
+                    }
+                    
+                }
+                if (response != null)
+                {
+                    return response;
+                }
                 if (ModelState.IsValid)
                 {
                     db.Entry(recipient).State = System.Data.Entity.EntityState.Modified;

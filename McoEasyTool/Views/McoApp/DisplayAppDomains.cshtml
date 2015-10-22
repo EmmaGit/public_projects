@@ -53,6 +53,7 @@
 
         //----------------------------------------------------------
         $("#mco-app-div .details-editor").click(function () {
+            $("#container").scrollTop(0);
             columns = $(this).closest("tr").find("td");
             $("#mco-app-div #domain-name").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
             domainId = $(this).closest("td").find(".action-id-getter").val();

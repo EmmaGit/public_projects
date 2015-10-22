@@ -143,7 +143,7 @@ namespace McoEasyTool.Controllers
                 account.Password = McoUtilities.Encrypt(password);
                 if (!McoUtilities.IsValidLoginPassword(account.DisplayName, account.Password))
                 {
-                    //    return "Erreur, le couple user/password ne correpond pas.";
+                    return "Erreur, le couple user/password ne correpond pas.";
                 }
                 if (ModelState.IsValid)
                 {

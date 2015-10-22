@@ -144,6 +144,7 @@
         });
 
         $("#mco-besr-div .details-editor").click(function () {
+            $("#container").scrollTop(0);
             columns = $(this).closest("tr").find("td");
             $("#mco-besr-div #taskname").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
             launchingDate = columns.eq(2).text().replace(/^\s+|\s+$/g, '').split(" ");

@@ -163,6 +163,7 @@
 
         //----------------------------------------------------------
         $("#mco-app-div .details-editor").click(function () {
+            $("#container").scrollTop(0);
             columns = $(this).closest("tr").find("td");
             $("#mco-app-div #new-application-name").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
             $("#mco-app-div #new-application-url").val(columns.eq(2).text().replace(/^\s+|\s+$/g, ''));

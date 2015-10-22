@@ -390,6 +390,7 @@
 
 
         $("#mco-app-div .details-editor").click(function () {
+            $("#container").scrollTop(0);
             serverId = $(this).closest("td").find(".action-id-getter").val();
             $("body").toggleClass("wait");
             columns = $(this).closest("tr").find("td");
@@ -473,6 +474,7 @@
         });
 
         $("#mco-app-div .stop-details-editor").click(function () {
+            $("#container").scrollTop(0);
             serverId = $(this).closest("td").find(".action-id-getter").val();
             $("body").toggleClass("wait");
             columns = $(this).closest("tr").find("td");

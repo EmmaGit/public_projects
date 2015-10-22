@@ -74,43 +74,33 @@
 <br />
 <ol>
     <li>
-    OBSOLETE
         <h5 class="page-chapter-subtitle">Uploader un fichier</h5>
-        L'alimentation de la base de données se fait via un fichier Excel contenant <span class="warning">(02) deux pages.</span><br /><br />
-        - La première page nommée <span class="nav-info">Pool</span> contient:<br /><br />
-            <span class="paragraph-info">
-                Dans la première colonne, le nom du Pool <strong>(Ex: SPACE1)</strong>
-            </span><br /><br />
-            <span class="paragraph-info">
-                Dans la seconde colonne, le jour d'exécution de la sauvegarde pour ce Pool écrite en toute lettre <strong>(Lundi,
-                Mardi, Mercredi,<br /> Jeudi, Vendredi, Samedi, Dimanche)</strong>.
-            </span><br /><br />
-            <span class="paragraph-info">
-                La troisième et dernière colonne est optionnelle; elle contient le code html (sans le #) de la couleur avec laquelle<br />
-                les cellules de ce Pool seront colorées dans le fichier Excel <strong>(EX: 75923C)</strong>.
-            </span><br /><br />
-            <span class="paragraph-info">
-                <span class="warning">
-                    Notons que cette couleur pourra être modifiée ultérieurement directement via l'onglet Pool; il est donc
-                    inutile de s'y attarder.<br />
-                    Par ailleurs Une couleur par défaut est automatiquement choisie pour les Pools.
-                </span>
-           </span><br /><br />
-            
-            
-        - La seconde page nommée <span class="nav-info">Servers</span>; 
-        cette page contient la liste de tous les serveurs. Le format suivant est à suivre:
-            <br /><br />
-            <span class="paragraph-info">
-                La première colonne contient le Pool d'appartenance du serveur <strong>(EX: SPACE1)</strong>.
-            </span><br /><br />
-            <span class="paragraph-info">
-                La seconde colonne contient le nom du serveur <strong>(EX: BCVNB123)</strong>.
-            </span><br /><br />
-            <span class="paragraph-info">
-                La troisième colonne contient la liste des partitions à sauvegarder séparées par une 
-                virgule et un espace <strong>(EX: C, D, T)</strong>.
-            </span>
+        L'alimentation de la base de données se fait via un fichier Excel contenant au moins <span class="warning">(01) une page.</span><br /><br />
+        La page utilisée est nommée <span class="nav-info">Relevé SUP</span> contient:<br /><br />
+        <span class="paragraph-info">
+            Dans la première ligne "Serveurs", le nom des serveurs ou le nom des racines de partage <strong>(Ex: SERVER1 ou \\SERVER1)</strong>
+        </span><br /><br />
+        <span class="paragraph-info">
+            Dans la seconde ligne, la lettre des partitions à vérifier précédée de <span class=nav-info">Disque </span> ou alors le chemin complet
+            du partage <strong>(Exemple: "Disque I" ou "\\SERVER1\SHARE")</strong>
+        </span><br /><br />
+        <span class="paragraph-info">
+            La troisième ligne est vide et existe par souci de lisibilité.
+        </span><br /><br />
+        <span class="paragraph-info">
+            La quatrième et dernière ligne utile contient le seuil (en To) considéré pour la partition ou le partage correspondant. <strong>(EX: 0,1)</strong>.
+        </span><br /><br />
+    </li>
+    <li>
+        <span class="warning">
+            Notons que les valeurs entrées dans ce fichier sont en To, cependant il faut éviter d'inscrire cette unité à côté des chiffres.<br />
+            L'unité qui apparaît dans le fichier est le fruit de l'exécution de certaines règles de formattage <br />et n'existe pas réellement dans la
+            valeur des cellules.<br /><br />
+
+            A chaque partition ou partage rajouté, correspond une colonne jumelle masquée (par souci de lisibilité) contenant une répétition
+            de la valeur du seuil.<br />
+            Ces colonnes fantômes ne sont pas optionnelles et servent à tracer les graphes comparatifs générés dans cette analyse.
+        </span>
     </li>
     <li>
         <h5 class="page-chapter-subtitle">Fichier modèle</h5>
@@ -120,7 +110,7 @@
     </li>
     <li>
         <h5 class="page-chapter-subtitle">Importer</h5>
-        Si vous êtes certain que votre fichier rempli tous les prérequis mentionnés ci-dessus,<br /> vous 
+        Si vous êtes certain que votre fichier rempli tous les prérequis mentionnés ci-dessus,<br /> vous
         pouvez l'uploader et cliquer sur <span class="nav-info">Importer</span> afin de réinitialiser la base de données SPACE.
     </li>
 </ol>

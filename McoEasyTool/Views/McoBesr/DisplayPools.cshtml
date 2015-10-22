@@ -123,6 +123,7 @@
 
         //----------------------------------------------------------
         $("#mco-besr-div .details-editor").click(function () {
+            $("#container").scrollTop(0);
             columns = $(this).closest("tr").find("td");
             $("#mco-besr-div #poolname").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
             $("#mco-besr-div #backupday").val(columns.eq(1).text().replace(/^\s+|\s+$/g, ''));

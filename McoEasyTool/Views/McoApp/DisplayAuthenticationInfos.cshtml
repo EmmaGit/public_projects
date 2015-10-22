@@ -162,6 +162,7 @@
         });
 
         $("#mco-app-div .details-editor").click(function () {
+            $("#container").scrollTop(0);
             columns = $(this).closest("tr").find("td");
             type = columns.eq(6).find(".type-getter").val();
 
@@ -295,13 +296,15 @@
         
     <table id="new-application-htmlelement-table" class="new-application-htmlelement-table">
         <thead class="new-application-htmlelement-thead">
-            <th>Balise</th>
-            <th>Attribut Xpath</th>
-            <th>Attribut Id</th>
-            <th>Attribut Nom</th>
-            <th>Attribut Classe</th>
-            <th>Valeur</th>
-            <th>Type de Paramètre</th>
+            <tr>
+                <th>Balise</th>
+                <th>Attribut Xpath</th>
+                <th>Attribut Id</th>
+                <th>Attribut Nom</th>
+                <th>Attribut Classe</th>
+                <th>Valeur</th>
+                <th>Type de Paramètre</th>
+            </tr>
         </thead>
         <tbody>
             <tr class="item-summary-tr infoline"></tr>
@@ -329,46 +332,39 @@
             </tr>
         </thead>
         <tbody> 
-        @foreach (var item in Model.Where(el => el.Type == "INPUT" || el.Type == "LOGIN")) {
-            @if(item.Type == "LOGIN")
+            @foreach (var item in Model.Where(el => el.Type == "INPUT" || el.Type == "LOGIN"))
             {
-       
-                <tr class="item-summary-tr index-tr" style="background-color:#13f3c3;" title="bouton de connexion">
+                <tr class="item-summary-tr index-tr" @(item.Type == "LOGIN" ? "style=background-color:#13f3c3;" : "style=background-color:#12baf4;")>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td title="@Html.DisplayFor(modelItem => item.AttrXpath)">
+                        @Html.DisplayFor(modelItem => item.AttrXpath)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AttrId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AttrName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AttrClass)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Value)
+                    </td>
+                    <td style="margin=0px;padding=0px;width:10%">
+                        @Html.TextBox("action-id-getter-" + item.Id, item.Id, new { @disabled = "disabled", @class = "action-id-getter" })
+                        @Html.TextBox("type-getter-" + item.Id, item.Type, new { @disabled = "disabled", @class = "type-getter" })
+                        <div class="action-div">
+                            <div class="action-icon details-editor" title="Modifier ce paramètre"></div>
+                            <div class="action-icon deleter" title="Supprimer ce paramètre"></div>
+                        </div>
+                    </td>
+                </tr>
             }
-            else
-            {
-       
-                <tr class="item-summary-tr index-tr" style="background-color:#12baf4;">
-            }
-            <td>
-                @Html.DisplayFor(modelItem => item.TagName)
-            </td>
-            <td title="@Html.DisplayFor(modelItem => item.AttrXpath)">
-                @Html.DisplayFor(modelItem => item.AttrXpath)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AttrId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AttrName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AttrClass)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Value)
-            </td>
-            <td style="margin=0px;padding=0px;width:10%">
-                @Html.TextBox("action-id-getter-" + item.Id, item.Id, new { @disabled = "disabled", @class = "action-id-getter" })
-                @Html.TextBox("type-getter-" + item.Id, item.Type, new { @disabled = "disabled", @class = "type-getter" })
-                <div class="action-div">
-                    <div class="action-icon details-editor" title="Modifier ce paramètre"></div>
-                    <div class="action-icon deleter" title="Supprimer ce paramètre"></div>
-                 </div>                
-             </td>
-         </tr>
-         
-        </tbody>
+
+</tbody>
     </table>
     <br /><span>PARAMETRES A VERIFIER APRES CONNEXION</span><br />
     <table id="Table1" class="item-summary application-table">

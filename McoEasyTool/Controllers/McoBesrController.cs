@@ -4694,6 +4694,7 @@ namespace McoEasyTool.Controllers
                     report.Author = User.Identity.Name;
                     report.Module = HomeController.BESR_MODULE;
                     report.ScheduleId = schedule.Id;
+                    report.Schedule = schedule;
                     email = db.Emails.Create();
                     report.Email = email;
                     email.Module = HomeController.BESR_MODULE;
@@ -4729,6 +4730,7 @@ namespace McoEasyTool.Controllers
                 {
                     report = oldReports.First();
                     report.ScheduleId = schedule.Id;
+                    report.Schedule = schedule;
                     report.DateTime = DateTime.Now;
                     email = report.Email;
                     email.Recipients = "";

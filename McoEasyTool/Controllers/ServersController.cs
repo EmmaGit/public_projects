@@ -579,6 +579,71 @@ namespace McoEasyTool.Controllers
             return null;
         }
 
+        public static List<VirtualizedPartition> GetRemainingSpaceOnMappedPartitions(SpaceServer server, Account account = null)
+        {
+            List<VirtualizedPartition> partitions = new List<VirtualizedPartition>();
+            Dictionary<string, string> server_disks = new Dictionary<string, string>();
+            string[] parser = server.Disks.Split(new string[] { "; " }, StringSplitOptions.RemoveEmptyEntries);
+            for (int index = 0; index < parser.Length; index++)
+            {
+                string[] infos = parser[index].Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
+                string disk = infos[0].Substring(infos[0].IndexOf("=") + 1);
+                string threshold = infos[1].Substring(infos[1].IndexOf("=") + 1);
+                server_disks.Add(disk, threshold);
+
+                Process connect_drive_process = new Process();
+                connect_drive_process.StartInfo.FileName = "cmd.exe";
+                connect_drive_process.StartInfo.Arguments = "/c net use " + HomeController.SPACE_DEFAULT_LOCAL_MAPPED_DRIVE_LETTER +
+                    ": " + disk + " /user:" + HomeController.SPACE_DOMAIN_AND_USERNAME_IMPERSONNATION +
+                    " \"" + McoUtilities.Decrypt(HomeController.SPACE_PASSWORD_IMPERSONNATION) + "\"";
+                connect_drive_process.Start();
+                connect_drive_process.WaitForExit();
+
+                var secure = new System.Security.SecureString();
+                foreach (char c in McoUtilities.Decrypt(HomeController.SPACE_PASSWORD_IMPERSONNATION))
+                {
+                    secure.AppendChar(c);
+                }
+                ConnectionOptions connection = new ConnectionOptions();
+                connection.Username = HomeController.SPACE_DOMAIN_AND_USERNAME_IMPERSONNATION;
+                connection.SecurePassword = secure;
+                connection.EnablePrivileges = true;
+                try
+                {
+                    var searcher = new ManagementObjectSearcher(
+                        "root\\CIMV2",
+                        "SELECT * FROM Win32_MappedLogicalDisk");
+                    string strNameSpace = @"\\";
+                    strNameSpace += ".";
+                    strNameSpace += @"\root\cimv2";
+                    System.Management.ManagementScope managementScope = new System.Management.ManagementScope(strNameSpace, connection);
+                    ManagementObjectCollection moCollection = searcher.Get();
+
+                    foreach (ManagementObject queryObj in moCollection)
+                    {
+                        string id = queryObj["DeviceID"].ToString().ToUpper();
+                        string info = disk;
+
+                        VirtualizedPartition partition = new VirtualizedPartition(server.Name, info);
+                        partition.Volume = queryObj["VolumeName"].ToString();
+                        partition.FileSystem = queryObj["FileSystem"].ToString();
+                        partition.AvailableSpace = queryObj["FreeSpace"].ToString() + " " + HomeController.DEFAULT_OCTECT_UNIT;
+                        partition.TotalSize = queryObj["Size"].ToString() + " " + HomeController.DEFAULT_OCTECT_UNIT;
+                        partitions.Add(partition);
+                    }
+                }
+                catch { }
+
+                Process disconnect_drive_process = new Process();
+                disconnect_drive_process.StartInfo.FileName = "cmd.exe";
+                disconnect_drive_process.StartInfo.Arguments = "/c net use " +
+                    HomeController.SPACE_DEFAULT_LOCAL_MAPPED_DRIVE_LETTER + ": /delete";
+                disconnect_drive_process.Start();
+                disconnect_drive_process.WaitForExit();
+            }
+            return partitions;
+        }
+
         public static VirtualizedPartition GetVirtualizedPartition(List<VirtualizedPartition> partitions, string disk)
         {
             if (disk != null && disk.Trim() != "")

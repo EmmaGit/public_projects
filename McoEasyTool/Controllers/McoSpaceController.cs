@@ -580,13 +580,13 @@ namespace McoEasyTool.Controllers
 
         public bool IsAlreadyAdded(string servername)
         {
-            int number = db.SpaceServers
-                .Where(ser => ser.Name == servername.Trim().ToUpper()).Count();
-            if (servername != null && servername.Trim() != "" && number > 0)
+            int number = 0;
+            if (servername != null && servername.Trim() != "")
             {
-                return true;
+                number = db.SpaceServers
+                .Where(ser => ser.Name.ToUpper() == servername.Trim().ToUpper()).Count();
             }
-            return false;
+            return (number > 0);
         }
 
         public bool IsShare(string servername)
@@ -759,7 +759,7 @@ namespace McoEasyTool.Controllers
                 string execution_account = Request.Form["execution_account"];
                 string check_account = Request.Form["check_account"];
                 string session_password = Request.Form["session_password"];
-                if (!McoUtilities.IsValidLoginPassword(author, session_password))
+                if (!McoUtilities.IsValidLoginPassword(author, McoUtilities.Encrypt(session_password)))
                 {
                     return "Authentification échouée:\n mauvaise combinaison username/password";
                 }
@@ -1608,7 +1608,7 @@ namespace McoEasyTool.Controllers
             }
             else
             {
-                partitions = ServersController.GetRemainingSpaceOnMappedDisk(server.Name, account);
+                partitions = ServersController.GetRemainingSpaceOnMappedPartitions(server, account);
             }
             return partitions;
         }
@@ -1770,6 +1770,7 @@ namespace McoEasyTool.Controllers
             report.TotalErrors = 0;
             report.Module = HomeController.SPACE_MODULE;
             report.ScheduleId = schedule.Id;
+            report.Schedule = schedule;
             report.Author = User.Identity.Name;
             report.ResultPath = "";
             Email email = db.Emails.Create();
@@ -1818,6 +1819,8 @@ namespace McoEasyTool.Controllers
 
                 SpaceServer_Report serverreport = db.SpaceServerReports.Create();
                 serverreport.Details = serverreport.Ping = serverreport.State = "";
+                serverreport.SpaceReport = report;
+                serverreport.SpaceServer = server;
                 serverreport.SpaceReportId = report.Id;
                 serverreport.SpaceServerId = server.Id;
                 List<ServersController.VirtualizedPartition> partitions;

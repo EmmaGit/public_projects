@@ -10,10 +10,10 @@
         var RIGHT_ENTRY = 0;
         var LAST_ENTRY = 0;
 
-        FIRST_ENTRY = "@: ViewBag.First_Entry";
-        LEFT_ENTRY = "@: ViewBag.Left_Entry";
-        RIGHT_ENTRY = "@: ViewBag.Right_Entry";
-        LAST_ENTRY = "@: ViewBag.Last_Entry";
+        FIRST_ENTRY = "@ViewBag.First_Entry";
+        LEFT_ENTRY = "@ViewBag.Left_Entry";
+        RIGHT_ENTRY = "@ViewBag.Right_Entry";
+        LAST_ENTRY = "@ViewBag.Last_Entry";
 
         get_arrows(AD_MCO_DIV, AD_CONTROLLER + "DisplayScheduleReports/", FIRST_ENTRY, LEFT_ENTRY, RIGHT_ENTRY, LAST_ENTRY);
 
@@ -90,7 +90,7 @@
 
 <hgroup>
     <h2 class="page-title">
-        @: ViewBag.Message
+        @ViewBag.Message
     </h2>
 </hgroup>
 <p class="page-title-info warning"></p>
@@ -107,32 +107,32 @@
         </tr>
     </thead>
     <tbody>
-@ foreach (var item in Model) {
+@foreach (var item in Model) {
         <tr class="item-summary-tr">
             <td>
-                @: Html.DisplayFor(modelItem => item.DateTime)
+                @Html.DisplayFor(modelItem => item.DateTime)
             </td>
             <td>
-                @: Html.DisplayFor(modelItem => item.Duration)
+                @Html.DisplayFor(modelItem => item.Duration)
             </td>
             <td>
-                @: Html.DisplayFor(modelItem => item.FatalErrors) critique(s)
-                sur @: Html.DisplayFor(modelItem => item.TotalErrors) détecté(s).
+                @Html.DisplayFor(modelItem => item.FatalErrors) critique(s)
+                sur @Html.DisplayFor(modelItem => item.TotalErrors) détecté(s).
             </td>
             <td class="file-opener">
-                @: Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
-                @: Html.DisplayFor(modelItem => item.ResultPath)
+                @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+                @Html.DisplayFor(modelItem => item.ResultPath)
             </td>
             <td>
-                @: Html.DisplayFor(modelItem => item.Author)
+                @Html.DisplayFor(modelItem => item.Author)
             </td>
             <td style="margin:0px;padding:0px;width:auto;">
-                @: Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
-                @: Html.TextBox("parent-id-getter-" + item.ScheduleId, item.ScheduleId, new { @disabled = "disabled", @class = "parent-id-getter" })
+                @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
+                @Html.TextBox("parent-id-getter-" + item.ScheduleId, item.ScheduleId, new { @disabled = "disabled", @class = "parent-id-getter" })
                 <div class="action-div">
-                    @ if(item.FaultyServer_Reports.Count() > 0) {
+                    @if(item.FaultyServer_Reports.Count() > 0) {
                         <div class="action-icon details-viewer" title="voir details"></div>    
-                    @}
+                    }
                     <div class="action-icon email-viewer" title="voir mail"></div>
                     <div class="action-icon email-sender" title="renvoyer le mail associé à ce rapport"></div>
                     <div class="action-icon deleter" title="supprimer"></div>

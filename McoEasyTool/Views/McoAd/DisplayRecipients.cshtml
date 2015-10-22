@@ -72,6 +72,7 @@
 
         //----------------------------------------------------------
         $("#mco-ad-div .details-editor").click(function () {
+            $("#container").scrollTop(0);
             columns = $(this).closest("tr").find("td");
             include = $(this).closest("tr").find(".include-content-getter").val();
             $("#mco-ad-div #internal-address").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));

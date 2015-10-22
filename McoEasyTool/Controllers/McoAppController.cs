@@ -587,9 +587,9 @@ namespace McoEasyTool.Controllers
                 applicationList = applications.Split(';');
                 foreach (string appId in applicationList)
                 {
-                    int Schappid = 0;
-                    Int32.TryParse(appId.Split('-')[1], out id);
-                    Application application = db.Applications.Find(id);
+                    int schappid = 0;
+                    Int32.TryParse(appId.Split('-')[1], out schappid);
+                    Application application = db.Applications.Find(schappid);
                     if (application != null)
                     {
                         SelectedApps.Add(application);
@@ -609,6 +609,8 @@ namespace McoEasyTool.Controllers
                 {
                     Scheduled_Application scheduledApp = db.ScheduledApplications.Create();
                     scheduledApp.ApplicationId = application.Id;
+                    scheduledApp.Application = application;
+                    scheduledApp.AppSchedule = appSchedule;
                     scheduledApp.AppScheduleId = appSchedule.Id;
                     if (ModelState.IsValid)
                     {
@@ -1461,6 +1463,7 @@ namespace McoEasyTool.Controllers
                     {
                         Application_Report applicationReport = new Application_Report();
                         applicationReport.Application = application;
+                        applicationReport.AppReport = report;
                         applicationReport.State = "KO";
                         applicationReport.Details = "";
                         applicationReport.Authentified = "";
@@ -1867,6 +1870,7 @@ namespace McoEasyTool.Controllers
                     {
                         Application_Report applicationReport = new Application_Report();
                         applicationReport.Application = application;
+                        applicationReport.AppReport = report;
                         applicationReport.State = "KO";
                         applicationReport.Details = "";
                         applicationReport.Authentified = "";
@@ -5064,6 +5068,7 @@ namespace McoEasyTool.Controllers
                 report.ResultPath = "";
                 report.Module = HomeController.APP_MODULE;
                 report.ScheduleId = schedule.Id;
+                report.Schedule = schedule;
                 report.Author = HomeController.SYSTEM_IDENTITY;
                 Email email = db.Emails.Create();
                 report.Email = email;
@@ -5114,6 +5119,7 @@ namespace McoEasyTool.Controllers
                         applicationReport.Authentified = "";
                         applicationReport.Linkable = "";
                         applicationReport.AppReportId = report.Id;
+                        applicationReport.ApplicationId = application.Id;
                         applicationReport.AppReport = report;
                         if (ModelState.IsValid)
                         {

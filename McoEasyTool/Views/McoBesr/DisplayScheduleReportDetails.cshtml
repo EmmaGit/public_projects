@@ -26,7 +26,7 @@
         });
 
         $("#mco-besr-div .previous-link").click(function () {
-            previous = $("#mco-besr-div .previous-id-getter").eq(0).val();
+            previous = $("#mco-besr-div #previous-link-a").attr("href");
             $.ajax({
                 url: SITENAME + BESR_CONTROLLER + 'DisplayScheduleReports/' + previous,
                 type: "GET",

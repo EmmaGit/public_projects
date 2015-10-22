@@ -142,6 +142,7 @@
         });
 
         $("#mco-ad-div .details-editor").click(function () {
+            $("#container").scrollTop(0);
             columns = $(this).closest("tr").find("td");
             $("#mco-ad-div #taskname").val(columns.eq(0).text().replace(/^\s+|\s+$/g, ''));
             launchingDate = columns.eq(2).text().replace(/^\s+|\s+$/g, '').split(" ");
@@ -444,7 +445,7 @@
                 @Html.DisplayFor(modelItem => item.Generator)
             </td>
             <td style="margin:0px;padding:0px;width:15%;">
-                @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})%>
+                @Html.TextBox("action-id-getter-"+item.Id, item.Id, new { @disabled="disabled",@class="action-id-getter"})
                 <div class="action-div">
                     <div class="action-icon details-viewer" title="voir rapports"></div>
                     <div class="action-icon email-sender" title="renvoyer le mail associé au dernier rapport"></div>

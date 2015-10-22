@@ -67,6 +67,7 @@
 
         //----------------------------------------------------------
         $("#mco-common-div .details-editor").click(function () {
+            $("#container").scrollTop(0);
             columns = $(this).closest("tr").find("td");
             var username = columns.eq(0).text().replace(/^\s+|\s+$/g, '');
             username = username + "\\" + columns.eq(1).text().replace(/^\s+|\s+$/g, '');

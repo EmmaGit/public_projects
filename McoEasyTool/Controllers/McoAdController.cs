@@ -1718,6 +1718,7 @@ namespace McoEasyTool.Controllers
             report.TotalErrors = 0;
             report.Module = HomeController.AD_MODULE;
             report.ScheduleId = schedule.Id;
+            report.Schedule = schedule;
             report.Author = HomeController.SYSTEM_IDENTITY;
             report.ResultPath = "";
             Email email = db.Emails.Create();
@@ -1738,7 +1739,7 @@ namespace McoEasyTool.Controllers
 
             string PathDirectory = HomeController.AD_RESULTS_FOLDER;
             Process process = new Process();
-            process.StartInfo.FileName = HomeController.BATCHES_FOLDER + "RepadminLauncher.bat";
+            process.StartInfo.FileName = HomeController.BATCHES_FOLDER + "Repadmin_Launcher_v4.bat";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = false;
             process.StartInfo.WorkingDirectory = PathDirectory;
