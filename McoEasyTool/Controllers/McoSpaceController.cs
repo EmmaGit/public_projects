@@ -1830,7 +1830,7 @@ namespace McoEasyTool.Controllers
                 }
                 else
                 {
-                    partitions = ServersController.GetRemainingSpaceOnMappedDisk(server.Name);
+                    partitions = ServersController.GetRemainingSpaceOnMappedPartitions(server);
                 }
                 partitions = GetPartitionsInfos(partitions, server_disks);
                 List<bool> criticals = new List<bool>();
