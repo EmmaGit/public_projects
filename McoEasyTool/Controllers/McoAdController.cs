@@ -1375,6 +1375,11 @@ namespace McoEasyTool.Controllers
 
         public string Purge()
         {
+            try
+            {
+                McoUtilities.CloseProcess("Repadmin");
+            }
+            catch { } 
             string message = "";
             List<AdReport> reports = db.AdReports.Where(rep => rep.Duration == null || rep.ResultPath == null).ToList();
             foreach (AdReport report in reports)
@@ -1825,12 +1830,7 @@ namespace McoEasyTool.Controllers
 
         public string HasUnachieviedReport()
         {
-            int unachievied = db.AdReports.Where(rep => rep.Duration == null || rep.ResultPath == null).Count();
-            if (unachievied > 0)
-            {
-                return "Il y a " + unachievied + " rapport(s) inachevé(s)\nVoulez-vous les supprimer?";
-            }
-            return "OK";
+            return Reports_Controller.HasUnachieviedReport(HomeController.AD_MODULE);
         }
 
     }

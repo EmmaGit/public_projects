@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
-
 
 namespace McoEasyTool.Controllers
 {
@@ -139,6 +139,31 @@ namespace McoEasyTool.Controllers
             return result;
         }
 
+        public string HasUnachieviedReport(string module)
+        {
+            string message = "";
+            try
+            {
+                int reports = db.Reports.Where(rep => (rep.Duration == null || rep.ResultPath == null) &&
+                    rep.Module == module).Count();
+                if (reports == 0)
+                {
+                    message = "OK";
+                }
+                else
+                {
+                    message = "Il y a " + reports + " rapport(s) inachevé(s) pour ce module; l'un d'eux est peut être en cours de génération.\n";
+                    message += "Si vous êtes sûrs de vous et que vous désirez annuler ce rapport, cliquez 'OK', le rapport en cours sera supprimé et une nouvelle analyse démarrera automatiquement.\n";
+                    message += "Si vous désirez attendre la fin d'exécution de l'autre rapport cliquer sur 'Annuler'.\n";
+                }
+            }
+            catch (Exception exception)
+            {
+                message = exception.Message;
+                McoUtilities.General_Logging(exception, "HasUnachieviedReport");
+            }
+            return message;
+        }
         protected override void Dispose(bool disposing)
         {
             db.Dispose();

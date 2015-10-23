@@ -5421,6 +5421,11 @@ namespace McoEasyTool.Controllers
             return true;
         }
 
+        public string HasUnachieviedReport()
+        {
+            return Reports_Controller.HasUnachieviedReport(HomeController.APP_MODULE);
+        }
+
         private void Specific_Logging(Exception exception, string action, int level = 0)
         {
             string author = "UNKNOWN";

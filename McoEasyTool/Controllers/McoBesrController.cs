@@ -1768,14 +1768,7 @@ namespace McoEasyTool.Controllers
                         Specific_Logging(exception, "UpdatePoolDatabase");
                     }
                 }
-                try
-                {
-                    string log = "\r\n**************************************************\r\n";
-                    log += DateTime.Now.ToString() + " : " + "Pool UpdateDatabase : General Error \r\n";
-                    log += modreport;
-                    System.IO.File.AppendAllText(HomeController.BESR_AUTO_UPDATE_LOG_FILE, log);
-                }
-                catch { }
+                McoUtilities.Independant_Logging(HomeController.BESR_AUTO_UPDATE_LOG_FILE, new Exception("..."), "Pool UpdateDatabase", 2);
             }
             return View();
         }
@@ -2092,6 +2085,12 @@ namespace McoEasyTool.Controllers
 
         public string Purge()
         {
+            try
+            {
+                McoUtilities.CloseExcel(MyApplication, MyWorkbook, MySheet);
+                McoUtilities.CloseProcess("EXCEL");
+            }
+            catch { } 
             string message = "";
             List<BackupReport> reports = db.BackupReports.Where(rep => rep.Duration == null || rep.ResultPath == null).ToList();
             foreach (BackupReport report in reports)
@@ -3337,10 +3336,10 @@ namespace McoEasyTool.Controllers
                 result["state"] = "KO";
                 result["details"] = "Accès refusé. ";
             }
-            catch (Exception)
+            catch (Exception exception)
             {
                 result["state"] = "KO";
-                result["details"] = "Erreur inconue. ";
+                result["details"] = "Erreur inconue: " + exception.Message;
             }
             return result;
         }
@@ -4915,6 +4914,11 @@ namespace McoEasyTool.Controllers
             }
             Specific_Logging(new Exception("...."), "ExecuteSchedule", 3);
             return Json(results, JsonRequestBehavior.AllowGet);
+        }
+
+        public string HasUnachieviedReport()
+        {
+            return Reports_Controller.HasUnachieviedReport(HomeController.BESR_MODULE);
         }
 
         private void Specific_Logging(Exception exception, string action, int level = 0)

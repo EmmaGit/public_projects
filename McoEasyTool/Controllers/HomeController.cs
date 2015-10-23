@@ -27,7 +27,6 @@ namespace McoEasyTool.Controllers
         public const string SALT_KEY = "S@LT&KEY";
         public const string VI_KEY = "@1B2c3D4e5F6g7H8";
 
-
         public const string OBJECT_ATTR_ID = "Id";
         public const string OBJECT_ATTR_NAME = "Name";
         public const string OBJECT_ATTR_STATE = "State";
@@ -52,6 +51,7 @@ namespace McoEasyTool.Controllers
 
         //----------------------------------------------------------------------------------------
         //GENERAL FOLDERS & VARIABLES
+        public static string MCO_EASY_TOOL_SITENAME = McoToolConfig.Settings.MCO_EASY_TOOL_SITENAME;
         public static string HOSTNAME = McoToolConfig.Settings.HOSTNAME;
         public static string BATCHES_FOLDER = McoToolConfig.Settings.BATCHES_FOLDER;
         public static string LOGS_FOLDER = McoToolConfig.Settings.LOGS_FOLDER;
@@ -146,28 +146,19 @@ namespace McoEasyTool.Controllers
         public static string SPACE_DEFAULT_LOCAL_MAPPED_DRIVE_LETTER = BATCHES_FOLDER + McoToolConfig.Settings.SPACE_DEFAULT_LOCAL_MAPPED_DRIVE_LETTER;
         public static double LOG_SIZE_LIMIT = McoToolConfig.Settings.LOG_SIZE_LIMIT;
 
-        //END SPACE FOLDERS & VARIABLES
-        //----------------------------------------------------------------------------------------
-
-        /*[HttpGet]
-        public ActionResult Index(string cultureName = null)
-        {
-            //Modify current thread's culture  
-            ViewBag.Message = "Bienvenue dans l'application d'automatisation des procédures";
-            return View();
-        }*/
-
         public ActionResult Index()
         {
             ViewBag.Message = "Bienvenue dans l'application d'automatisation des procédures";
-
+            //ViewBag.Sitename = "/McoEasyTool/"; //PROD
+            ViewBag.Sitename = MCO_EASY_TOOL_SITENAME;
+            //ViewBag.Title = "McoEasyTool";
+            ViewBag.Title = MCO_EASY_TOOL_SITENAME;
             return View();
         }
 
         public ActionResult Home()
         {
             ViewBag.Message = "Bienvenue dans l'application d'automatisation des procédures";
-
             return View();
         }
 

@@ -566,6 +566,87 @@ namespace McoEasyTool.Controllers
             return "N/A";
         }
 
+        public static string CloseProcess(string processName)
+        {
+            string response = "";
+            int number = 0;
+            try
+            {
+                string CurrentUser = Environment.UserName.Replace("*\\", "");
+                Process[] processes = Process.GetProcessesByName(processName);
+                foreach (Process process in processes)
+                {
+                    string ProcessUserSID = McoUtilities.GetProcessOwner(process.Id);
+                    if (ProcessUserSID == CurrentUser)
+                    {
+                        process.Kill();
+                        number++;
+                    }
+                }
+                response = "deleted";
+            }
+            catch (Exception exception) { response = exception.Message; }
+            return response;
+        }
+
+        public static bool IsInLogSize(string filepath)
+        {
+            System.IO.FileInfo file = new System.IO.FileInfo(filepath);
+            double size = file.Length;
+            size = McoUtilities.SizeConversion(size, HomeController.DEFAULT_OCTECT_UNIT, HomeController.DEFAULT_KILO_OCTECT_UNIT);
+            return (size <= HomeController.LOG_SIZE_LIMIT);
+        }
+
+        public static bool ArchiveLogFile(string filepath)
+        {
+            try
+            {
+                if (!IsInLogSize(filepath))
+                {
+                    IEnumerable<string> lines = System.IO.File.ReadLines(filepath, Encoding.UTF8);
+                    string content = "";
+                    foreach (string line in lines)
+                    {
+                        content += line.Replace('\t', ';') + "\r\n";
+                    }
+                    DateTime now = DateTime.Now;
+                    System.IO.FileInfo file = new System.IO.FileInfo(filepath);
+                    string name = file.FullName + "_" + now.ToString("dd") +
+                        "_" + now.ToString("MM") + "_" + now.ToString("yyyy")
+                        + "_" + now.ToString("hh") + "h_" + now.ToString("mm") + "m";
+                    System.IO.File.AppendAllText(name, content, Encoding.UTF8);
+                    file.Delete();
+                    return true;
+                }
+            }
+            catch (Exception exception) { }
+            return false;
+        }
+
+        //0 error
+        //2 warning
+        //3 info
+        public static void Independant_Logging(string filename, Exception exception, string action, int level = 0, string author = "UNKNOWN")
+        {
+            string log = "";
+            switch (level)
+            {
+                case 0: log = "[ERROR]"; break;
+                case 2: log = "[WARNING]"; break;
+                case 3: log = "[INFO]"; break;
+                default: log = "[UNKNOWN]"; break;
+            }
+            try
+            {
+                ArchiveLogFile(filename);
+                log = "\"" + DateTime.Now.ToString() + "\";\"" + log + "\";\"" + action + "\";\"";
+                log += (exception.InnerException == null) ? exception.Message + "\";\"" + author + "\"\r\n" :
+                    exception.Message + " || " + exception.InnerException + "\";\"" + author + "\"\r\n";
+                System.IO.File.AppendAllText(filename, log, Encoding.UTF8);
+            }
+            catch { }
+        }
+        
         //0 error
         //1 warning
         //2 info
@@ -581,6 +662,7 @@ namespace McoEasyTool.Controllers
             }
             try
             {
+                ArchiveLogFile(HomeController.LOGS_FOLDER + HomeController.GENERAL_LOG_FILE);
                 log = "\"" + DateTime.Now.ToString() + "\";\"" + log + "\";\"" + action + "\";\"";
                 log += (exception.InnerException == null) ? exception.Message + "\";\"" + author + "\"\r\n" :
                     exception.Message + " || " + exception.InnerException + "\";\"" + author + "\"\r\n";
@@ -608,6 +690,7 @@ namespace McoEasyTool.Controllers
             }
             try
             {
+                ArchiveLogFile(filename);
                 log = "\"" + DateTime.Now.ToString() + "\";\"" + log + "\";\"" + action + "\";\"";
                 log += (exception.InnerException == null) ? exception.Message + "\";\"" + author + "\"\r\n" :
                     exception.Message + " || " + exception.InnerException + "\";\"" + author + "\"\r\n";
@@ -656,75 +739,6 @@ namespace McoEasyTool.Controllers
             return success;
         }
 
-        /*public static bool CreateRdpFile(string servername)
-        {
-            string[] lines = System.IO.File.ReadAllLines(HomeController.DEFAULT_RDP_FILE, Encoding.Default);
-            string[] content = new string[lines.Length];
-            int index = 0;
-            foreach (string line in lines)
-            {
-                if (line.IndexOf(HomeController.DEFAULT_RDP_HOSTNAME_KEY) != -1)
-                {
-                    content[index] = line.Replace(HomeController.DEFAULT_RDP_HOSTNAME_KEY, servername.ToUpper());
-                }
-                else
-                {
-                    content[index] = line;
-                }
-
-                index++;
-            }
-            try
-            {
-                System.IO.File.AppendAllLines(HomeController.BATCHES_FOLDER + servername + ".rdp", content, Encoding.Default);
-                General_Logging(new Exception("..."), "CreateRdpFile " + servername);
-                return true;
-            }
-            catch (Exception exception)
-            {
-                General_Logging(exception, "CreateRdpFile " + servername);
-                return false;
-            }
-        }
-
-        public static Process OpenRdpConnection(string servername)
-        {
-            try
-            {
-                Process process = new Process();
-                process.StartInfo.FileName = Environment.ExpandEnvironmentVariables(@"%SystemRoot%\system32\cmdkey.exe");
-                process.StartInfo.Arguments = "/generic:TERMSRV/" + servername + " /user:" +
-                    HomeController.DEFAULT_DOMAIN_AND_USERNAME_IMPERSONNATION + " /pass:" +
-                    Decrypt(HomeController.DEFAULT_PASSWORD_IMPERSONNATION);
-                process.Start();
-
-                process.StartInfo.FileName = Environment.ExpandEnvironmentVariables(@"%SystemRoot%\system32\mstsc.exe");
-                process.StartInfo.Arguments = "/v " + servername; // ip or name of computer to connect
-                process.Start();
-                General_Logging(new Exception(), "OpenRdpConnection " + servername + " Process Id:" + process.Id);
-                return process;
-            }
-            catch (Exception exception)
-            {
-                General_Logging(exception, "OpenRdpConnection " + servername);
-                return null;
-            }
-        }
-
-        public static bool CloseRdpConnection(Process process)
-        {
-            try
-            {
-                process.Close();
-                return true;
-            }
-            catch (Exception exception)
-            {
-                General_Logging(exception, "CloseRdpConnection " + process.Id);
-                return false;
-            }
-        }*/
-
         public static bool CheckIfLoggedOn(string username)
         {
             var ntuser = new NTAccount(username);
@@ -737,6 +751,31 @@ namespace McoEasyTool.Controllers
                 return true;
             else
                 return false;
+        }
+
+        public static double SizeConversion(double size, string from, string to)
+        {
+            int uppow = 0;
+            int downpow = 0;
+            switch (from)
+            {
+                case HomeController.DEFAULT_TERA_OCTECT_UNIT: uppow = 4; break;
+                case HomeController.DEFAULT_GIGA_OCTECT_UNIT: uppow = 3; break;
+                case HomeController.DEFAULT_MEGA_OCTECT_UNIT: uppow = 2; break;
+                case HomeController.DEFAULT_KILO_OCTECT_UNIT: uppow = 1; break;
+                case HomeController.DEFAULT_OCTECT_UNIT: uppow = 0; break;
+            }
+            switch (to)
+            {
+                case HomeController.DEFAULT_TERA_OCTECT_UNIT: downpow = 4; break;
+                case HomeController.DEFAULT_GIGA_OCTECT_UNIT: downpow = 3; break;
+                case HomeController.DEFAULT_MEGA_OCTECT_UNIT: downpow = 2; break;
+                case HomeController.DEFAULT_KILO_OCTECT_UNIT: downpow = 1; break;
+                case HomeController.DEFAULT_OCTECT_UNIT: downpow = 0; break;
+
+            }
+            int pow = uppow - downpow;
+            return Math.Round((size * Math.Pow(HomeController.DEFAULT_OCTECT_INCREMENT, pow)), 2);
         }
 
         public static JsonResult NotifyImpossibility(string module, bool autosend = true)

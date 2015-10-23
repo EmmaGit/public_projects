@@ -4,7 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.TitleT</title>
+    <link href="@Url.Content("~/favicon.ico")" rel="shortcut icon" type="image/x-icon" />
+    <title>@ViewBag.Title</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/modernizr")
@@ -359,7 +360,7 @@
     </div>
     <div id="footer">
         <span>
-            &copy; @DateTime.Now.Year - Structis Maroc @{ Html.ActionLink("mco", "Index", null, new { @class = "footer-logo-img" });}
+            &copy; @ViewBag.Title @DateTime.Now.Year - Structis Maroc @{ Html.ActionLink("mco", "Index", null, new { @class = "footer-logo-img" });}
             - MCO Easy Tool : Version 5.0.01
         </span>
     </div>
@@ -367,13 +368,14 @@
     @Scripts.Render("~/bundles/bootstrap")
     
     <script type="text/javascript">
-    SITENAME = "/";
+    SITENAME = "@ViewBag.Sitename";
+
     var loadinggif = "<div class='loading-gif-div'>" +
             "<div class='transparent'></div>" +
             "<div class='anti-transparent'><div class='loading-gif-img'>" +
             "<span class='waiting-span'>Veuillez patienter s'il vous plait....</span>" +
             "<span class='server-msg'>....<br />" +
-            "<img src='Images/mini-loading.gif' style='position:relative;'/>" +
+            "<img src='@ViewBag.Sitename" + "Images/mini-loading.gif' style='position:relative;'/>" +
             "</div></div></span></div>";
 
     var APP_MCO_DIV = $("#mco-app-div");
@@ -420,7 +422,7 @@
     var NAV_SPACE_INIT_SERVERS_BTN = $("#init-spaceservers-btn");
     var NAV_SPACE_RECIPIENTS_BTN = $("#nav-spacerecipients-btn");
 
-    </script>    
+</script>    
     
     @RenderSection("scripts", required: false)
 </body>
